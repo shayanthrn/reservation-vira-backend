@@ -18,21 +18,46 @@ var lodash =require('lodash');
 var time=require('../coreapp/resTime.js');
 var persianDate = require('persian-date');
 var myDate= require('../coreapp/myDate.js');
+var Kavenegar = require('kavenegar');
+var api = Kavenegar.KavenegarApi({
+  apikey:"534438436D6364307552744278336A334B694F46343179417642536E66686568"
+  });
+
+
+
+
+//--------------------------api---------------------------//
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//------------------------api------------------------------//
+
+
+
+
+
 
 
 //-----------------------test route--------------------------//
 
 
-
-
-router.get("/test1",function(req,res){
-  a=new persianDate();
-  for(let i=0;i<5;i++){
-    a=a.add("d",1);
-    console.log(a.toArray());
-  }
-  res.json({data:a.toArray()});
-})
 
 
 
@@ -60,7 +85,8 @@ function getDoctimeslots(doctor,date){
     timeslots.push(interval);
   }
   for(let i=0;i<unavb.length;i++){
-    if(lodash.isEqual(unavb[i].date,date)||(unavb[i].date=="*"&&dayofweek==unavb[i].dayofweek)||(unavb[i].dayofweek=="*")){
+    temp=new myDate(unavb[i].date.day,unavb[i].date.month,unavb[i].date.year);
+    if(lodash.isEqual(temp,date)||(unavb[i].date=="*"&&dayofweek==unavb[i].dayofweek)||(unavb[i].dayofweek=="*")){
       lodash.remove(timeslots,function(slot){
         slotstart=slot.start.min + (slot.start.hour*60);
         slotend=slot.end.min + (slot.end.hour*60);
@@ -73,6 +99,9 @@ function getDoctimeslots(doctor,date){
           return true;
         }
         if(unavbstart<slotstart&&unavbend>slotend){
+          return true;
+        }
+        if(unavbstart==slotstart&&unavbend==slotend){
           return true;
         }
         return false;
@@ -90,6 +119,8 @@ function createDayboxobj(days){
       dayofweek:days[i].format("dddd"),
       day:days[i].toArray()[2],
       month:days[i].format("MMMM"),
+      monthnum:days[i].toArray()[1],
+      year:days[i].toArray()[0],
       index:i
     })
   }
@@ -171,7 +202,6 @@ router.get("/reserve/:Doctor",function(req,res){
         days.push(currentday);
         freetimes.push(getDoctimeslots(result,new myDate(currentday.toArray()[2],currentday.toArray()[1],currentday.toArray()[0])));
       }
-      console.log(freetimes);
       res.render("reserve.ejs",{doctor:result,days:createDayboxobj(days),freetimes:freetimes});
       res.end();
     })
@@ -190,83 +220,70 @@ router.get("/c/:Category/:Doctor",function(req,res){
 })
 
 
-router.get("/paymenthandler",function(req,res){
+router.post("/paymenthandler",function(req,res){
   if(req.cookies.usertoken==undefined){
     res.redirect("/");
     res.end();
   }
   else{
-  var query = url.parse(req.url,true).query;
-  var flag=0;
-  var time={date:{day:query.day,month:query.month,year:query.year},
-            hour:Number(query.hour),
-            min:Number(query.min)
-           }
+  if(req.body.choice==undefined){
+    res.redirect("/");
+    res.end();
+  }
+  reservedata=req.body.choice.split(":");
   MongoClient.connect(dburl,function(err,db){
     var dbo= db.db("mydb");
-    dbo.collection("Doctors").findOne({name:query.doctor},function(err,result){
-      flag=checktime(result.unavailabletimes,time,result.visitduration);
-      if(flag==0){
-        res.render("reserve.ejs",{doctor:result})
-        res.end();
-      }
-      else{
+    dbo.collection("Doctors").findOne({name:req.body.doctor},function(err,result){
+        date=new myDate(Number(reservedata[4]),Number(reservedata[3]),Number(reservedata[2]));
+        start={hour:Number(reservedata[0]),min:Number(reservedata[1])};
+        temp=(start.hour*60)+start.min+result.visitduration;
+        end={hour:Math.floor(temp/60),min:temp%60}
         //
         var paymentack=1;
         /*
 
-
-
         payment
-
-
 
         */
         if(paymentack==0){
-          strtime=query.hour +":"+ query.min;
+          strtime=reservedata[0]+":"+reservedata[1];
           res.render("paymentfail.ejs",{doctor:result,time:strtime});
         }
         else{
-          unavb={start:{hour:Number(query.hour),min:Number(query.min)},end:{hour:time.hour,min:time.min},date:time.date};
-          time={date:{day:query.day,month:query.month,year:query.year},
-            hour:Number(query.hour),
-            min:Number(query.min)
-           }
+          unavb={start:start,end:end,date:date,dayofweek:new persianDate([Number(reservedata[2]),Number(reservedata[3]),Number(reservedata[4])]).format("dddd")};
           dbo.collection("Users").findOne({token:req.cookies.usertoken},function(err,user){
-            reservation = new Reservation(user._id,result._id,time)
+            reservation = new Reservation(user._id,result._id,unavb)
             dbo.collection("Reservations").insertOne(reservation,function(err,result2){
-              dbo.collection("Doctors").updateOne({name:query.doctor},{$addToSet:{reservations:reservation,unavailabletimes:unavb}},function(err,result3){
+              dbo.collection("Doctors").updateOne({name:req.body.doctor},{$addToSet:{reservations:reservation,unavailabletimes:unavb}},function(err,result3){
                 dbo.collection("Users").updateOne({username:user.username},{$addToSet:{reserves:reservation}},function(err,result4){
-                  strtime=query.hour +":"+ query.min;
+                  strtime=reservedata[0]+":"+reservedata[1];
                   res.render("paymentaccept.ejs",{doctor:result,time:strtime,resid:reservation._id});
                 })
               })
             })
           })
         }
-      }
     })
   })
   }
 })
+router.get("/register",function(req,res){
+  res.render('register.ejs');
+  res.end();
+})
 
-
-router.get('/register',function(req,res){       //register 
-  var query = url.parse(req.url,true).query;
-  if(query.username==undefined&&query.pass==undefined){
+router.post('/register',function(req,res){       //register 
+  if(req.body.username==undefined&&req.body.pass==undefined){
     res.render('register.ejs');
     res.end();
   }
   else{
-    if(query.rules=='on'&&query.username!=""&&query.pass!=""){
-      let newuser=new User(query.username,query.pass,"empty","empty","user");
-      let token=tokgen.generate();
-      newuser.token=token;
-      res.cookie('usertoken',newuser.token);
+    if(req.body.rules=='on'&&req.body.username!=""&&req.body.pass!=""){
+      let newuser=new User(req.body.username,req.body.pass,"empty","empty","user");
       MongoClient.connect(dburl, function(err, db) {
         if (err) throw err;
         var dbo = db.db("mydb");
-        dbo.collection("Users").insertOne(newuser, function(err, res) {
+        dbo.collection("tempuser").insertOne(newuser, function(err, res) {
           if (err) throw err;
           console.log("user :"+newuser.username+" inserted");
           db.close();
@@ -288,27 +305,67 @@ router.get('/welcome',function(req,res){
 })
 
 router.get('/submitinfo',function(req,res){
-  var query = url.parse(req.url,true).query;
-    if(query.firstname==undefined){
-      res.render('submitinfo.ejs');
-      res.end();
-    }
-    else{
-      MongoClient.connect(dburl, function(err, db) {
-        if (err) throw err;
-        var dbo = db.db("mydb");
-        var newvalues = { $set: {firstname: query.firstname, lastname: query.lastname,codemeli: query.codemeli,phone: query.phonenumber,creditcardnumber: query.creditcardnumber,email: query.email } };
-        dbo.collection("Users").updateOne({token:req.cookies.usertoken},newvalues, function(err, res) {
+    res.render('submitinfo.ejs');
+    res.end();
+})
+
+router.post('/submitinfo',function(req,res){
+MongoClient.connect(dburl, function(err, db) {
+    if (err) throw err;
+    var dbo = db.db("mydb");
+    var verifycode=Math.floor(Math.random() * (99999 - 10000) + 10000);
+   verifycode=verifycode.toString();
+    api.VerifyLookup({
+      token: verifycode,
+      template : "reservation",
+      receptor: req.body.phonenumber
+    },
+    function(response, status) {
+      console.log(response);
+      console.log(status);
+      if(status==200){
+        var newvalues = { $set: {firstname: req.body.firstname, lastname: req.body.lastname,codemeli: req.body.codemeli,phone: req.body.phonenumber,creditcardnumber: req.body.creditcardnumber,email: req.body.email,code:verifycode } };
+        dbo.collection("tempuser").updateOne({},newvalues, function(err, result3) {
           if (err) throw err;
           db.close();
+          res.redirect("/verifynumber");
+          res.end();
         });
-      });
-      res.redirect('/');
-      res.end();
-    }
+      }
+      else{
+        console.log(req.body.phonenumber);
+        console.log(verifycode);
+        // moshkeli dar ersal pish amade ast
+      }
+    });
+  });
+})
+
+router.get("/verifynumber",function(req,res){
+  res.render("verify.ejs");
+  res.end();
 })
 
 
+router.post("/verifynumber",function(req,res){
+  MongoClient.connect(dburl,function(err,db){
+    var dbo=db.db("mydb");
+    dbo.collection("tempuser").findOne({},function(err,result){
+      if(req.body.code==result.code){
+        let token=tokgen.generate();
+        result.token=token;
+        res.cookie('usertoken',token);
+        dbo.collection("Users").insertOne(result,function(err,res2){
+          dbo.collection("tempuser").drop();
+          res.redirect("/");
+        })
+      }
+      else{
+          res.redirect("/verifynumber");
+      }
+    })
+  })
+})
 
 router.get('/login',function(req,res){   // login page
   var query = url.parse(req.url,true).query;

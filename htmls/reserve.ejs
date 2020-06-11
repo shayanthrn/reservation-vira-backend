@@ -23,6 +23,15 @@
     <link rel="stylesheet" href="https://unpkg.com/flickity@2/dist/flickity.min.css">
     <link rel="stylesheet" href="styleres.css">
     
+    <style>
+        .reserve-time {
+        border-radius: 5px !important;
+        }
+        .reserve-time.active {
+        background-color: #ef5661 !important;
+        border-color: #ef5661 !important;
+        }
+    </style>
  
 </head>
 
@@ -74,7 +83,7 @@
                         </div>
                         <section class="page-content default">
                             <div class="checkout-shipment">
-                               <form action="checktime" method="GET">
+                               <form action="paymenthandler" method="POST">
                                 <ul>
                                     <li><span> نام دکتر :</span><span><%= doctor.name %></span></li>
                                     <li><span>  تخصص :</span><span><%= doctor.category %></span></li>
@@ -99,14 +108,13 @@
                                         <div id="reserveTimesContainer">
                                         <% for(let j=0;j<days.length;j++) { %>
                                           <div class="reserveTimes" data-key="<%= days[j].index %>">
+                                            <div data-toggle="buttons">
                                             <% for(let k=0;k<freetimes[j].length;k++) { %>
-                                            <div class="form-check reserve-time btn btn-outline-secondary float-right ml-2 is-selected">
-                                                <input class="form-check-input" type="radio" name="exampleRadios" id="exampleRadios1" value="option1" checked>
-                                                <label class="form-check-label" for="exampleRadios1">
-                                                    <%= freetimes[j][k].start.hour + ":" + freetimes[j][k].start.min + "-" + freetimes[j][k].end.hour + ":" + freetimes[j][k].end.min %>
-                                                </label>
-                                            </div>
+                                                    <label class="reserve-time btn btn-outline-secondary float-right ml-2">
+                                                      <input class="d-none" type="radio" name="choice" id="<%= days[j].index %>" value="<%=freetimes[j][k].start.hour + ":" + freetimes[j][k].start.min + ":" + days[j].year +":"+days[j].monthnum + ":" + days[j].day %>"> <%= freetimes[j][k].start.hour + ":" + freetimes[j][k].start.min + "-" + freetimes[j][k].end.hour + ":" + freetimes[j][k].end.min %>
+                                                    </label>
                                             <% } %>
+                                            </div>
                                           </div>
                                         <% } %>
                                         </div>

@@ -15,6 +15,7 @@
     "express": "^4.17.1",
     "formidable": "^1.2.2",
     "fs": "0.0.1-security",
+    "kavenegar": "^1.1.4",
     "lodash": "^4.17.15",
     "mongodb": "^3.5.7",
     "mv": "^2.1.1",

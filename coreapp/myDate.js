@@ -1,8 +1,8 @@
 class myDate{
     constructor(day,month,year){
-        this.year=year;
-        this.month=month;
-        this.day=day;
+        this.year=Number(year);
+        this.month=Number(month);
+        this.day=Number(day);
     }
 }
 
