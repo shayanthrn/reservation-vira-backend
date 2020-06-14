@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html dir="rtl" class="fa-events-icons-ready" lang="en"><head>
+  <meta charset="utf-8">
+  <base href="http://localhost:3000/">
+  <title>تعیین زمانبندی - دکتر تجویز</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="">
+  <meta name="author" content="">
+  <link rel="icon" href="favicon.ico">
+
+  <title></title>
+
+  <link rel="stylesheet" href="https://cdn.rtlcss.com/bootstrap/v4.1.3/css/bootstrap.min.css" integrity="sha384-Jt6Tol1A2P9JBesGeCxNrxkmRFSjWCBW1Af7CSQSKsfMVQCqnUVWhZzG0puJMCK6" crossorigin="anonymous">
+  <link href="assets/docpanelassests/dashboard.rtl.css" rel="stylesheet">
+  <script src="https://use.fontawesome.com/6d68f18b97.js"></script><link href="https://use.fontawesome.com/6d68f18b97.css" media="all" rel="stylesheet">
+
+  <link rel="stylesheet" href="https://unpkg.com/persian-datepicker@latest/dist/css/persian-datepicker.min.css">
+</head>
+
+<body>
+
+  <nav class="navbar fixed-top navbar-expand-lg nav-dark">
+    <a class="navbar-brand mr-2" href="#">داشبورد برند</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarTogglerDemo" aria-controls="navbarTogglerDemo" aria-expanded="false" aria-label="Toggle navigation">
+      <i class="fa fa-bars menu-icon"></i>
+    </button>
+  </nav>
+
+
+  <div class="container-fluid">
+    <div class="row">
+      
+      <nav class="col-lg-3 col-xl-2 d-lg-block sidebar collapse" id="navbarTogglerDemo">
+        <div class="sidebar-sticky">
+          <ul class="nav flex-column">
+            <li class="nav-item">
+              <a class="nav-link" href="#">
+                <span class="balance text-white">موجودی: 12345</a>
+              </a>
+            </li>
+            
+            <li class="nav-item">
+              <a class="nav-link" href="/DoctorPanel/dashboard">
+                <i class="fa fa-tachometer"></i>
+                داشبورد
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/DoctorPanel/profile">
+                <i class="fa fa-user-md"></i>
+                پروفایل
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/DoctorPanel/patients">
+                <i class="fa fa-users"></i>
+                بیماران
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/DoctorPanel/visittimes">
+                <i class="fa fa-calendar"></i>
+                تعیین زمانبندی
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link active" href="/DoctorPanel/systemicinfo">
+                <i class="fa fa-cog"></i>
+                اطلاعات سیستم
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/exit">
+                <i class="fa fa-sign-out"></i>
+                خروج
+              </a>
+            </li>
+          </ul>
+
+          </div>
+      </nav>
+
+      <main role="main" class=" ml-sm-auto col-lg-9 col-xl-10 px-4" id="settings">
+        <div class="container-fluid">
+          <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+            <h1 class="h2">تغییر اطلاعات سیستم</h1>
+          </div>
+          
+
+          <div class="row">
+            <div class="col-xl-4 col-lg-6 ">
+              <form class="" action="index.html" method="GET">
+                  <div class="form-group">
+                    <label for="email">
+                      <i class='fa fa-envelope mr-2'></i>
+                      ایمیل
+                    </label>
+                    <input type="email" class="form-control" id="email" name="email" value="example@gmail.com" required>
+                  </div>
+                  <div class="form-group">
+                    <label for="oldPassword">
+                      <i class='fa fa-key mr-2'></i>
+                      رمز عبور قدیمی
+                    </label>
+                    <input type="password" class="form-control" id="oldPassword" id="oldPassword" required>
+                  </div>
+                  <div class="form-group">
+                    <label for="newPassword">
+                      <i class='fa fa-key mr-2'></i>
+                      رمز عبور جدید
+                    </label>
+                    <input type="password" class="form-control" id="newPassword" id="newPassword" required>
+                  </div>
+                  <div class="form-group">
+                    <label for="confirmPassword">
+                      <i class='fa fa-key mr-2'></i>
+                      تکرار رمز عبور جدید
+                    </label>
+                    <input type="password" class="form-control" id="confirmPassword" id="confirmPassword" required>
+                  </div>
+                  <button type="submit" class="btn btn-success submit-button float-right">
+                    <i class="fa fa-check"></i>
+                    تغییر
+                  </button>
+                </form>
+            </div>
+          </div>
+
+      </main>
+
+    </div>
+  </div>
+  
+
+
+  <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+  <script>window.jQuery || document.write('<script src="assets/docpanelassests/jquery-slim.min.js"><\/script>')</script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+  <script src="https://cdn.rtlcss.com/bootstrap/v4.1.3/js/bootstrap.min.js" integrity="sha384-C/pvytx0t5v9BEbkMlBAGSPnI1TQU1IrTJ6DJbC8GBHqdMnChcb6U4xg4uRkIQCV" crossorigin="anonymous"></script>
+
+</body>
+</html>

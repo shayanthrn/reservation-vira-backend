@@ -1,5 +1,7 @@
 class Doctor{
-    constructor(name,category,address,unavailabletimes,path,background,cost,description){
+    constructor(username,pass,name,category,address,unavailabletimes,path,background,cost,description){
+        this.username=username;
+        this.password=pass;
         this.name=name;
         this.category=category;
         this.address=address;
@@ -7,6 +9,7 @@ class Doctor{
         this.image=path;
         this.background=background;
         this.visitcost=cost;
+        this.token="";
         this.description=description;
         this.reservations=[];
     }

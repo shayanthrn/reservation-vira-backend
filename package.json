@@ -17,6 +17,7 @@
     "fs": "0.0.1-security",
     "kavenegar": "^1.1.4",
     "lodash": "^4.17.15",
+    "md5": "^2.2.1",
     "mongodb": "^3.5.7",
     "mv": "^2.1.1",
     "persian-date": "^1.1.0",

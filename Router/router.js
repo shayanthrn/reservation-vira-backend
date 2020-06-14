@@ -22,12 +22,13 @@ var Kavenegar = require('kavenegar');
 var api = Kavenegar.KavenegarApi({
   apikey:"534438436D6364307552744278336A334B694F46343179417642536E66686568"
   });
+var md5 = require('md5');
+const { each } = require('lodash');
 
 
 
 
 //--------------------------api---------------------------//
-
 
 
 
@@ -128,6 +129,132 @@ function createDayboxobj(days){
 }
 
 //-----------------------functions--------------------------//
+
+
+
+
+
+//-----------------------Doctorpanel---------------------------//
+
+router.get('/doctorpanel/dashboard',function(req,res){
+  if(req.cookies.doctortoken==undefined){
+    res.redirect('/noaccess');
+  }
+  else{
+    MongoClient.connect(dburl,function(err,db){
+      var dbo=db.db("mydb");
+      dbo.collection('Doctors').findOne({token:req.cookies.doctortoken},function(err,result){
+        if(result==null){
+          res.redirect('noaccess');
+        }
+        else{
+          var visittimes=[];
+          var currentday=new persianDate();
+          visittimes.push({date:{year:currentday.toArray()[0],month:currentday.toArray()[1],day:currentday.toArray()[2]},times:[]});
+          for(let i=0;i<5;i++){
+            currentday=currentday.add('d',1);
+            visittimes.push({date:{year:currentday.toArray()[0],month:currentday.toArray()[1],day:currentday.toArray()[2]},times:[]});
+          }
+          result.reservations.forEach(function(doc){
+            for(i=0;i<6;i++){
+              
+              if(lodash.isEqual(visittimes[i].date,doc.time.date)){
+                visittimes[i].times.push(doc);
+              }
+            }
+          })
+          console.log(visittimes);
+          res.render('DoctorPanel/dashboard.ejs',{visittimes:visittimes}); //-00000000000000000 i am here bitch!
+          res.end();
+        }
+      })
+    })
+  }
+})
+
+router.get('/doctorpanel/profile',function(req,res){
+  if(req.cookies.doctortoken==undefined){
+    res.redirect('/noaccess');
+  }
+  else{
+    MongoClient.connect(dburl,function(err,db){
+      var dbo=db.db("mydb");
+      dbo.collection('Doctors').findOne({token:req.cookies.doctortoken},function(err,result){
+        if(result==null){
+          res.redirect('noaccess');
+        }
+        else{
+          res.render('DoctorPanel/profile.ejs');
+          res.end();
+        }
+      })
+    })
+  }
+})
+
+
+router.get('/doctorpanel/patients',function(req,res){
+  if(req.cookies.doctortoken==undefined){
+    res.redirect('/noaccess');
+  }
+  else{
+    MongoClient.connect(dburl,function(err,db){
+      var dbo=db.db("mydb");
+      dbo.collection('Doctors').findOne({token:req.cookies.doctortoken},function(err,result){
+        if(result==null){
+          res.redirect('noaccess');
+        }
+        else{
+          res.render('DoctorPanel/patients.ejs');
+          res.end();
+        }
+      })
+    })
+  }
+})
+
+router.get('/doctorpanel/visittimes',function(req,res){
+  if(req.cookies.doctortoken==undefined){
+    res.redirect('/noaccess');
+  }
+  else{
+    MongoClient.connect(dburl,function(err,db){
+      var dbo=db.db("mydb");
+      dbo.collection('Doctors').findOne({token:req.cookies.doctortoken},function(err,result){
+        if(result==null){
+          res.redirect('noaccess');
+        }
+        else{
+          res.render('DoctorPanel/addunavb.ejs');
+          res.end();
+        }
+      })
+    })
+  }
+})
+
+router.get('/doctorpanel/systemicinfo',function(req,res){
+  if(req.cookies.doctortoken==undefined){
+    res.redirect('/noaccess');
+  }
+  else{
+    MongoClient.connect(dburl,function(err,db){
+      var dbo=db.db("mydb");
+      dbo.collection('Doctors').findOne({token:req.cookies.doctortoken},function(err,result){
+        if(result==null){
+          res.redirect('noaccess');
+        }
+        else{
+          res.render('DoctorPanel/settings.ejs');
+          res.end();
+        }
+      })
+    })
+  }
+})
+
+//------------------------Doctorpanel---------------------------//
+
 
 router.get("/",function(req,res){
   Categories = [];
@@ -407,12 +534,47 @@ router.get('/login',function(req,res){   // login page
 })
 
 
+router.get('/loginDoc',function(req,res){
+  res.render('logindoctor.ejs',{wrongflag:0});
+  res.end();
+});
+
+router.post('/loginDoc',function(req,res){
+  MongoClient.connect(dburl,function(err,db){
+    var dbo=db.db("mydb");
+    dbo.collection("Doctors").findOne({username:req.body.username},function(err,result){
+      if(result==null){
+        res.render('logindoctor.ejs',{wrongflag:1});
+        res.end();
+      }
+      else{
+        if(req.body.pass!=result.password){
+          res.render('logindoctor.ejs',{wrongflag:1});
+          res.end();
+        }
+        else{
+          let mytoken=tokgen.generate();
+          dbo.collection("Doctors").updateOne({username:req.body.username},{$set:{token:mytoken}},function(err,result2){
+            res.cookie('doctortoken',mytoken);
+            res.redirect('/Doctorpanel/dashboard');
+          })
+        }
+      }
+    })
+  })
+})
 
 
 router.get('/exit',function(req,res){
-  res.clearCookie('usertoken');
-  res.redirect('/');
-  res.end();
+  MongoClient.connect(dburl,function(err,db){
+    var dbo=db.db("mydb");
+    dbo.collection('Users').updateOne({token:req.cookies.usertoken},{$set:{token:""}});
+    res.clearCookie('usertoken');
+    dbo.collection('Doctors').updateOne({token:req.cookies.doctortoken},{$set:{token:""}});
+    res.clearCookie('doctortoken');
+    res.redirect('/');
+    res.end();
+  })
 })
 
 
