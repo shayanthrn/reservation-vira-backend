@@ -50,8 +50,29 @@ const { each } = require('lodash');
 
 //------------------------api------------------------------//
 router.post("/changedocinfo",function(req,res){
-  console.log(req.files);
-  res.redirect('/doctorpanel/profile');
+  if(req.cookies.doctortoken==undefined){
+    res.redirect('/noaccess');
+  }
+  else{
+    MongoClient.connect(dburl,function(err,db){
+      var dbo=db.db("mydb");
+      dbo.collection('Doctors').findOne({token:req.cookies.doctortoken},function(err,result){
+        if(result==null){
+          res.redirect('noaccess');
+        }
+        else{
+          dbo.collection('Doctors').updateOne({token:req.cookies.doctortoken},{$set:{category:req.body.major,background:req.body.experience,address:req.body.address,phonenumber:req.body.phone,visitduration:Number(req.body.duration),visitcost:Number(req.body.cost),description:req.body.description}},function(err,res2){
+            if(req.files!=null){
+              mv(req.files.image.tempFilePath,"D://web developing/reservation/public"+result.image,function(err){
+  
+              })
+            }
+            res.redirect('/doctorpanel/profile');
+          })
+        }
+      })
+    })
+  }
 })
 
 
@@ -195,6 +216,8 @@ router.get('/doctorpanel/profile',function(req,res){
 
 
 router.get('/doctorpanel/patients',function(req,res){
+  var patientsid=[];
+  var patients=[];
   if(req.cookies.doctortoken==undefined){
     res.redirect('/noaccess');
   }
@@ -206,8 +229,18 @@ router.get('/doctorpanel/patients',function(req,res){
           res.redirect('noaccess');
         }
         else{
-          res.render('DoctorPanel/patients.ejs');
-          res.end();
+          for(var i=0;i<result.reservations.length;i++){
+              patientsid.push(result.reservations[i].user);
+          }
+          dbo.collection("Users").find({_id: { $in : patientsid }},function(err,result2){
+            result2.forEach(function(doc){
+              patients.push(doc);
+            },function(){
+              console.log(patients);
+              res.render('DoctorPanel/patients.ejs',{patients:patients});
+              res.end();
+            })
+          })
         }
       })
     })

@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html dir="rtl" class="fa-events-icons-ready" lang="en"><head>
   <meta charset="utf-8">
-  <base href="http://87.236.210.141:8080/">
+  <base href="http://localhost:3000/">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
   <meta name="description" content="">
   <meta name="author" content="">
@@ -79,7 +79,7 @@
             <h1 class="h2">پروفایل</h1>
           </div>
 
-          <form class="hidden-form" action="changeDocinfo" method="POST">
+          <form class="hidden-form" action="changeDocinfo" enctype="multipart/form-data" method="POST">
             <div class="row">
               <div class="col-sm-6 col-md-2 mb-5">
                 <img class="img-fluid" src="<%=doctor.image %>" alt="not found">
@@ -95,7 +95,7 @@
                   <div class="col-md-6 col-lg-6">
                     <p><%=doctor.name %></p>
                     <div class="form-group mb-2">
-                      <input type="text" class="form-control form-control-sm" name="name" id="name" placeholder="نام و نام خانوادگی" value="<%=doctor.name %>" required>
+                      <input type="text" class="form-control form-control-sm" name="name" id="name" placeholder="نام و نام خانوادگی" value="<%=doctor.name %>" disabled>
                     </div>
                   </div>
                 </div>
@@ -139,7 +139,7 @@
                   <div class="col-md-6 col-lg-6">
                     <p><%=doctor.phonenumber %></p>
                     <div class="form-group mb-2">
-                      <input type="text" class="form-control form-control-sm" name="address" id="address" placeholder="شماره تماس" value="<%=doctor.phonenumber %>" required>
+                      <input type="text" class="form-control form-control-sm" name="phone" id="phone" placeholder="شماره تماس" value="<%=doctor.phonenumber %>" required>
                     </div>
                   </div>
                 </div>
@@ -150,7 +150,7 @@
                   <div class="col-md-6 col-lg-6">
                     <p><%=doctor.visitduration %> دقیقه</p>
                     <div class="form-group mb-2">
-                      <input type="number" class="form-control form-control-sm" name="address" id="address" placeholder="مدت هر ویزیت" value="<%=doctor.visitduration %>" required>
+                      <input type="number" class="form-control form-control-sm" name="duration" id="duration" placeholder="مدت هر ویزیت" value="<%=doctor.visitduration %>" required>
                     </div>
                   </div>
                 </div>
@@ -161,7 +161,7 @@
                   <div class="col-md-6 col-lg-6">
                     <p><%=doctor.visitcost %>  تومان</p>
                     <div class="form-group mb-2">
-                      <input type="number" class="form-control form-control-sm" name="address" id="address" placeholder="هزینه هر ویزیت" value="<%=doctor.visitcost %>" required>
+                      <input type="number" class="form-control form-control-sm" name="cost" id="cost" placeholder="هزینه هر ویزیت" value="<%=doctor.visitcost %>" required>
                     </div>
                   </div>
                 </div>
@@ -174,8 +174,7 @@
                       <%=doctor.description %>
                     </p>
                     <div class="form-group mb-2">
-                      <textarea class="form-control form-control-sm" name="description" id="description" rows="5"><%=doctor.description %>
-                      </textarea>
+                      <textarea class="form-control form-control-sm" name="description" id="description" rows="5" required><%=doctor.description %></textarea>
                     </div>
                   </div>
                 </div>

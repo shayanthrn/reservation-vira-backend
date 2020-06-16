@@ -10,11 +10,11 @@ app.use(express.static('public'));    // files on the public path are downloadab
 app.use(bodyParser.urlencoded({extended: false}));
 app.use(bodyParser.json());
 app.use(cookieParser());
-app.use(fileUpload())
+app.use(fileUpload({useTempFiles : true}))
 
 app.set('views','./htmls');
 app.engine('html', require('ejs').renderFile);
 app.use('/',router);
 
-const port = process.env.port || 8080;   // server port for listen
+const port = process.env.port || 3000;   // server port for listen
 app.listen(port, () => console.log(`Run on port ${port}`));   //listen
