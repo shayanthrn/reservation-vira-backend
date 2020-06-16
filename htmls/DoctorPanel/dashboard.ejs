@@ -31,13 +31,7 @@
       
       <nav class="col-lg-3 col-xl-2 d-lg-block sidebar collapse" id="navbarTogglerDemo">
         <div class="sidebar-sticky">
-          <ul class="nav flex-column">
-            <li class="nav-item">
-              <a class="nav-link" href="#">
-                <span class="balance text-white">موجودی: 12345</a>
-              </a>
-            </li>
-            
+          <ul class="nav flex-column">       
             <li class="nav-item">
               <a class="nav-link active" href="/DoctorPanel/dashboard">
                 <i class="fa fa-tachometer"></i>
@@ -82,21 +76,23 @@
       <main role="main" class=" ml-sm-auto col-lg-9 col-xl-10 px-4" id="dashboard">
         <div class="container-fluid">
           <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-            <h1 class="h2">تایم های رزرو شده</h1>
+            <h1 class="h2">برنامه 6 روز آینده</h1>
           </div>
           <div class='row'>
+            <% for(let i = 0; i<visittimes.length;i++) { %>
             <div class="col-sm-12 col-md-6 col-lg-4 mb-3">
               <div class="card shadow">
                 <div class="card-header bg-site-primary text-white p-2">
-                  شنبه 17 خرداد
+                  <%= visittimes[i].dayofweek +" " + visittimes[i].date1.day + " " + visittimes[i].date1.month %>
                 </div>
                 <div class="card-body p-1 d-flex flex-wrap">
-                  <a href="#" class="cursor-pointer badge badge-secondary p-1 m-1">16:30 - 16:45</a>
-                  <a href="#" class="cursor-pointer badge badge-secondary p-1 m-1">17:30 - 17:45</a>
-                  <a href="#" class="cursor-pointer badge badge-secondary p-1 m-1">17:30 - 17:45</a>
+                  <% for(let j=0;j<visittimes[i].times.length;j++) { %>
+                  <a href="<%="reserves/" +visittimes[i].times[j]._id%>" class="cursor-pointer badge badge-secondary p-1 m-1"><%=visittimes[i].times[j].time.start.hour +":"+visittimes[i].times[j].time.start.min + "-" + visittimes[i].times[j].time.end.hour+":"+visittimes[i].times[j].time.end.min %></a>
+                  <% } %>
                 </div>
               </div>
-            </div>   
+            </div> 
+            <% } %>  
           </div>
         </div>
       </main>

@@ -84,48 +84,20 @@
         <div class="container-fluid">
 
           <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-            <h1 class="h2">اضافه کردن روز تعطیل</h1>
+            <h1 class="h2">اضافه کردن ساعت تعطیل</h1>
           </div>
           
           <form class="" action="index.html" method="GET">
-          <div class="row">
-              <div class="col-xl-4 col-lg-6 ">
-                <div class="form-group">
-                  <label for="datePicker">
-                    روز
-                  </label>
-                  <input type="text" class="form-control datePicker" name="datePicker" id="datePicker" required/>
-                </div>
-              </div>
+            <div class="row">
               <div class="col-xl-4 col-lg-6">
-                <div class="form-check mt-4">
-                  <input class="form-check-input" type="radio" name="state" id="closedDayInWeek" value="1" required>
-                  <label class="form-check-label" for="closedDayInWeek">
-                    <span id="selectedDay"></span> ها
-                    به عنوان روز تعطیل عمومی در کل هفته ها
-                  </label>
-                </div>
-                <div class="form-check">
-                  <input class="form-check-input" type="radio" name="state" id="closedDay" value="2" required>
-                  <label class="form-check-label" for="closedDay">
-                    <span id="selectedDate"></span>
-                    به عنوان روز تعطیل 
-                  </label>
-                </div>
-                <div class="form-check">
-                  <input class="form-check-input" type="radio" name="state" id="closedTime" value="3" required>
-                  <label class="form-check-label" for="closedTime">
-                    اضافه کردن ساعت رزرو شده
-                  </label>
-                </div>
-                <div class="timePickerForm hidden-form" action="index.html" method="GET">
+                <div class="timePickerForm" action="index.html" method="GET">
                   <div class="row">
                     <div class="col">
                       <div class="form-group">
                         <label for="fromTime">
                           از
                         </label>
-                        <input type="text" class="form-control fromTimePicker" name="fromTime" id="fromTime"/>
+                        <input type="text" class="form-control fromTimePicker" name="fromTime" id="fromTime" required/>
                       </div>
                     </div>
                     <div class="col">
@@ -133,14 +105,14 @@
                         <label for="toTime">
                           تا
                         </label>
-                        <input type="text" class="form-control toTimePicker" name="toTime" id="toTime"/>
+                        <input type="text" class="form-control toTimePicker" name="toTime" id="toTime" required/>
                       </div>
                     </div>
                   </div>
                 </div>
                 <button type="submit" class="btn btn-success submit-button float-right">
                   <i class="fa fa-check"></i>
-                  تغییر
+                  اضافه کردن
                 </button>
               </div>
             </div>
@@ -148,6 +120,108 @@
 
       </main>
 
+      <main role="main" class=" ml-sm-auto col-lg-9 col-xl-10 px-4" id="addClosedTimeInAWeekday">
+        <div class="container-fluid">
+
+          <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+            <h1 class="h2">اضافه کردن ساعت تعطیل در یک روز خاص از هفته</h1>
+          </div>
+          
+          <form class="" action="index.html" method="GET">
+            <div class="row">
+              <div class="col-xl-2 col-lg-6">
+                <div class="form-group">
+                  <label for="weekDayPicker">روز هفته</label>
+                  <select class="form-control" id="weekDayPicker" required>
+                    <option disabled>--- انتخاب روز هفته ---</option>
+                    <option value={0}>شنبه</option>
+                    <option value={1}>یک شنبه</option>
+                    <option value={2}>دوشنبه</option>
+                    <option value={3}>سه شنبه</option>
+                    <option value={4}>چهارشنبه</option>
+                    <option value={5}>پنجشنبه</option>
+                  </select>
+                </div>
+              </div>
+              <div class="col-xl-4 col-lg-6">
+                <div class="timePickerForm" action="index.html" method="GET">
+                  <div class="row">
+                    <div class="col">
+                      <div class="form-group">
+                        <label for="fromTime">
+                          از
+                        </label>
+                        <input type="text" class="form-control fromTimePicker" name="fromTime" id="fromTime" required/>
+                      </div>
+                    </div>
+                    <div class="col">
+                      <div class="form-group">
+                        <label for="toTime">
+                          تا
+                        </label>
+                        <input type="text" class="form-control toTimePicker" name="toTime" id="toTime" required/>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <button type="submit" class="btn btn-success submit-button float-right">
+                  <i class="fa fa-check"></i>
+                  اضافه کردن
+                </button>
+              </div>
+            </div>
+          </form>
+
+      </main>
+
+      
+      <main role="main" class=" ml-sm-auto col-lg-9 col-xl-10 px-4" id="addClosedTimeInAWeekday">
+        <div class="container-fluid">
+
+          <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+            <h1 class="h2">اضافه کردن ساعت تعطیل در یک تاریخ خاص</h1>
+          </div>
+          
+          <form class="" action="index.html" method="GET">
+            <div class="row">
+              <div class="col-xl-2 col-lg-6">
+                <div class="form-group">
+                  <label for="datePicker">
+                    تاریخ
+                  </label>
+                  <input type="text" class="form-control datePicker" name="datePicker" id="datePicker" required/>
+                </div>
+              </div>
+              <div class="col-xl-4 col-lg-6">
+                <div class="timePickerForm" action="index.html" method="GET">
+                  <div class="row">
+                    <div class="col">
+                      <div class="form-group">
+                        <label for="fromTime">
+                          از
+                        </label>
+                        <input type="text" class="form-control fromTimePicker" name="fromTime" id="fromTime" required/>
+                      </div>
+                    </div>
+                    <div class="col">
+                      <div class="form-group">
+                        <label for="toTime">
+                          تا
+                        </label>
+                        <input type="text" class="form-control toTimePicker" name="toTime" id="toTime" required/>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <button type="submit" class="btn btn-success submit-button float-right">
+                  <i class="fa fa-check"></i>
+                  اضافه کردن
+                </button>
+              </div>
+            </div>
+          </form>
+
+      </main>
     </div>
   </div>
 

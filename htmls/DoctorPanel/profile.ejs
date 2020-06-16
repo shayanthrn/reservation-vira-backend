@@ -33,12 +33,6 @@
         <div class="sidebar-sticky">
           <ul class="nav flex-column">
             <li class="nav-item">
-              <a class="nav-link" href="#">
-                <span class="balance text-white">موجودی: 12345</a>
-              </a>
-            </li>
-            
-            <li class="nav-item">
               <a class="nav-link" href="/DoctorPanel/dashboard">
                 <i class="fa fa-tachometer"></i>
                 داشبورد
@@ -85,10 +79,10 @@
             <h1 class="h2">پروفایل</h1>
           </div>
 
-          <form class="hidden-form" action="index.html" method="GET">
+          <form class="hidden-form" action="changeDocinfo" method="POST">
             <div class="row">
               <div class="col-sm-6 col-md-2 mb-5">
-                <img class="img-fluid" src="avatar-1.png" alt="not found">
+                <img class="img-fluid" src="<%=doctor.image %>" alt="not found">
                 <div class="form-group mt-2">
                   <input type="file" class="form-control-file" name="image" id="image">
                 </div>
@@ -99,9 +93,9 @@
                     <h5>نام</h5>
                   </div>
                   <div class="col-md-6 col-lg-6">
-                    <p>علی</p>
+                    <p><%=doctor.name %></p>
                     <div class="form-group mb-2">
-                      <input type="text" class="form-control form-control-sm" name="name" id="name" placeholder="نام و نام خانوادگی" value="علی" required>
+                      <input type="text" class="form-control form-control-sm" name="name" id="name" placeholder="نام و نام خانوادگی" value="<%=doctor.name %>" required>
                     </div>
                   </div>
                 </div>
@@ -110,9 +104,9 @@
                     <h5>تخصص</h5>
                   </div>
                   <div class="col-md-6 col-lg-6">
-                    <p>پوست</p>
+                    <p><%=doctor.category %></p>
                     <div class="form-group mb-2">
-                      <input type="text" class="form-control form-control-sm" name="major" id="major" placeholder="تخصص" value="پوست" required>
+                      <input type="text" class="form-control form-control-sm" name="major" id="major" placeholder="تخصص" value="<%=doctor.category %>" required>
                     </div>
                   </div>
                 </div>
@@ -121,9 +115,9 @@
                     <h5>سابقه کار</h5>
                   </div>  
                   <div class="col-md-6 col-lg-6">
-                    <p>5 سال</p>
+                    <p><%= doctor.background %></p>
                     <div class="form-group mb-2">
-                      <input type="number" class="form-control form-control-sm" name="experience" id="experience" placeholder="سابقه کار" value="5" required>
+                      <input type="text" class="form-control form-control-sm" name="experience" id="experience" placeholder="سابقه کار" value="<%= doctor.background %>" required>
                     </div>
                   </div>
                 </div>
@@ -132,9 +126,9 @@
                     <h5>ادرس</h5>
                   </div>
                   <div class="col-md-6 col-lg-6">
-                    <p>تهران ایران</p>
+                    <p><%=doctor.address %></p>
                     <div class="form-group mb-2">
-                      <input type="text" class="form-control form-control-sm" name="address" id="address" placeholder="ادرس" value="تهران ایران" required>
+                      <input type="text" class="form-control form-control-sm" name="address" id="address" placeholder="ادرس" value="<%=doctor.address %>" required>
                     </div>
                   </div>
                 </div>
@@ -143,9 +137,9 @@
                     <h5>شماره تماس</h5>
                   </div>
                   <div class="col-md-6 col-lg-6">
-                    <p>093123456789</p>
+                    <p><%=doctor.phonenumber %></p>
                     <div class="form-group mb-2">
-                      <input type="text" class="form-control form-control-sm" name="address" id="address" placeholder="شماره تماس" value="093123456789" required>
+                      <input type="text" class="form-control form-control-sm" name="address" id="address" placeholder="شماره تماس" value="<%=doctor.phonenumber %>" required>
                     </div>
                   </div>
                 </div>
@@ -154,9 +148,9 @@
                     <h5>مدت هر ویزیت</h5>
                   </div>
                   <div class="col-md-6 col-lg-6">
-                    <p>15 دقیقه</p>
+                    <p><%=doctor.visitduration %> دقیقه</p>
                     <div class="form-group mb-2">
-                      <input type="number" class="form-control form-control-sm" name="address" id="address" placeholder="مدت هر ویزیت" value="15" required>
+                      <input type="number" class="form-control form-control-sm" name="address" id="address" placeholder="مدت هر ویزیت" value="<%=doctor.visitduration %>" required>
                     </div>
                   </div>
                 </div>
@@ -165,9 +159,9 @@
                     <h5>هزینه هر ویزیت</h5>
                   </div>
                   <div class="col-md-6 col-lg-6">
-                    <p>50 هزار تومان</p>
+                    <p><%=doctor.visitcost %>  تومان</p>
                     <div class="form-group mb-2">
-                      <input type="number" class="form-control form-control-sm" name="address" id="address" placeholder="هزینه هر ویزیت" value="50" required>
+                      <input type="number" class="form-control form-control-sm" name="address" id="address" placeholder="هزینه هر ویزیت" value="<%=doctor.visitcost %>" required>
                     </div>
                   </div>
                 </div>
@@ -177,10 +171,10 @@
                   </div>
                   <div class="col-md-6 col-lg-6">
                     <p>
-                      لورم ایپسوم متن ساختگی با تولید سادگی نامفهوم از صنعت چاپ و با استفاده از طراحان گرافیک است. چاپگرها و متون بلکه روزنامه و مجله در ستون و سطرآنچنان که لازم است و برای شرایط فعلی تکنولوژی مورد نیاز و کاربردهای متنوع با هدف بهبود ابزارهای کاربردی می باشد.
+                      <%=doctor.description %>
                     </p>
                     <div class="form-group mb-2">
-                      <textarea class="form-control form-control-sm" name="description" id="description" rows="5">                          لورم ایپسوم متن ساختگی با تولید سادگی نامفهوم از صنعت چاپ و با استفاده از طراحان گرافیک است. چاپگرها و متون بلکه روزنامه و مجله در ستون و سطرآنچنان که لازم است و برای شرایط فعلی تکنولوژی مورد نیاز و کاربردهای متنوع با هدف بهبود ابزارهای کاربردی می باشد.
+                      <textarea class="form-control form-control-sm" name="description" id="description" rows="5"><%=doctor.description %>
                       </textarea>
                     </div>
                   </div>

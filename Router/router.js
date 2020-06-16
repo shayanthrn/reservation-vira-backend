@@ -49,7 +49,10 @@ const { each } = require('lodash');
 
 
 //------------------------api------------------------------//
-
+router.post("/changedocinfo",function(req,res){
+  console.log(req.files);
+  res.redirect('/doctorpanel/profile');
+})
 
 
 
@@ -150,21 +153,19 @@ router.get('/doctorpanel/dashboard',function(req,res){
         else{
           var visittimes=[];
           var currentday=new persianDate();
-          visittimes.push({date:{year:currentday.toArray()[0],month:currentday.toArray()[1],day:currentday.toArray()[2]},times:[]});
+          visittimes.push({date1:{year:currentday.toArray()[0],month:currentday.format("MMMM"),day:currentday.toArray()[2]},date:{year:currentday.toArray()[0],month:currentday.toArray()[1],day:currentday.toArray()[2]},times:[],dayofweek:currentday.format("dddd")});
           for(let i=0;i<5;i++){
             currentday=currentday.add('d',1);
-            visittimes.push({date:{year:currentday.toArray()[0],month:currentday.toArray()[1],day:currentday.toArray()[2]},times:[]});
+            visittimes.push({date1:{year:currentday.toArray()[0],month:currentday.format("MMMM"),day:currentday.toArray()[2]},date:{year:currentday.toArray()[0],month:currentday.toArray()[1],day:currentday.toArray()[2]},times:[],dayofweek:currentday.format("dddd")});
           }
           result.reservations.forEach(function(doc){
             for(i=0;i<6;i++){
-              
               if(lodash.isEqual(visittimes[i].date,doc.time.date)){
                 visittimes[i].times.push(doc);
               }
             }
           })
-          console.log(visittimes);
-          res.render('DoctorPanel/dashboard.ejs',{visittimes:visittimes}); //-00000000000000000 i am here bitch!
+          res.render('DoctorPanel/dashboard.ejs',{visittimes:visittimes});
           res.end();
         }
       })
@@ -184,7 +185,7 @@ router.get('/doctorpanel/profile',function(req,res){
           res.redirect('noaccess');
         }
         else{
-          res.render('DoctorPanel/profile.ejs');
+          res.render('DoctorPanel/profile.ejs',{doctor:result});
           res.end();
         }
       })
