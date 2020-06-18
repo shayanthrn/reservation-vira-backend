@@ -30,25 +30,6 @@ const { each } = require('lodash');
 
 //--------------------------api---------------------------//
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-//------------------------api------------------------------//
 router.post("/changedocinfo",function(req,res){
   if(req.cookies.doctortoken==undefined){
     res.redirect('/noaccess');
@@ -74,6 +55,140 @@ router.post("/changedocinfo",function(req,res){
     })
   }
 })
+
+router.get("/addunavbeveryday",function(req,res){
+  var query = url.parse(req.url,true).query;
+  if(req.cookies.doctortoken==undefined){
+    res.redirect('/noaccess');
+  }
+  else{
+    MongoClient.connect(dburl,function(err,db){
+      var dbo=db.db("mydb");
+      dbo.collection('Doctors').findOne({token:req.cookies.doctortoken},function(err,result){
+        if(result==null){
+          res.redirect('noaccess');
+        }
+        else{
+          fromtime = {hour:Number(query.fromTime.split(":")[0]),min:Number(query.fromTime.split(":")[1])};
+          totime= {hour:Number(query.toTime.split(":")[0]),min:Number(query.toTime.split(":")[1])};
+          if(Number.isNaN(fromtime.hour)||Number.isNaN(fromtime.min)||Number.isNaN(totime.hour)||Number.isNaN(totime.min)){
+            res.write("invalid");
+            res.end();
+          }
+          else{
+            dbo.collection('Doctors').updateOne({token:req.cookies.doctortoken},{$addToSet:{unavailabletimes:{date:"*",dayofweek:"*",start:fromtime,end:totime}}},function(result2){
+              res.redirect('/doctorpanel/visittimes');
+            })
+          }
+        }
+      })
+    })
+  }
+})
+
+router.get("/addunavbdayofweek",function(req,res){
+  var query = url.parse(req.url,true).query;
+  if(req.cookies.doctortoken==undefined){
+    res.redirect('/noaccess');
+  }
+  else{
+    MongoClient.connect(dburl,function(err,db){
+      var dbo=db.db("mydb");
+      dbo.collection('Doctors').findOne({token:req.cookies.doctortoken},function(err,result){
+        if(result==null){
+          res.redirect('noaccess');
+        }
+        else{
+          fromtime = {hour:Number(query.fromTime.split(":")[0]),min:Number(query.fromTime.split(":")[1])};
+          totime= {hour:Number(query.toTime.split(":")[0]),min:Number(query.toTime.split(":")[1])};
+          if(Number.isNaN(fromtime.hour)||Number.isNaN(fromtime.min)||Number.isNaN(totime.hour)||Number.isNaN(totime.min)){
+            res.write("invalid");
+            res.end();
+          }
+          else{
+            dbo.collection('Doctors').updateOne({token:req.cookies.doctortoken},{$addToSet:{unavailabletimes:{date:"*",dayofweek:query.dayofweek,start:fromtime,end:totime}}},function(result2){
+              res.redirect('/doctorpanel/visittimes');
+            })
+          }
+        }
+      })
+    })
+  }
+})
+
+
+router.get("/addunavb",function(req,res){
+  var query = url.parse(req.url,true).query;
+  if(req.cookies.doctortoken==undefined){
+    res.redirect('/noaccess');
+  }
+  else{
+    MongoClient.connect(dburl,function(err,db){
+      var dbo=db.db("mydb");
+      dbo.collection('Doctors').findOne({token:req.cookies.doctortoken},function(err,result){
+        if(result==null){
+          res.redirect('noaccess');
+        }
+        else{
+          fromtime = {hour:Number(query.fromTime.split(":")[0]),min:Number(query.fromTime.split(":")[1])};
+          totime= {hour:Number(query.toTime.split(":")[0]),min:Number(query.toTime.split(":")[1])};
+          if(Number.isNaN(fromtime.hour)||Number.isNaN(fromtime.min)||Number.isNaN(totime.hour)||Number.isNaN(totime.min)){
+            res.write("invalid");
+            res.end();
+          }
+          else{
+            querydate=new persianDate(Number(query.datePicker));
+            date=new myDate(querydate.toArray()[2],querydate.toArray()[1],querydate.toArray()[0])
+            dbo.collection('Doctors').updateOne({token:req.cookies.doctortoken},{$addToSet:{unavailabletimes:{date:date,dayofweek:querydate.format("dddd"),start:fromtime,end:totime}}},function(result2){
+              res.redirect('/doctorpanel/visittimes');
+            })
+          }
+        }
+      })
+    })
+  }
+})
+
+
+router.post("/changepass",function(req,res){
+  if(req.cookies.doctortoken==undefined){
+    res.redirect('/noaccess');
+  }
+  else{
+    MongoClient.connect(dburl,function(err,db){
+      var dbo=db.db("mydb");
+      dbo.collection('Doctors').findOne({token:req.cookies.doctortoken},function(err,result){
+        if(result==null){
+          res.redirect('noaccess');
+        }
+        else{
+          if(result.password==req.body.oldPassword){
+              if(req.body.confirmPassword==req.body.newPassword){
+                dbo.collection("Doctors").updateOne({token:req.cookies.doctortoken},{ $set:{password:req.body.newPassword}},function(err,result3){
+                  res.redirect("/doctorpanel/systemicinfo");
+                })
+              }
+              else{
+                res.write("not confirmed");
+                res.end();
+              }
+          }
+          else{
+            res.write("wrong pass");
+            res.end();
+          }
+        }
+      })
+    })
+  }
+})
+
+
+
+
+
+
+//------------------------api------------------------------//
 
 
 

@@ -93,7 +93,11 @@
                                         <div class="reservation-carousel">
                                           <!-- TODO: [BACKEND] add class 'disabled' if  all times are reserved -->
                                           <% for(let i=0;i<days.length;i++) { %>
-                                          <div class="carousel-cell m-2" data-key="<%= days[i].index %>">
+                                              <% if(freetimes[i].length==0) { %>
+                                                <div class="carousel-cell m-2 disabled" data-key="<%= days[i].index %>">
+                                                <% } else { %>
+                                            <div class="carousel-cell m-2" data-key="<%= days[i].index %>">
+                                                <% } %>
                                             <div class="card px-4">
                                               <div class="card-body text-center">
                                                 <p class="mb-0" style="width: max-content;"><%= days[i].dayofweek%></p>

@@ -2,7 +2,7 @@
 <html dir="rtl" class="fa-events-icons-ready" lang="en"><head>
   <meta charset="utf-8">
   <base href="http://localhost:3000/">
-  <title>تعیین زمانبندی - دکتر تجویز</title>
+  <title> اطلاعات سیستم - دکتر تجویز</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
   <meta name="description" content="">
   <meta name="author" content="">
@@ -33,12 +33,6 @@
       <nav class="col-lg-3 col-xl-2 d-lg-block sidebar collapse" id="navbarTogglerDemo">
         <div class="sidebar-sticky">
           <ul class="nav flex-column">
-            <li class="nav-item">
-              <a class="nav-link" href="#">
-                <span class="balance text-white">موجودی: 12345</a>
-              </a>
-            </li>
-            
             <li class="nav-item">
               <a class="nav-link" href="/DoctorPanel/dashboard">
                 <i class="fa fa-tachometer"></i>
@@ -89,34 +83,27 @@
 
           <div class="row">
             <div class="col-xl-4 col-lg-6 ">
-              <form class="" action="index.html" method="GET">
-                  <div class="form-group">
-                    <label for="email">
-                      <i class='fa fa-envelope mr-2'></i>
-                      ایمیل
-                    </label>
-                    <input type="email" class="form-control" id="email" name="email" value="example@gmail.com" required>
-                  </div>
+              <form class="" action="changepass" method="post">
                   <div class="form-group">
                     <label for="oldPassword">
                       <i class='fa fa-key mr-2'></i>
                       رمز عبور قدیمی
                     </label>
-                    <input type="password" class="form-control" id="oldPassword" id="oldPassword" required>
+                    <input type="password" class="form-control" name="oldPassword" id="oldPassword" required>
                   </div>
                   <div class="form-group">
                     <label for="newPassword">
                       <i class='fa fa-key mr-2'></i>
                       رمز عبور جدید
                     </label>
-                    <input type="password" class="form-control" id="newPassword" id="newPassword" required>
+                    <input type="password" class="form-control" name="newPassword" id="newPassword" required>
                   </div>
                   <div class="form-group">
                     <label for="confirmPassword">
                       <i class='fa fa-key mr-2'></i>
                       تکرار رمز عبور جدید
                     </label>
-                    <input type="password" class="form-control" id="confirmPassword" id="confirmPassword" required>
+                    <input type="password" class="form-control" name="confirmPassword" id="confirmPassword" required>
                   </div>
                   <button type="submit" class="btn btn-success submit-button float-right">
                     <i class="fa fa-check"></i>

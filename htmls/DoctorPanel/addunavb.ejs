@@ -32,39 +32,33 @@
       
       <nav class="col-lg-3 col-xl-2 d-lg-block sidebar collapse" id="navbarTogglerDemo">
         <div class="sidebar-sticky">
-          <ul class="nav flex-column">
+          <ul class="nav flex-column"> 
             <li class="nav-item">
-              <a class="nav-link" href="#">
-                <span class="balance text-white">موجودی: 12345</a>
-              </a>
-            </li>
-            
-            <li class="nav-item">
-              <a class="nav-link" href="/DoctorPanel/dashboard">
+              <a class="nav-link" href="/doctorpanel/dashboard">
                 <i class="fa fa-tachometer"></i>
                 داشبورد
               </a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="/DoctorPanel/profile">
+              <a class="nav-link" href="/doctorpanel/profile">
                 <i class="fa fa-user-md"></i>
                 پروفایل
               </a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="/DoctorPanel/patients">
+              <a class="nav-link" href="/doctorpanel/patients">
                 <i class="fa fa-users"></i>
                 بیماران
               </a>
             </li>
             <li class="nav-item">
-              <a class="nav-link active" href="/DoctorPanel/visittimes">
+              <a class="nav-link active" href="/doctorpanel/visittimes">
                 <i class="fa fa-calendar"></i>
                 تعیین زمانبندی
               </a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="/DoctorPanel/systemicinfo">
+              <a class="nav-link" href="/doctorpanel/systemicinfo">
                 <i class="fa fa-cog"></i>
                 اطلاعات سیستم
               </a>
@@ -87,10 +81,10 @@
             <h1 class="h2">اضافه کردن ساعت تعطیل</h1>
           </div>
           
-          <form class="" action="index.html" method="GET">
+          <form class="" action="addunavbeveryday" method="GET">
             <div class="row">
               <div class="col-xl-4 col-lg-6">
-                <div class="timePickerForm" action="index.html" method="GET">
+                <div class="timePickerForm" action="addunavbeveryday" method="GET">
                   <div class="row">
                     <div class="col">
                       <div class="form-group">
@@ -127,19 +121,20 @@
             <h1 class="h2">اضافه کردن ساعت تعطیل در یک روز خاص از هفته</h1>
           </div>
           
-          <form class="" action="index.html" method="GET">
+          <form class="" action="addunavbdayofweek" method="GET">
             <div class="row">
               <div class="col-xl-2 col-lg-6">
                 <div class="form-group">
                   <label for="weekDayPicker">روز هفته</label>
-                  <select class="form-control" id="weekDayPicker" required>
+                  <select class="form-control" name="dayofweek" id="weekDayPicker" required>
                     <option disabled>--- انتخاب روز هفته ---</option>
-                    <option value={0}>شنبه</option>
-                    <option value={1}>یک شنبه</option>
-                    <option value={2}>دوشنبه</option>
-                    <option value={3}>سه شنبه</option>
-                    <option value={4}>چهارشنبه</option>
-                    <option value={5}>پنجشنبه</option>
+                    <option value="شنبه">شنبه</option>
+                    <option value="یکشنبه">یک شنبه</option>
+                    <option value="دوشنبه">دوشنبه</option>
+                    <option value="سه شنبه">سه شنبه</option>
+                    <option value="چهار شنبه">چهارشنبه</option>
+                    <option value="پنج‌شنبه">پنجشنبه</option>
+                    <option value="جمعه">جمعه</option>
                   </select>
                 </div>
               </div>
@@ -182,18 +177,19 @@
             <h1 class="h2">اضافه کردن ساعت تعطیل در یک تاریخ خاص</h1>
           </div>
           
-          <form class="" action="index.html" method="GET">
+          <form class="" action="addunavb" method="GET">
             <div class="row">
               <div class="col-xl-2 col-lg-6">
                 <div class="form-group">
                   <label for="datePicker">
                     تاریخ
                   </label>
-                  <input type="text" class="form-control datePicker" name="datePicker" id="datePicker" required/>
+                  <input type="text" class="form-control datePicker" id="datePicker" required/>
+                  <input type="text" class="form-control datePicker" name="datePicker" id="datePickerTimeStamp" required hidden/>
                 </div>
               </div>
               <div class="col-xl-4 col-lg-6">
-                <div class="timePickerForm" action="index.html" method="GET">
+                <div class="timePickerForm" action="addunavb" method="GET">
                   <div class="row">
                     <div class="col">
                       <div class="form-group">
@@ -222,12 +218,14 @@
           </form>
 
       </main>
+
+
     </div>
   </div>
 
 
   <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
-  <script>window.jQuery || document.write('<script src="assets/docpanelassests/jquery-slim.min.js"><\/script>')</script>
+  <script>window.jQuery || document.write('<script src="../assets/jquery-slim.min.js"><\/script>')</script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
   <script src="https://cdn.rtlcss.com/bootstrap/v4.1.3/js/bootstrap.min.js" integrity="sha384-C/pvytx0t5v9BEbkMlBAGSPnI1TQU1IrTJ6DJbC8GBHqdMnChcb6U4xg4uRkIQCV" crossorigin="anonymous"></script>
 
@@ -237,13 +235,20 @@
   <script type="text/javascript">
     let datePickerOptions = {
       autoClose: true,
+      initialValue: false,
       format: 'dddd YYYY/MM/DD',
+      altField: "#datePickerTimeStamp"
     }
 
     let timePickerOptions = {
       format: 'HH:mm',
       initialValue: false,
       onlyTimePicker: true,
+      calendar:{
+        persian: {
+          locale: 'en'
+        }
+      },
       timePicker: {
         enabled: true,
         step: 1,
@@ -281,7 +286,7 @@
 
     
     $(document).ready(function() {
-      datePicker = $(".datePicker").persianDatepicker({
+      datePicker = $("#datePicker").persianDatepicker({
         ...datePickerOptions,
         checkDate: disableClosedDays,
         onSelect: updateDate
