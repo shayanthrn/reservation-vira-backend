@@ -23,7 +23,7 @@ var api = Kavenegar.KavenegarApi({
   apikey:"534438436D6364307552744278336A334B694F46343179417642536E66686568"
   });
 var md5 = require('md5');
-const { each } = require('lodash');
+const { ObjectID } = require('mongodb');
 
 
 
@@ -76,9 +76,16 @@ router.get("/addunavbeveryday",function(req,res){
             res.end();
           }
           else{
+            if((fromtime.hour*60)+fromtime.min>(totime.hour*60)+totime.min){
+              dbo.collection('Doctors').updateOne({token:req.cookies.doctortoken},{$addToSet:{unavailabletimes:{date:"*",dayofweek:"*",start:fromtime,end:{hour:23,min:59}}}});
+              dbo.collection('Doctors').updateOne({token:req.cookies.doctortoken},{$addToSet:{unavailabletimes:{date:"*",dayofweek:"*",start:{hour:0,min:0},end:totime}}});
+              res.redirect('/doctorpanel/visittimes');
+            }
+            else{
             dbo.collection('Doctors').updateOne({token:req.cookies.doctortoken},{$addToSet:{unavailabletimes:{date:"*",dayofweek:"*",start:fromtime,end:totime}}},function(result2){
               res.redirect('/doctorpanel/visittimes');
             })
+            }
           }
         }
       })
@@ -106,9 +113,16 @@ router.get("/addunavbdayofweek",function(req,res){
             res.end();
           }
           else{
+            if((fromtime.hour*60)+fromtime.min>(totime.hour*60)+totime.min){
+              dbo.collection('Doctors').updateOne({token:req.cookies.doctortoken},{$addToSet:{unavailabletimes:{date:"*",dayofweek:query.dayofweek,start:fromtime,end:{hour:23,min:59}}}});
+              dbo.collection('Doctors').updateOne({token:req.cookies.doctortoken},{$addToSet:{unavailabletimes:{date:"*",dayofweek:query.dayofweek,start:{hour:0,min:0},end:totime}}});
+              res.redirect('/doctorpanel/visittimes');
+            }
+            else{
             dbo.collection('Doctors').updateOne({token:req.cookies.doctortoken},{$addToSet:{unavailabletimes:{date:"*",dayofweek:query.dayofweek,start:fromtime,end:totime}}},function(result2){
               res.redirect('/doctorpanel/visittimes');
             })
+            }
           }
         }
       })
@@ -138,10 +152,17 @@ router.get("/addunavb",function(req,res){
           }
           else{
             querydate=new persianDate(Number(query.datePicker));
-            date=new myDate(querydate.toArray()[2],querydate.toArray()[1],querydate.toArray()[0])
+            date=new myDate(querydate.toArray()[2],querydate.toArray()[1],querydate.toArray()[0]);
+            if((fromtime.hour*60)+fromtime.min>(totime.hour*60)+totime.min){
+              dbo.collection('Doctors').updateOne({token:req.cookies.doctortoken},{$addToSet:{unavailabletimes:{date:date,dayofweek:querydate.format("dddd"),start:fromtime,end:{hour:23,min:59}}}})
+              dbo.collection('Doctors').updateOne({token:req.cookies.doctortoken},{$addToSet:{unavailabletimes:{date:date,dayofweek:querydate.format("dddd"),start:{hour:0,min:0},end:totime}}})
+              res.redirect('/doctorpanel/visittimes');
+            }
+            else{
             dbo.collection('Doctors').updateOne({token:req.cookies.doctortoken},{$addToSet:{unavailabletimes:{date:date,dayofweek:querydate.format("dddd"),start:fromtime,end:totime}}},function(result2){
               res.redirect('/doctorpanel/visittimes');
             })
+            }
           }
         }
       })
@@ -403,6 +424,98 @@ router.get('/doctorpanel/systemicinfo',function(req,res){
 })
 
 //------------------------Doctorpanel---------------------------//
+
+
+//------------------------adminpanel---------------------------//
+
+router.get("/AdminPanel/users/:userid",function(req,res){
+  userid=req.params.userid;
+  userid=ObjectID(userid);
+  if(req.cookies.doctortoken==undefined&&req.cookies.admintoken==undefined){
+    res.redirect('/noaccess');
+  }
+  else{
+    MongoClient.connect(dburl,function(err,db){
+      var dbo=db.db("mydb");
+      dbo.collection('Doctors').findOne({token:req.cookies.doctortoken},function(err,result){
+        if(result==null){
+          dbo.collection('Admins').findOne({token:req.cookies.admintoken},function(err,result2){
+            if(result2==null){
+              res.redirect('noaccess');
+            }
+            else{
+              dbo.collection("Users").findOne({_id:userid},function(err,result3){
+                var promises=[];
+                if(result3!=null){
+                  result3.reserves.forEach(function(doc){
+                   promises.push(dbo.collection("Doctors").findOne({_id:doc.doctor},{ projection: {name: 1} }));
+                  });
+                  Promise.all(promises).then(function(value){
+                      res.render("AdminPanel/patients-profile.ejs",{user:result3,reservations:value});
+                      res.end();
+                  });
+                }
+                else{
+                  res.redirect("/AdminPanel/users");
+                }
+              })
+            }
+          })
+        }
+        else{
+          dbo.collection("Users").findOne({_id:userid},function(err,result3){
+            var promises=[];
+            if(result3!=null){
+              result3.reserves.forEach(function(doc){
+               promises.push(dbo.collection("Doctors").findOne({_id:doc.doctor},{ projection: {name: 1} }));
+              });
+              Promise.all(promises).then(function(value){
+                  res.render("AdminPanel/patients-profile.ejs",{user:result3,reservations:value});
+                  res.end();
+              });
+            }
+            else{
+              res.redirect("/AdminPanel/users");
+            }
+          })
+        }
+      })
+    })
+  }
+})
+
+
+
+router.get("/Adminpanel/reserves/:resid",function(req,res){
+  resid=req.params.resid;
+  resid=ObjectID(resid);
+  if(req.cookies.doctortoken==undefined&&req.cookies.admintoken==undefined){
+    res.redirect('/noaccess');
+  }
+  else{
+    MongoClient.connect(dburl,function(err,db){
+      var dbo=db.db("mydb");
+      dbo.collection('Doctors').findOne({token:req.cookies.doctortoken},function(err,result){
+        if(result==null){
+          dbo.collection('Admins').findOne({token:req.cookies.admintoken},function(err,result2){
+            if(result2==null){
+              res.redirect('noaccess');
+            }
+            else{
+              res.render("AdminPanel/reserve-status.ejs");
+            }
+          })
+        }
+        else{
+          res.render("AdminPanel/reserve-status.ejs");
+        }
+      })
+    })
+  }
+})
+
+//------------------------adminpanel---------------------------//
+
 
 
 router.get("/",function(req,res){
@@ -721,6 +834,8 @@ router.get('/exit',function(req,res){
     res.clearCookie('usertoken');
     dbo.collection('Doctors').updateOne({token:req.cookies.doctortoken},{$set:{token:""}});
     res.clearCookie('doctortoken');
+    dbo.collection('Admins').updateOne({token:req.cookies.admintoken},{$set:{token:""}});
+    res.clearCookie('admintoken');
     res.redirect('/');
     res.end();
   })
