@@ -288,6 +288,11 @@ function createDayboxobj(days){
   return result;
 }
 
+function replaceALL(string,search,replace){
+  return string.split(search).join(replace);
+}
+
+
 //-----------------------functions--------------------------//
 
 

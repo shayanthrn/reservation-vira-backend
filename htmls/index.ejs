@@ -317,7 +317,7 @@
                                 <% for(let i=0;i<Objects.length;i++) { %>
                                 <li class="list-item list-item-has-children">
                                     <a class="main-list-item nav-link"
-                                        href="<%= "/category//"+Objects[i].name %>"><%= Objects[i].name %> </a>
+                                        href="<%= "/category//"+Objects[i].name.split(' ').join('-') %>"><%= Objects[i].name %> </a>
                                 </li>
                                 <% } %>
                                 <img src="assets/img/logo.png" alt="">
@@ -370,7 +370,7 @@
                                         <ul class="row listing-items">
                                             <% for(let i =0 ;i < Objects.length ; i++) { %>
                                             <li>
-                                                <a href="<%= "category/" + category + "/" + Objects[i].name %>">
+                                                <a href="<%= "category/" + category + "/" + Objects[i].name.split(' ').join('-') %>">
                                                     <div style="border-width: 2px;
                                                     font-weight: 400;
                                                     font-size: 0.8571em;
