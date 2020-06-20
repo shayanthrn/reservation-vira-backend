@@ -27,7 +27,7 @@
         <div class="container">
             <div class="navbar-translate">
                 <a class="navbar-brand" href="#pablo">
-                    <img src="assets/img/logo.png" alt="">
+                    <img src="assets/img/logo.png" style="height: 36px;" alt="">
                 </a>
                 <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse"
                     data-target="#navigation" aria-controls="navigation-index" aria-expanded="false"
@@ -56,193 +56,23 @@
                 </div>
                 <ul class="navbar-nav default">
                     <li class="sub-menu">
-                        <a href="#">تخصص</a>
+                        <a href="#">  تخصص ها</a>
                         <ul>
-                            <li class="sub-menu">
-                                <a href="#">لوازم جانبی گوشی</a>
-                                <ul>
-                                    <li>
-                                        <a href="#">کیف و کاور گوشی</a>
-                                    </li>
-                                    <li>
-                                        <a href="#">پاور بانک</a>
-                                    </li>
-                                    <li>
-                                        <a href="#">هندزفری،هدفون</a>
-                                    </li>
-                                    <li>
-                                        <a href="#">پایه نگهدارنده گوشی</a>
-                                    </li>
-                                </ul>
-                            </li>
-                            <li class="sub-menu">
-                                <a href="#">گوشی موبایل</a>
-                                <ul>
-                                    <li>
-                                        <a href="#"></a>
-                                    </li>
-                                    <li>
-                                        <a href="#">آیفون اپل</a>
-                                    </li>
-                                    <li>
-                                        <a href="#">هوآوی</a>
-                                    </li>
-                                </ul>
-                            </li>
+                            <% for(let i=0 ; i < categories.length;i++) { %>
                             <li>
-                                <a href="#">ساعت هوشمند</a>
+                                <a href="<%= "/category//"+categories[i].name.split(' ').join('-') %>"><%= categories[i].name %> </a>
                             </li>
-                            <li>
-                                <a href="#">اسپیکر بلوتوث و با سیم</a>
-                            </li>
-                            <li class="sub-menu">
-                                <a href="#">موبایل</a>
-                                <ul>
-                                    <li>
-                                        <a href="#">Apple</a>
-                                    </li>
-                                    <li>
-                                        <a href="#">Asus</a>
-                                    </li>
-                                    <li>
-                                        <a href="#">HTC</a>
-                                    </li>
-                                    <li>
-                                        <a href="#">LG</a>
-                                    </li>
-                                </ul>
-                            </li>
-                        </ul>
-                    </li>
-                    <li class="sub-menu">
-                        <a href="#">آرایشی،بهداشت</a>
-                        <ul>
-                            <li class="sub-menu">
-                                <a href="#">لوازم جانبی گوشی</a>
-                                <ul>
-                                    <li>
-                                        <a href="#">کیف و کاور گوشی</a>
-                                    </li>
-                                    <li>
-                                        <a href="#">پاور بانک</a>
-                                    </li>
-                                    <li>
-                                        <a href="#">هندزفری،هدفون</a>
-                                    </li>
-                                    <li>
-                                        <a href="#">پایه نگهدارنده گوشی</a>
-                                    </li>
-                                </ul>
-                            </li>
-                            <li class="sub-menu">
-                                <a href="#">گوشی موبایل</a>
-                                <ul>
-                                    <li>
-                                        <a href="#"></a>
-                                    </li>
-                                    <li>
-                                        <a href="#">آیفون اپل</a>
-                                    </li>
-                                    <li>
-                                        <a href="#">هوآوی</a>
-                                    </li>
-                                </ul>
-                            </li>
-                            <li>
-                                <a href="#">ساعت هوشمند</a>
-                            </li>
-                            <li>
-                                <a href="#">اسپیکر بلوتوث و با سیم</a>
-                            </li>
-                            <li class="sub-menu">
-                                <a href="#">موبایل</a>
-                                <ul>
-                                    <li>
-                                        <a href="#">Apple</a>
-                                    </li>
-                                    <li>
-                                        <a href="#">Asus</a>
-                                    </li>
-                                    <li>
-                                        <a href="#">HTC</a>
-                                    </li>
-                                    <li>
-                                        <a href="#">LG</a>
-                                    </li>
-                                </ul>
-                            </li>
-                        </ul>
-                    </li>
-                    <li class="sub-menu">
-                        <a href="#">خودرو،ابزار و اداری</a>
-                        <ul>
-                            <li class="sub-menu">
-                                <a href="#">لوازم جانبی گوشی</a>
-                                <ul>
-                                    <li>
-                                        <a href="#">کیف و کاور گوشی</a>
-                                    </li>
-                                    <li>
-                                        <a href="#">پاور بانک</a>
-                                    </li>
-                                    <li>
-                                        <a href="#">هندزفری،هدفون</a>
-                                    </li>
-                                    <li>
-                                        <a href="#">پایه نگهدارنده گوشی</a>
-                                    </li>
-                                </ul>
-                            </li>
-                            <li class="sub-menu">
-                                <a href="#">گوشی موبایل</a>
-                                <ul>
-                                    <li>
-                                        <a href="#"></a>
-                                    </li>
-                                    <li>
-                                        <a href="#">آیفون اپل</a>
-                                    </li>
-                                    <li>
-                                        <a href="#">هوآوی</a>
-                                    </li>
-                                </ul>
-                            </li>
-                            <li>
-                                <a href="#">ساعت هوشمند</a>
-                            </li>
-                            <li>
-                                <a href="#">اسپیکر بلوتوث و با سیم</a>
-                            </li>
-                            <li class="sub-menu">
-                                <a href="#">موبایل</a>
-                                <ul>
-                                    <li>
-                                        <a href="#">Apple</a>
-                                    </li>
-                                    <li>
-                                        <a href="#">Asus</a>
-                                    </li>
-                                    <li>
-                                        <a href="#">HTC</a>
-                                    </li>
-                                    <li>
-                                        <a href="#">LG</a>
-                                    </li>
-                                </ul>
-                            </li>
+                            <% } %>
                         </ul>
                     </li>
                     <li>
-                        <a href="#">مد و پوشاک</a>
+                        <a href="/aboutus">درباره ما  </a>
                     </li>
                     <li>
-                        <a href="#">خانه و آشپزخانه</a>
+                        <a href="/contactus"> تماس با ما </a>
                     </li>
                     <li>
-                        <a href="#">کتاب،لوازم تحریر</a>
-                    </li>
-                    <li>
-                        <a href="#">ورزش و سفر</a>
+                        <a href="/blog"> بلاگ</a>
                     </li>
                 </ul>
             </div>
@@ -314,10 +144,10 @@
                         <li class="list-item list-item-has-children mega-menu mega-menu-col-5">
                             <a class="nav-link" href="#">تخصص</a>
                             <ul class="sub-menu nav">
-                                <% for(let i=0;i<Objects.length;i++) { %>
+                                <% for(let i=0;i<categories.length;i++) { %>
                                 <li class="list-item list-item-has-children">
                                     <a class="main-list-item nav-link"
-                                        href="<%= "/category//"+Objects[i].name.split(' ').join('-') %>"><%= Objects[i].name %> </a>
+                                        href="<%= "/category//"+categories[i].name.split(' ').join('-') %>"><%= categories[i].name %> </a>
                                 </li>
                                 <% } %>
                                 <img src="assets/img/logo.png" alt="">
@@ -409,7 +239,7 @@
         </main>
         <!-- main -->
 
-        <<!-- footer -->
+        <!-- footer -->
         <footer class="main-footer default">
             <div class="back-to-top">
                 <a href="#"><span class="icon"><i class="now-ui-icons arrows-1_minimal-up"></i></span> <span>بازگشت به
