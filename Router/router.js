@@ -858,7 +858,7 @@ router.get('/exit',function(req,res){
 
 
 router.get('*',function(req,res){        // 404 page should be displayed here// should be at the end
-  res.render("404.ejs",{categories:categories});
+  res.render("404.ejs",{categories:categories,user:""});
   res.end();
 });
 
