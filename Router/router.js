@@ -587,7 +587,7 @@ router.get("/reserve/:Doctor",function(req,res){
     var dbo=db.db("mydb");
     days=[];
     freetimes=[]
-    dbo.collection("Doctors").findOne({name:req.params.Doctor},function(err,result){
+    dbo.collection("Doctors").findOne({name:req.params.Doctor.split('-').join(' ')},function(err,result){
       currentday=new persianDate();
       days.push(currentday);
       freetimes.push(getDoctimeslots(result,new myDate(currentday.toArray()[2],currentday.toArray()[1],currentday.toArray()[0])));
