@@ -557,7 +557,7 @@ router.get("/category//:Category",function(req,res){
   MongoClient.connect(dburl,function(err,db){
     if(err) throw err;
     var dbo= db.db("mydb");
-    dbo.collection("Doctors").find({category:req.params.Category}).forEach(function(doc,err){
+    dbo.collection("Doctors").find({category:req.params.Category.split('-').join(' ')}).forEach(function(doc,err){
       Doctors.push(doc);
     },function(){
       if(req.cookies.usertoken==undefined){
@@ -572,7 +572,7 @@ router.get("/category//:Category",function(req,res){
             res.clearCookie('usertoken');
             res.redirect('/c//'+req.params.Category);
           }
-          res.render('index.ejs',{Objects:Doctors,type:"doc",category:req.params.Category,user:result});
+          res.render('index.ejs',{Objects:Doctors,type:"doc",category:req.params.Category.split(' ').join('-'),user:result});
           res.end();
           db.close();
         })
@@ -606,7 +606,7 @@ router.get("/category/:Category/:Doctor",function(req,res){
   MongoClient.connect(dburl,function(err,db){
     if (err) throw err;
     var dbo=db.db("mydb");
-    dbo.collection("Doctors").findOne({name:req.params.Doctor},function(err,result){
+    dbo.collection("Doctors").findOne({name:req.params.Doctor.split('-').join(' ')},function(err,result){
       res.render("doctorpage.ejs",{doctor:result});
       res.end();
     })
