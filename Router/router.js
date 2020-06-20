@@ -547,7 +547,7 @@ router.get("/",function(req,res){
   })
 })
 
-router.get("/c//:Category",function(req,res){
+router.get("/category//:Category",function(req,res){
   Doctors = [];
   MongoClient.connect(dburl,function(err,db){
     if(err) throw err;
@@ -597,7 +597,7 @@ router.get("/reserve/:Doctor",function(req,res){
   })
 })
 
-router.get("/c/:Category/:Doctor",function(req,res){ 
+router.get("/category/:Category/:Doctor",function(req,res){ 
   MongoClient.connect(dburl,function(err,db){
     if (err) throw err;
     var dbo=db.db("mydb");

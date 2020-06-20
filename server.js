@@ -16,5 +16,5 @@ app.set('views','./htmls');
 app.engine('html', require('ejs').renderFile);
 app.use('/',router);
 
-const port = process.env.port || 3000;   // server port for listen
+const port = process.env.port || 80;   // server port for listen
 app.listen(port, () => console.log(`Run on port ${port}`));   //listen
