@@ -67,8 +67,18 @@
                                         </div>
                                         <input name="phonenumber" type="text" value="<%= phonenumber %>" style="visibility: hidden;">
                                     </div>
+                                    <script>
+                                        function myfunction(e) {
+                                        e.preventDefault();
+                                        grecaptcha.ready(function() {
+                                        grecaptcha.execute('6LdfZagZAAAAALyt9lMePYKSdifceTRbPvYSa2Hw', {action: 'submit'}).then(function(token) {
+                                        // Add your logic to submit to your backend server here.
+                                            });
+                                         });
+                                         }
+                                    </script>
                                     <div class="col-12 text-center">
-                                        <button class="btn btn-default btn-lg" type="submit" >ذخیره</button>
+                                        <button class="btn btn-default btn-lg" type="submit" onclick="myfunction()" >ذخیره</button>
                                         <a class="btn btn-default btn-lg" id="123" href="/">انصراف</a>
                                     </div>
                                 </form>
