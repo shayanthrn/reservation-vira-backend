@@ -38,7 +38,7 @@
                                         <h1 class="title-tab-content">حساب شخصی</h1>
                                     </div>
                                 </div>
-                                <form class="form-account" method="POST">
+                                <form class="form-account" action="submitinfo" method="POST">
                                     <div class="row">
                                         <div class="col-sm-12 col-md-6">
                                             <div class="form-account-title">نام</div>
@@ -53,32 +53,24 @@
                                             </div>
                                         </div>
                                         <div class="col-sm-12 col-md-6">
-                                            <div class="form-account-title">کد ملی</div>
+                                            <div class="form-account-title"> تاریخ تولد</div>
                                             <div class="form-account-row">
-                                                <input class="input-field"  name="codemeli" type="text" placeholder="کد ملی خود را وارد نمایید">
+                                                نمونه ورودی : (1360/2/3) <input class="input-field"  name="birthdate" type="text" placeholder="تاریخ تولد  خود را وارد نمایید">
                                             </div>
                                         </div>
                                         <div class="col-sm-12 col-md-6">
-                                            <div class="form-account-title">شماره موبایل</div>
+                                            <div class="form-account-title">جنسیت </div>
                                             <div class="form-account-row">
-                                                <input class="input-field" name="phonenumber" type="text" placeholder="شماره موبایل خود را وارد نمایید">
+                                                <select name="sex" class="btn btn-info">
+                                                    <option value="man">مرد</option>
+                                                    <option value="woman">زن</option>
+                                                </select>
                                             </div>
                                         </div>
-                                        <div class="col-sm-12 col-md-6">
-                                            <div class="form-account-title">شماره کارت</div>
-                                            <div class="form-account-row">
-                                                <input class="input-field" name="creditcardnumber" type="text" placeholder=" شماره کارت خود را وارد نمایید">
-                                            </div>
-                                        </div>
-                                        <div class="col-sm-12 col-md-6">
-                                            <div class="form-account-title">آدرس ایمیل</div>
-                                            <div class="form-account-row">
-                                                <input class="input-field" name="email" type="email" placeholder=" آدرس ایمیل خود را وارد نمایید">
-                                            </div>
-                                        </div>
+                                        <input name="phonenumber" type="text" value="<%= phonenumber %>" style="visibility: hidden;">
                                     </div>
                                     <div class="col-12 text-center">
-                                        <button class="btn btn-default btn-lg" type="submit" onClick="return checkempty()">ذخیره</button>
+                                        <button class="btn btn-default btn-lg" type="submit" >ذخیره</button>
                                         <a class="btn btn-default btn-lg" id="123" href="/">انصراف</a>
                                     </div>
                                 </form>

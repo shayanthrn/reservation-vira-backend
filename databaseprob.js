@@ -49,5 +49,16 @@ MongoClient.connect(dburl, function(err, db) {    // collection categories
     });
 });
 
+MongoClient.connect(dburl, function(err, db) {    // collection signupcode
+  if (err) throw err;
+  var dbo=db.db('mydb');
+  dbo.createCollection("signupcode", function(err, res) {
+    if (err) throw err;
+    console.log("Collection Users created!");
+    dbo.collection("signupcode").createIndex({},{expireAfterSeconds:60});
+    db.close();
+  });
+});
+
 
 

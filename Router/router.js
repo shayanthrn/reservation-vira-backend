@@ -19,7 +19,7 @@ var time=require('../coreapp/resTime.js');
 var persianDate = require('persian-date');
 var myDate= require('../coreapp/myDate.js');
 var Kavenegar = require('kavenegar');
-var api = Kavenegar.KavenegarApi({
+var apikave = Kavenegar.KavenegarApi({
   apikey:"534438436D6364307552744278336A334B694F46343179417642536E66686568"
   });
 var md5 = require('md5');
@@ -534,6 +534,8 @@ router.get("/Adminpanel/reserves/:resid",function(req,res){
 
 
 router.get("/",function(req,res){
+  req.session.prevurl=req.session.currurl;
+  req.session.currurl=req.url;
   Categories = [];
   MongoClient.connect(dburl,function(err,db){
     if (err) throw err;
@@ -563,6 +565,8 @@ router.get("/",function(req,res){
 })
 
 router.get("/category//:Category",function(req,res){
+  req.session.prevurl=req.session.currurl;
+  req.session.currurl=req.url;
   Doctors = [];
   MongoClient.connect(dburl,function(err,db){
     if(err) throw err;
@@ -592,6 +596,8 @@ router.get("/category//:Category",function(req,res){
 })
 
 router.get("/reserve/:Doctor",function(req,res){
+  req.session.prevurl=req.session.currurl;
+  req.session.currurl=req.url;
   MongoClient.connect(dburl,function(err,db){
     if(err) throw err;
     var dbo=db.db("mydb");
@@ -613,6 +619,8 @@ router.get("/reserve/:Doctor",function(req,res){
 })
 
 router.get("/category/:Category/:Doctor",function(req,res){ 
+  req.session.prevurl=req.session.currurl;
+  req.session.currurl=req.url;
   MongoClient.connect(dburl,function(err,db){
     if (err) throw err;
     var dbo=db.db("mydb");
@@ -625,6 +633,8 @@ router.get("/category/:Category/:Doctor",function(req,res){
 
 
 router.post("/paymenthandler",function(req,res){
+  req.session.prevurl=req.session.currurl;
+  req.session.currurl=req.url;
   if(req.cookies.usertoken==undefined){
     res.redirect("/");
     res.end();
@@ -671,152 +681,133 @@ router.post("/paymenthandler",function(req,res){
   })
   }
 })
-router.get("/register",function(req,res){
-  res.render('register.ejs');
+
+
+router.get("/signup",function(req,res){
+  req.session.prevurl=req.session.currurl;
+  req.session.currurl=req.url;
+  req.session.gobackafterlogin=req.session.prevurl;
+  console.log(req.session)
+  res.render('signup.ejs',{data:""});
   res.end();
 })
 
-router.post('/register',function(req,res){       //register 
-  if(req.body.username==undefined&&req.body.pass==undefined){
-    res.render('register.ejs');
-    res.end();
-  }
-  else{
-    if(req.body.rules=='on'&&req.body.username!=""&&req.body.pass!=""){
-      let newuser=new User(req.body.username,req.body.pass,"empty","empty","user");
+router.post('/signup',function(req,res){
+  req.session.prevurl=req.session.currurl;
+  req.session.currurl=req.url;
+  console.log(req.session)
+    if(req.body.rules=='on'&&req.body.phonenumber!=undefined){
       MongoClient.connect(dburl, function(err, db) {
         if (err) throw err;
         var dbo = db.db("mydb");
-        dbo.collection("tempuser").insertOne(newuser, function(err, res) {
-          if (err) throw err;
-          console.log("user :"+newuser.username+" inserted");
-          db.close();
+        var verifycode=Math.floor(Math.random() * (99999 - 10000) + 10000);
+        verifycode=verifycode.toString();
+        apikave.VerifyLookup({
+          token: verifycode,
+          template : "reservation",
+          receptor: req.body.phonenumber
+        },
+        function(response, status) {
+          console.log(response);
+          console.log(status);
+          if(status==200){
+            dbo.collection("signupcode").updateOne({phonenumber:req.body.phonenumber},{$set:{code:verifycode,phonenumber:req.body.phonenumber,date:new Date().getTime()}},{upsert:true},function(err,result){
+                res.render("verify.ejs",{phonenumber:req.body.phonenumber,text:""});
+                res.end();
+            })
+          }
+          else{
+            res.write("<html><body><p>there is a problem on server please try again later</p></body></html>");
+            res.end();
+          }
         });
       });
-      res.redirect('/welcome');
-      res.end();
     }
     else{
-      res.redirect('/register');
+      res.render('signup.ejs',{data:"قوانین بررسی نشده است"});
       res.end();
     }
-  }
-})
-
-router.get('/welcome',function(req,res){
-  res.render('welcome.ejs');
-  res.end();
-})
-
-router.get('/submitinfo',function(req,res){
-    res.render('submitinfo.ejs');
-    res.end();
-})
-
-router.post('/submitinfo',function(req,res){
-MongoClient.connect(dburl, function(err, db) {
-    if (err) throw err;
-    var dbo = db.db("mydb");
-    var verifycode=Math.floor(Math.random() * (99999 - 10000) + 10000);
-   verifycode=verifycode.toString();
-    api.VerifyLookup({
-      token: verifycode,
-      template : "reservation",
-      receptor: req.body.phonenumber
-    },
-    function(response, status) {
-      console.log(response);
-      console.log(status);
-      if(status==200){
-        var newvalues = { $set: {firstname: req.body.firstname, lastname: req.body.lastname,codemeli: req.body.codemeli,phone: req.body.phonenumber,creditcardnumber: req.body.creditcardnumber,email: req.body.email,code:verifycode } };
-        dbo.collection("tempuser").updateOne({},newvalues, function(err, result3) {
-          if (err) throw err;
-          db.close();
-          res.redirect("/verifynumber");
-          res.end();
-        });
-      }
-      else{
-        console.log(req.body.phonenumber);
-        console.log(verifycode);
-        // moshkeli dar ersal pish amade ast
-      }
-    });
-  });
-})
-
-router.get("/verifynumber",function(req,res){
-  res.render("verify.ejs");
-  res.end();
 })
 
 
 router.post("/verifynumber",function(req,res){
+  req.session.prevurl=req.session.currurl;
+  req.session.currurl=req.url;
   MongoClient.connect(dburl,function(err,db){
     var dbo=db.db("mydb");
-    dbo.collection("tempuser").findOne({},function(err,result){
-      if(req.body.code==result.code){
-        let token=tokgen.generate();
-        result.token=token;
-        res.cookie('usertoken',token);
-        dbo.collection("Users").insertOne(result,function(err,res2){
-          dbo.collection("tempuser").drop();
-          res.redirect("/");
-        })
+    dbo.collection("signupcode").findOne({phonenumber:req.body.phonenumber},function(err,result){
+      var now=new Date().getTime();
+      if(now-result.date<120000){
+          if(req.body.code==result.code){
+            dbo.collection("signupcode").deleteOne({phonenumber:req.body.phonenumber},function(err,result3){
+              dbo.collection("Users").findOne({phonenumber:req.body.phonenumber},function(err,result4){
+                if(result4==null){
+                  var user=new User(req.body.phonenumber);
+                  dbo.collection('Users').insertOne(user,function(err,result6){
+                    res.render('submitinfo.ejs',{phonenumber:req.body.phonenumber});
+                    res.end();
+                  })
+                }
+                else{
+                    if(result4!=""){
+                      res.cookie('usertoken',result4.token);
+                      res.redirect(req.session.gobackafterlogin)
+                    }
+                    else{
+                      let token1=tokgen.generate();
+                      res.cookie('usertoken',token1);
+                      dbo.collection("Users").updateOne({phonenumber:req.body.phonenumber},{$set:{token:token1}},function(err,result5){
+                        res.redirect(req.session.gobackafterlogin);
+                        })
+                    }
+                }
+              })
+            })
+          }
+          else{
+            res.render("verify.ejs",{phonenumber:req.body.phonenumber,text:"کد وارد شده معتبر نیست"});
+            res.end();
+          }
       }
       else{
-          res.redirect("/verifynumber");
+        dbo.collection("signupcode").deleteOne({phonenumber:req.body.phonenumber},function(err,result2){
+          res.render('signup.ejs',{data:"کد منقضی شده است"})
+          res.end();
+        })
       }
     })
   })
 })
 
-router.get('/login',function(req,res){   // login page
-  var query = url.parse(req.url,true).query;
-  if(query.username==undefined){
-    res.render('login.ejs',{wrongflag:0});
-    res.end();
-  }
-  else{
-    MongoClient.connect(dburl, function(err, db) {
-      if (err) throw err;
-      var dbo = db.db("mydb");
-      dbo.collection("Users").findOne({username:query.username}, function(err, result) {
-        if (err) throw err;
-        if(result==null){
-          res.render("login.ejs",{wrongflag:1});
-          res.end();
-        }
-        else{
-          if(query.pass!=result.pass){
-            res.render("login.ejs",{wrongflag:1});
-            res.end();
-         }
-         else{
-           MongoClient.connect(dburl,function(err,db){
-             if(err) throw err;
-             dbo = db.db("mydb");
-             let token1=tokgen.generate();
-              dbo.collection("Users").updateOne({username:query.username},{ $set : {token:token1}},function(err,result2){
-              if(err) throw err;
-              res.cookie('usertoken',token1);
-              res.redirect("/");
-            })
-           })
-          }
-        }
-      });
-    });
-  }
+router.post('/submitinfo',function(req,res){
+  req.session.prevurl=req.session.currurl;
+  req.session.currurl=req.url;
+  MongoClient.connect(dburl,function(err,db){
+    var dbo=db.db("mydb");
+    var bdate={
+      year:req.body.birthdate.split('/')[0],
+      month:req.body.birthdate.split('/')[1],
+      day:req.body.birthdate.split('/')[2]
+    }
+    let token1=tokgen.generate();
+    res.cookie('usertoken',token1);
+    dbo.collection("Users").updateOne({phonenumber:req.body.phonenumber},{$set:{sex:req.body.sex,firstname:req.body.firstname,lastname:req.body.lastname,birthdate:bdate,token:token1}},function(err,result){
+      res.redirect('/');
+    })
+  })
 })
 
 
 router.get('/loginDoc',function(req,res){
+  req.session.prevurl=req.session.currurl;
+  req.session.currurl=req.url;
   res.render('logindoctor.ejs',{wrongflag:0});
   res.end();
 });
 
 router.post('/loginDoc',function(req,res){
+  req.session.prevurl=req.session.currurl;
+  req.session.currurl=req.url;
   MongoClient.connect(dburl,function(err,db){
     var dbo=db.db("mydb");
     dbo.collection("Doctors").findOne({username:req.body.username},function(err,result){
@@ -843,13 +834,12 @@ router.post('/loginDoc',function(req,res){
 
 
 router.get('/exit',function(req,res){
+  req.session.prevurl=req.session.currurl;
+  req.session.currurl=req.url;
   MongoClient.connect(dburl,function(err,db){
     var dbo=db.db("mydb");
-    dbo.collection('Users').updateOne({token:req.cookies.usertoken},{$set:{token:""}});
     res.clearCookie('usertoken');
-    dbo.collection('Doctors').updateOne({token:req.cookies.doctortoken},{$set:{token:""}});
     res.clearCookie('doctortoken');
-    dbo.collection('Admins').updateOne({token:req.cookies.admintoken},{$set:{token:""}});
     res.clearCookie('admintoken');
     res.redirect('/');
     res.end();
@@ -858,6 +848,8 @@ router.get('/exit',function(req,res){
 
 
 router.get('*',function(req,res){        // 404 page should be displayed here// should be at the end
+  req.session.prevurl=req.session.currurl;
+  req.session.currurl=req.url;
   res.render("404.ejs",{categories:categories,user:""});
   res.end();
 });

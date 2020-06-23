@@ -205,32 +205,3 @@ $(document).ready(function () {
 
 
 });
-
-function checkempty(){             //check if form is empty
-    if(document.getElementsByName("firstname")[0].value==""){
-        alert("نام خود را وارد کنید.")
-        return false;
-    }
-    if(document.getElementsByName("lastname")[0].value==""){
-        alert("نام خانوادگی خود را وارد کنید.")
-        return false;
-    }
-    if(document.getElementsByName("codemeli")[0].value==""){
-        alert("کد ملی خود را وارد کنید.")
-        return false;
-    }
-    if(document.getElementsByName("phonenumber")[0].value==""){
-        alert("شماره تلفن خود را وارد کنید.")
-        return false;
-    }
-    if(document.getElementsByName("creditcardnumber")[0].value==""){
-        alert("شماره کارت خود را وارد کنید.")
-        return false;
-    }
-    if(document.getElementsByName("email")[0].value==""){
-        alert("ایمیل خود را وارد کنید.")
-        return false;
-    }
-    alert("اطلاعات شما با موفقیت ثبت شد!")
-    return true;
-}

@@ -32,8 +32,8 @@
                             </a>
                         </div>
                         <div class="message-light">
-                            برای شماره همراه 09999999999 کد تایید ارسال گردید
-                            <a href="" class="btn-link-border form-account-link">
+                            برای شماره همراه <%=  phonenumber %> کد تایید ارسال گردید
+                            <a href="/signup" class="btn-link-border form-account-link">
                                 ویرایش شماره
                             </a>
                         </div>
@@ -42,19 +42,13 @@
                                 <div class="form-account-title">کد تایید را وارد کنید</div>
                                 <div class="form-account-row numbers-verify">
                                     <div class="lines-number-input">
-                                        <input type="text" name="code" id="code" class="line-number" maxlength="6">
+                                        <input type="text" name="code" id="code" class="line-number" maxlength="5">
                                     </div>
+                                    <input type="text" value="<%=phonenumber %>" style="visibility: hidden;" name="phonenumber">
                                 </div>
-                                <div class="form-account-row">
-                                    دریافت مجدد کد تایید(
-                                    <p id="countdown-verify-end"></p>)
-                                </div>
+                                <p style="color: crimson;"><%= text %></p>
+                                <button type="submit" class="btn btn-info">ثبت</button>
                             </form>
-                        </div>
-                        <div class="account-box-footer">
-                            <span>کاربر جدید هستید؟</span>
-                            <a href="#" class="btn-link-border">ثبت‌نام در
-                                تاپ کالا</a>
                         </div>
                     </div>
                 </div>
@@ -66,7 +60,7 @@
                 <div class="container">
                     <ul class="menu">
                         <li>
-                            <a href="#">درباره تاپ کالا</a>
+                            <a href="#">درباره دکتر تجویز</a>
                         </li>
                         <li>
                             <a href="#">فرصت‌های شغلی</a>
@@ -84,9 +78,9 @@
             <div class="copyright-bar">
                 <div class="container">
                     <p>
-                        استفاده از مطالب فروشگاه اینترنتی تاپ کالا فقط برای مقاصد غیرتجاری و با ذکر منبع بلامانع است.
+                        استفاده از مطالب  دکتر تجویز فقط برای مقاصد غیرتجاری و با ذکر منبع بلامانع است.
                         کلیه حقوق این سایت متعلق
-                        به شرکت نوآوران فن آوازه (فروشگاه آنلاین تاپ کالا) می‌باشد.
+                        به شرکت اروین اکسیر شفا می‌باشد.
                     </p>
                 </div>
             </div>
