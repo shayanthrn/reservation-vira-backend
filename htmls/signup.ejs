@@ -45,19 +45,14 @@
                                         <span class="checkbox-check"></span>
                                     </label>
                                     <label for="agree">
-                                        <a href="#" class="btn-link-border">حریم خصوصی</a> و <a href="#"
+                                        <a class="btn-link-border">حریم خصوصی</a> و <a
                                             class="btn-link-border">شرایط و قوانین</a> استفاده از سرویس های سایت
                                          دکتر تجویز را مطالعه نموده و با کلیه موارد آن موافقم.</label>
                                 </div>
                                 <p style="color: crimson;"> <%= data %></p>
                                 <div class="form-account-row form-account-submit">
                                     <div class="parent-btn">
-                                        <script>
-                                            function onSubmit(token) {
-                                            document.getElementById("myform").submit();
-                                            }
-                                        </script>
-                                        <button class="btn dk-btn-info g-recaptcha" data-sitekey="6LdfZagZAAAAALyt9lMePYKSdifceTRbPvYSa2Hw" data-callback='onSubmit' data-action='submit' type="submit">
+                                        <button class="btn dk-btn-info" type="submit">
                                             ورود/ثبت نام در دکتر تجویز
                                             <i class="now-ui-icons users_circle-08"></i>
                                         </button>
@@ -104,7 +99,6 @@
 </body>
 <!--   Core JS Files   -->
 <script src="assets/js/core/jquery.3.2.1.min.js" type="text/javascript"></script>
-<script src="https://www.google.com/recaptcha/api.js"></script>
 <script src="assets/js/core/popper.min.js" type="text/javascript"></script>
 <script src="assets/js/core/bootstrap.min.js" type="text/javascript"></script>
 <!--  Plugin for Switches, full documentation here: http://www.jque.re/plugins/version3/bootstrap.switch/ -->
