@@ -636,7 +636,7 @@ router.post("/paymenthandler",function(req,res){
   req.session.prevurl=req.session.currurl;
   req.session.currurl=req.url;
   if(req.cookies.usertoken==undefined){
-    res.redirect("/");
+    res.redirect("/signup");
     res.end();
   }
   else{
