@@ -32,7 +32,7 @@
                         </a>
                         <div class="account-box-title">ورود/ثبت نام</div>
                         <div class="account-box-content">
-                            <form class="form-account" action="/signup" method="POST">
+                            <form id="myform" class="form-account" action="/submit" method="POST">
                                 <div class="form-account-title">شماره تلفن</div>
                                 <div class="form-account-row">
                                     <label class="input-label"><i class="now-ui-icons users_single-02"></i></label>
@@ -52,7 +52,12 @@
                                 <p style="color: crimson;"> <%= data %></p>
                                 <div class="form-account-row form-account-submit">
                                     <div class="parent-btn">
-                                        <button class="dk-btn dk-btn-info" type="submit">
+                                        <script>
+                                            function onSubmit(token) {
+                                            document.getElementById("myform").submit();
+                                            }
+                                        </script>
+                                        <button class="btn dk-btn-info g-recaptcha" data-sitekey="6LdfZagZAAAAALyt9lMePYKSdifceTRbPvYSa2Hw" data-callback='onSubmit' data-action='submit' type="submit">
                                             ورود/ثبت نام در دکتر تجویز
                                             <i class="now-ui-icons users_circle-08"></i>
                                         </button>
@@ -99,6 +104,7 @@
 </body>
 <!--   Core JS Files   -->
 <script src="assets/js/core/jquery.3.2.1.min.js" type="text/javascript"></script>
+<script src="https://www.google.com/recaptcha/api.js"></script>
 <script src="assets/js/core/popper.min.js" type="text/javascript"></script>
 <script src="assets/js/core/bootstrap.min.js" type="text/javascript"></script>
 <!--  Plugin for Switches, full documentation here: http://www.jque.re/plugins/version3/bootstrap.switch/ -->
