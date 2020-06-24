@@ -274,18 +274,22 @@ function createinterval(start,end){
 
 
 function getDoctimeslots(doctor,date){
-  console.log(doctor);
-  console.log(date);
   duration=doctor.visitduration;
+  console.log("here");
   unavb=doctor.unavailabletimes;
+  console.log("here1");
   dayofweek=new persianDate([date.year,date.month,date.day]).format('dddd');
+  console.log("here2");
   mintime=0;
   timeslots=[];
+  console.log("here3");
   while(mintime+duration<=1440){
+    console.log("here4");
     interval=createinterval(mintime,mintime+duration);
     mintime+=duration;
     timeslots.push(interval);
   }
+
   for(let i=0;i<unavb.length;i++){
     temp=new myDate(unavb[i].date.day,unavb[i].date.month,unavb[i].date.year);
     if(lodash.isEqual(temp,date)||(unavb[i].date=="*"&&dayofweek==unavb[i].dayofweek)||(unavb[i].dayofweek=="*")){
