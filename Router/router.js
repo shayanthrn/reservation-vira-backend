@@ -55,6 +55,7 @@ router.post("/changedocinfo",function(req,res){
           dbo.collection('Doctors').updateOne({token:req.cookies.doctortoken},{$set:{category:req.body.major,background:req.body.experience,address:req.body.address,phonenumber:req.body.phone,visitduration:Number(req.body.duration),visitcost:Number(req.body.cost),description:req.body.description}},function(err,res2){
             if(req.files!=null){
               mv(req.files.image.tempFilePath,"public"+result.image,function(err){
+                console.log("public"+result.image)
               })
             }
             res.redirect('/doctorpanel/profile');
@@ -666,6 +667,7 @@ router.get("/reserve/:Doctor",function(req,res){
     days=[];
     freetimes=[]
     dbo.collection("Doctors").findOne({name:req.params.Doctor.split('-').join(' ')},function(err,result){
+      console.log(result);
       currentday=new persianDate();
       days.push(currentday);
       freetimes.push(getDoctimeslots(result,new myDate(currentday.toArray()[2],currentday.toArray()[1],currentday.toArray()[0])));
