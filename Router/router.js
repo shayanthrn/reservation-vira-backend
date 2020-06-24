@@ -280,7 +280,6 @@ function getDoctimeslots(doctor,date){
   mintime=0;
   timeslots=[];
   while(mintime+duration<=1440){
-    console.log("here4");
     interval=createinterval(mintime,mintime+duration);
     mintime+=duration;
     timeslots.push(interval);
