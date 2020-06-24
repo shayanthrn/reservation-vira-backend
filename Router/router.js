@@ -229,6 +229,7 @@ router.post("/addDoctor",function(req,res){
           dbo.collection('Doctors').insertOne(new Doctor(req.body.username,req.body.pass,req.body.name,req.body.categories,req.body.medicalnumber,req.body.codemeli,req.body.workphone,req.body.phonenumber,req.body.address,req.body.city,"/docphotos/"+req.body.name+".png",req.body.background,req.body.description,req.body.membershiptypes,req.body.appknowledge),function(err,res2){
             if(req.files!=null){
               mv(req.files.image.tempFilePath,"public/docphotos/"+req.body.name+".png",function(err){
+                console.log("public/docphotos/"+req.body.name+".png")
               })
             }
             res.redirect('/'); //fixxxxxxxxxxxxxxxxxxxxxxxx
