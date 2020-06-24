@@ -55,7 +55,7 @@ router.post("/changedocinfo",function(req,res){
           dbo.collection('Doctors').updateOne({token:req.cookies.doctortoken},{$set:{category:req.body.major,background:req.body.experience,address:req.body.address,phonenumber:req.body.phone,visitduration:Number(req.body.duration),visitcost:Number(req.body.cost),description:req.body.description}},function(err,res2){
             if(req.files!=null){
               mv(req.files.image.tempFilePath,"public"+result.image,function(err){
-  
+                console.log("public"+result.image);
               })
             }
             res.redirect('/doctorpanel/profile');
@@ -227,11 +227,10 @@ router.post("/addDoctor",function(req,res){
           res.redirect('noaccess');
         }
         else{
-          console.log(req.body)
           dbo.collection('Doctors').insertOne(new Doctor(req.body.username,req.body.pass,req.body.name,req.body.categories,req.body.medicalnumber,req.body.codemeli,req.body.workphone,req.body.phonenumber,req.body.address,req.body.city,"/docphotos/"+req.body.name+".png",req.body.background,req.body.description,req.body.membershiptypes,req.body.appknowledge),function(err,res2){
             if(req.files!=null){
               mv(req.files.image.tempFilePath,"public/docphotos/"+result.name+".png",function(err){
-  
+                console.log("public/docphotos/"+result.name+".png")
               })
             }
             res.redirect('/'); //fixxxxxxxxxxxxxxxxxxxxxxxx
