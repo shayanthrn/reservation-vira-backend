@@ -274,6 +274,8 @@ function createinterval(start,end){
 
 
 function getDoctimeslots(doctor,date){
+  console.log(doctor);
+  console.log(date);
   duration=doctor.visitduration;
   unavb=doctor.unavailabletimes;
   dayofweek=new persianDate([date.year,date.month,date.day]).format('dddd');
@@ -667,7 +669,9 @@ router.get("/reserve/:Doctor",function(req,res){
     days=[];
     freetimes=[]
     dbo.collection("Doctors").findOne({name:req.params.Doctor.split('-').join(' ')},function(err,result){
-      console.log(result);
+      if(result==null){
+        res.redirect('/');
+      }
       currentday=new persianDate();
       days.push(currentday);
       freetimes.push(getDoctimeslots(result,new myDate(currentday.toArray()[2],currentday.toArray()[1],currentday.toArray()[0])));
