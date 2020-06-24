@@ -7,7 +7,8 @@ const fileUpload = require('express-fileupload');
 const session = require('express-session');
 
 
-app.use(express.static('public'));    // files on the public path are downloadable
+//app.use(express.static('public'));    // files on the public path are downloadable
+app.use("/public", express.static(path.resolve('/public')));
 app.use(bodyParser.urlencoded({extended: false}));
 app.use(bodyParser.json());
 app.use(cookieParser());
