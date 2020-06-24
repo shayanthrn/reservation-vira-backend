@@ -231,7 +231,7 @@ router.post("/addDoctor",function(req,res){
             if(req.files!=null){
               console.log("i am here")
               mv(req.files.image.tempFilePath,"public"+result.image,function(err){
-                console.log("i am here2")
+                console.log("public"+result.image)
               })
             }
             res.redirect('/'); //fixxxxxxxxxxxxxxxxxxxxxxxx
