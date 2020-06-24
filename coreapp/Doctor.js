@@ -13,8 +13,8 @@ class Doctor{
         this.unavailabletimes=[];
         this.image=path;
         this.background=background;
-        this.visitduration=0;
-        this.visitcost=0;
+        this.visitduration=60;
+        this.visitcost=10000;
         this.description=description;
         this.membershiptypes=membershiptypes;
         this.token="";

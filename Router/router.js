@@ -275,14 +275,10 @@ function createinterval(start,end){
 
 function getDoctimeslots(doctor,date){
   duration=doctor.visitduration;
-  console.log("here");
   unavb=doctor.unavailabletimes;
-  console.log("here1");
   dayofweek=new persianDate([date.year,date.month,date.day]).format('dddd');
-  console.log("here2");
   mintime=0;
   timeslots=[];
-  console.log("here3");
   while(mintime+duration<=1440){
     console.log("here4");
     interval=createinterval(mintime,mintime+duration);
@@ -586,6 +582,14 @@ router.get("/Adminpanel/addDoctor",function(req,res){
 })
 
 //------------------------adminpanel---------------------------//
+//=======================doctor signup========================//
+
+router.get("/DoctorSignup",function(req,res){
+  res.render("doctorsignup.ejs",{categories:categories});
+  res.end();
+})
+
+//=======================doctor signup========================//
 
 
 
