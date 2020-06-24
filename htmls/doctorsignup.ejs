@@ -26,7 +26,6 @@
 <body>
 
   <nav class="navbar fixed-top navbar-expand-lg nav-dark">
-    <a class="navbar-brand mr-2" >داشبورد برند</a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarTogglerDemo" aria-controls="navbarTogglerDemo" aria-expanded="false" aria-label="Toggle navigation">
       <i class="fa fa-bars menu-icon"></i>
     </button>
@@ -43,12 +42,12 @@
             <h1 class="h2">ثبت نام دکتر</h1>
           </div>
 
-          <form class="" action="addDoctorPending" enctype="multipart/form-data" method="POST">
+          <form class="" action="addDoctor" enctype="multipart/form-data" method="POST">
             <div class="row">
               <div class="col-sm-12 col-md-10">
                 <div class="row">
                   <div class="col-md-4 col-lg-2">
-                    <h5>عکس ( 512*512)</h5>
+                    <h3>عکس ( 512*512)</h3>
                   </div>
                   <div class="col-md-6 col-lg-6">
                     <div class="form-group mb-2">
@@ -218,7 +217,7 @@
             <div class="row">
               <div class="col">
                 <div class="float-right">
-                  <button type="submit" onclick="return myfunction()" class="btn btn-success edit-button">
+                  <button type="submit" onclick="return myfunction()" class="btn btn-success edit-button" style="margin: 24px;">
                     <i class="fa fa-plus"></i>
                     ثبت اطلاعات برای بررسی
                   </button>
