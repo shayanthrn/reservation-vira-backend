@@ -1,16 +1,24 @@
 class Doctor{
-    constructor(username,pass,name,category,address,unavailabletimes,path,background,cost,description){
+    constructor(username,pass,name,categories,medicalnumber,codemeli,workphone,phonenumber,address,city,path,background,description,membershiptypes,appknowledge){
         this.username=username;
         this.password=pass;
         this.name=name;
-        this.category=category;
+        this.categories=categories;
+        this.medicalnumber=medicalnumber;
+        this.codemeli=codemeli;
+        this.workphone=workphone;
+        this.phonenumber=phonenumber;
         this.address=address;
-        this.unavailabletimes=unavailabletimes;
+        this.city=city;
+        this.unavailabletimes=[];
         this.image=path;
         this.background=background;
-        this.visitcost=cost;
-        this.token="";
+        this.visitduration=0;
+        this.visitcost=0;
         this.description=description;
+        this.membershiptypes=membershiptypes;
+        this.token="";
+        this.appknowledge=appknowledge;
         this.reservations=[];
     }
 }

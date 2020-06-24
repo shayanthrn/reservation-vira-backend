@@ -215,6 +215,33 @@ router.post("/changepass",function(req,res){
 })
 
 
+router.post("/addDoctor",function(req,res){
+  if(req.cookies.admintoken==undefined){
+    res.redirect('/noaccess');
+  }
+  else{
+    MongoClient.connect(dburl,function(err,db){
+      var dbo=db.db("mydb");
+      dbo.collection('Admins').findOne({token:req.cookies.admintoken},function(err,result){
+        if(result==null){
+          res.redirect('noaccess');
+        }
+        else{
+          console.log(req.body)
+          dbo.collection('Doctors').insertOne(new Doctor(req.body.username,req.body.pass,req.body.name,req.body.categories,req.body.medicalnumber,req.body.codemeli,req.body.workphone,req.body.phonenumber,req.body.address,req.body.city,"/docphotos/"+req.body.name+".png",req.body.background,req.body.description,req.body.membershiptypes,req.body.appknowledge),function(err,res2){
+            if(req.files!=null){
+              mv(req.files.image.tempFilePath,"D://web developing/reservation/public"+result.image,function(err){
+  
+              })
+            }
+            res.redirect('/'); //fixxxxxxxxxxxxxxxxxxxxxxxx
+          })
+        }
+      })
+    })
+  }
+})
+
 
 
 
@@ -228,7 +255,10 @@ router.post("/changepass",function(req,res){
 
 //-----------------------test route--------------------------//
 
-
+router.get("/test",function(req,res){
+  var query=url.parse(req.url,true).query;
+  console.log(query);
+})
 
 
 
@@ -529,6 +559,27 @@ router.get("/Adminpanel/reserves/:resid",function(req,res){
   }
 })
 
+
+router.get("/Adminpanel/addDoctor",function(req,res){
+  if(req.cookies.admintoken==undefined){
+    res.redirect('/noaccess');
+  }
+  else{
+    MongoClient.connect(dburl,function(err,db){
+      var dbo=db.db("mydb");
+      dbo.collection("Admins").findOne({token:req.cookies.admintoken},function(err,result){
+        if(result==null){
+          res.redirect('/noaccess');
+        }
+        else{
+          res.render("AdminPanel/doctors-add.ejs",{categories:categories});
+          res.end();
+        }
+      })
+    })
+  }
+})
+
 //------------------------adminpanel---------------------------//
 
 
@@ -571,7 +622,7 @@ router.get("/category//:Category",function(req,res){
   MongoClient.connect(dburl,function(err,db){
     if(err) throw err;
     var dbo= db.db("mydb");
-    dbo.collection("Doctors").find({category:req.params.Category.split('-').join(' ')}).forEach(function(doc,err){
+    dbo.collection("Doctors").find({categories:req.params.Category.split('-').join(' ')}).forEach(function(doc,err){
       Doctors.push(doc);
     },function(){
       if(req.cookies.usertoken==undefined){
@@ -591,6 +642,19 @@ router.get("/category//:Category",function(req,res){
           db.close();
         })
       }
+    })
+  })
+})
+
+router.get("/category/:Category/:Doctor",function(req,res){ 
+  req.session.prevurl=req.session.currurl;
+  req.session.currurl=req.url;
+  MongoClient.connect(dburl,function(err,db){
+    if (err) throw err;
+    var dbo=db.db("mydb");
+    dbo.collection("Doctors").findOne({name:req.params.Doctor.split('-').join(' ')},function(err,result){
+      res.render("doctorpage.ejs",{doctor:result,categories:categories,user:""});      //fix this
+      res.end();
     })
   })
 })
@@ -618,18 +682,7 @@ router.get("/reserve/:Doctor",function(req,res){
   })
 })
 
-router.get("/category/:Category/:Doctor",function(req,res){ 
-  req.session.prevurl=req.session.currurl;
-  req.session.currurl=req.url;
-  MongoClient.connect(dburl,function(err,db){
-    if (err) throw err;
-    var dbo=db.db("mydb");
-    dbo.collection("Doctors").findOne({name:req.params.Doctor.split('-').join(' ')},function(err,result){
-      res.render("doctorpage.ejs",{doctor:result,categories:categories,user:""});      //fix this
-      res.end();
-    })
-  })
-})
+
 
 
 router.post("/paymenthandler",function(req,res){
@@ -825,6 +878,40 @@ router.post('/loginDoc',function(req,res){
           dbo.collection("Doctors").updateOne({username:req.body.username},{$set:{token:mytoken}},function(err,result2){
             res.cookie('doctortoken',mytoken);
             res.redirect('/Doctorpanel/dashboard');
+          })
+        }
+      }
+    })
+  })
+})
+
+router.get("/loginAdmin",function(req,res){
+  req.session.prevurl=req.session.currurl;
+  req.session.currurl=req.url;
+  res.render('AdminPanel/loginadmin.ejs',{wrongflag:0});
+  res.end();
+})
+
+router.post('/loginAdmin',function(req,res){
+  req.session.prevurl=req.session.currurl;
+  req.session.currurl=req.url;
+  MongoClient.connect(dburl,function(err,db){
+    var dbo=db.db("mydb");
+    dbo.collection("Admins").findOne({username:req.body.username},function(err,result){
+      if(result==null){
+        res.render('AdminPanel/loginadmin.ejs',{wrongflag:1});
+        res.end();
+      }
+      else{
+        if(req.body.pass!=result.password){
+          res.render('AdminPanel/loginadmin.ejs',{wrongflag:1});
+          res.end();
+        }
+        else{
+          let mytoken=tokgen.generate();
+          dbo.collection("Admins").updateOne({username:req.body.username},{$set:{token:mytoken}},function(err,result2){
+            res.cookie('admintoken',mytoken);
+            res.redirect('/AdminPanel/addDoctor');
           })
         }
       }
