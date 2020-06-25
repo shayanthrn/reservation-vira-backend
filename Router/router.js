@@ -25,6 +25,7 @@ var apikave = Kavenegar.KavenegarApi({
 var md5 = require('md5');
 const { ObjectID } = require('mongodb');
 const ZarinpalCheckout = require('zarinpal-checkout');
+const { debugPort } = require('process');
 const zarinpal = ZarinpalCheckout.create('3392f819-3761-4add-babb-4d1d70021603', false);
 
 
@@ -37,7 +38,110 @@ MongoClient.connect(dburl,function(err,db){
   db.close();
 })
 
+//------------------------api------------------------------//
 
+router.get("/api/verification",function(req,res){
+  var query=url.parse(req.url,true).query;
+  if(query.key!="pouyarahmati"){
+    res.write("noaccess");
+    res.end();
+  }
+  else{
+    var phonenumber = query.phonenumber;
+    var myresponse;
+    MongoClient.connect(dburl, function(err, db) {
+      if (err) throw err;
+      var dbo = db.db("mydb");
+      var verifycode=Math.floor(Math.random() * (99999 - 10000) + 10000);
+      verifycode=verifycode.toString();
+      apikave.VerifyLookup({
+        token: verifycode,
+        template : "reservation",
+        receptor: phonenumber
+      },
+      function(response, status) {
+        if(status==200){
+          dbo.collection("signupcode").updateOne({phonenumber:phonenumber},{$set:{code:verifycode,phonenumber:phonenumber,date:new Date().getTime()}},{upsert:true},function(err,result){
+              dbo.collection("Users").findOne({phonenumber:query.phonenumber},function(err,user){
+                if(user==null){
+                  myresponse={func:"signup",code:verifycode};
+                }
+                else{
+                  myresponse={func:"login",code:verifycode};
+                }
+                res.json(myresponse)
+                res.end();
+              })
+          })
+        }
+        else{
+          res.write("problem in sending");
+          res.end();
+        }
+      });
+    });
+  }
+})
+
+///
+
+var query=url.parse(req.url,true).query;
+  if(query.key!="pouyarahmati"){
+    res.write("noaccess");
+    res.end();
+  }
+  else{
+    
+  }
+///
+
+router.get("/api/login",function(req,res){
+  var query=url.parse(req.url,true).query;
+  if(query.key!="pouyarahmati"){
+    res.write("noaccess");
+    res.end();
+  }
+  else{
+    var query=url.parse(req.url,true).query;
+  MongoClient.connect(dburl,function(err,db){
+    var dbo=db.db("mydb");
+    dbo.collection("Users").findOne({phonenumber:query.phonenumber},function(err,user){
+      res.json({token:user.token});
+      res.end();
+    })
+  })
+  }
+})
+
+router.post("/api/signup",function(req,res){
+  var user=new User(req.body.phonenumber);
+  user.sex=req.body.gender;
+  user.firstname=req.body.firstname;
+  user.lastname=req.body.lastname;
+  user.birthdate=req.body.birthdate;
+  let token1=tokgen.generate();
+  user.token=token1;
+  dbo.collection('Users').insertOne(user,function(err,result6){
+    if(err) res.json({status:"nok"})
+    else{
+      res.json({status:"ok",token:token1});
+    }
+    res.end();
+  })
+})
+
+
+router.get("/api/get",function(req,res){
+  var query=url.parse(req.url,true).query;
+  if(query.key!="pouyarahmati"){
+    res.write("noaccess");
+    res.end();
+  }
+  else{
+    res.write("noaccess");
+    res.end();
+  }
+})
 
 
 //--------------------------api---------------------------//
@@ -242,12 +346,6 @@ router.post("/addDoctor",function(req,res){
     })
   }
 })
-
-
-
-
-
-//------------------------api------------------------------//
 
 
 
