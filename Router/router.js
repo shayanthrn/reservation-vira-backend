@@ -199,7 +199,7 @@ router.get("/api/getDoctorsBycategory",function(req,res){
     var data=[];
     MongoClient.connect(dburl,function(err,db){
       var dbo=db.db("mydb");
-      dbo.collection("Doctors").find({Categories:query.category}).forEach(function(doc){
+      dbo.collection("Doctors").find({categories:query.category}).forEach(function(doc){
         data.push(doc);
       },function(){
         res.json({Doctors:data});
@@ -220,7 +220,7 @@ router.get("/api/getDoctorsBycategory-city",function(req,res){
     var data=[];
     MongoClient.connect(dburl,function(err,db){
       var dbo=db.db("mydb");
-      dbo.collection("Doctors").find({Categories:query.category,city:query.city}).forEach(function(doc){
+      dbo.collection("Doctors").find({categories:query.category,city:query.city}).forEach(function(doc){
         data.push(doc);
       },function(){
         res.json({Doctors:data});
