@@ -454,15 +454,25 @@ router.post("/addDoctor",function(req,res){
 //-----------------------test route--------------------------//
 
 router.get("/test",function(req,res){
-  apikave.Send({
-    message: "خدمات پیام کوتاه کاوه نگار",
-    sender: "10008663",
-    receptor: "09192356516"
-},
-function(response, status) {
+  apikave.VerifyLookup({
+    token: "10203040",
+    token2: "دکتر مجید",
+    token3: "مجیدی",
+    template : "reserveACK",
+    receptor: "09128993687"
+  },
+  function(response, status) {
     console.log(response);
     console.log(status);
-});
+    if(status==200){
+      console.log("hehe");
+      res.end();
+    }
+    else{
+      res.write("<html><body><p>there is a problem on server please try again later</p></body></html>");
+      res.end();
+    }
+  });
 })
 
 //-----------------------test route--------------------------//
@@ -540,6 +550,36 @@ function checkinterval(reservedata){       //must be implemented
   return 1;
 }
 
+
+function sendSMSforres(reservation){
+  MongoClient.connect(dburl,function(err,db){
+    var dbo=db.db("mydb");
+    dbo.collection("Doctors").findOne({_id:reservation.doctor},function(err,doctor){
+      dbo.collection("Users").findOne({_id:reservation.user},function(err,user){
+        var date=reservation.time.date.year+"/"+reservation.time.date.month+'/'+reservation.time.day+" "+reservation.time.start.hour+":"+reservation.time.start.min;
+        apikave.VerifyLookup({
+          token: reservation.refid,
+          token2: doctor.name,
+          token3: date,
+          template : "reserveACK",
+          receptor: doctor.phonenumber+","+user.phonenumber
+        },
+        function(response, status) {
+          console.log(response);
+          console.log(status);
+          if(status==200){
+            console.log("hehe");
+            res.end();
+          }
+          else{
+            res.write("<html><body><p>there is a problem on server please try again later</p></body></html>");
+            res.end();
+          }
+        });
+      })
+    })
+  })
+}
 
 //-----------------------functions--------------------------//
 
@@ -994,6 +1034,7 @@ router.get("/paymenthandler",function(req,res){
                   dbo.collection("Users").updateOne({_id:reservation.user},{$addToSet:{reserves:reservation}},function(err,ad){
                     strtime=reservation.time.start.hour+":"+reservation.time.start.min;
                     res.render("paymentaccept.ejs",{doctor:result,time:strtime,resid:reservation.refid});
+                    sendSMSforres(reservation);
                     res.end();
                   })
                 })
