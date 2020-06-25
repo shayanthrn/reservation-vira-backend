@@ -362,43 +362,6 @@ router.post("/addDoctor",function(req,res){
 
 //-----------------------test route--------------------------//
 
-router.get("/test",function(req,res){
-  zarinpal.PaymentRequest({
-    Amount: '1000000', // In Tomans
-    CallbackURL: 'http://localhost/test2',
-    Description: 'A Payment from Node.JS',
-    Email: 'hi@siamak.work',
-    Mobile: '09128993687'
-  }).then(response => {
-    if (response.status === 100) {
-      res.redirect(response.url)
-    }
-  }).catch(err => {
-    res.write("<html><body><p>there is a problem on server please try again later</p><a href='/' >go back to main page</a></body></html>");
-    console.error(err);
-  });
-})
-
-router.get('/test2',function(req,res){
-  var query = url.parse(req.url,true).query;
-  zarinpal.PaymentVerification({
-    Amount: '1000000', // In Tomans
-    Authority: query.Authority,
-  }).then(response => {
-    console.log("========veri response+++++")
-    console.log(response);
-    if (response.status === -21) {
-      console.log('Empty!');
-    } else {
-      console.log(`Verified! Ref ID: ${response.RefID}`);
-    }
-  }).catch(err => {
-    console.error(err);
-  });
-  //status == NOK  انصراف زده 
-  //status == OK  موفق
-})
-
 
 //-----------------------test route--------------------------//
 
@@ -811,31 +774,29 @@ router.get("/category/:Category/:Doctor",function(req,res){
 })
 
 router.get("/reserve/:Doctor",function(req,res){
-    res.write("<html><body><p>under development please contact vira co </p></body></html>");
-    res.end();
-//   req.session.prevurl=req.session.currurl;
-//   req.session.currurl=req.url;
-//   MongoClient.connect(dburl,function(err,db){
-//     if(err) throw err;
-//     var dbo=db.db("mydb");
-//     days=[];
-//     freetimes=[]
-//     dbo.collection("Doctors").findOne({name:req.params.Doctor.split('-').join(' ')},function(err,result){
-//       if(result==null){
-//         res.redirect('/');
-//       }
-//       currentday=new persianDate();
-//       days.push(currentday);
-//       freetimes.push(getDoctimeslots(result,new myDate(currentday.toArray()[2],currentday.toArray()[1],currentday.toArray()[0])));
-//       for(let i=0;i<14;i++){
-//         currentday=currentday.add("d",1);
-//         days.push(currentday);
-//         freetimes.push(getDoctimeslots(result,new myDate(currentday.toArray()[2],currentday.toArray()[1],currentday.toArray()[0])));
-//       }
-//       res.render("reserve.ejs",{doctor:result,days:createDayboxobj(days),freetimes:freetimes,categories:categories});
-//       res.end();
-//     })
-//   })
+  req.session.prevurl=req.session.currurl;
+  req.session.currurl=req.url;
+  MongoClient.connect(dburl,function(err,db){
+    if(err) throw err;
+    var dbo=db.db("mydb");
+    days=[];
+    freetimes=[]
+    dbo.collection("Doctors").findOne({name:req.params.Doctor.split('-').join(' ')},function(err,result){
+      if(result==null){
+        res.redirect('/');
+      }
+      currentday=new persianDate();
+      days.push(currentday);
+      freetimes.push(getDoctimeslots(result,new myDate(currentday.toArray()[2],currentday.toArray()[1],currentday.toArray()[0])));
+      for(let i=0;i<14;i++){
+        currentday=currentday.add("d",1);
+        days.push(currentday);
+        freetimes.push(getDoctimeslots(result,new myDate(currentday.toArray()[2],currentday.toArray()[1],currentday.toArray()[0])));
+      }
+      res.render("reserve.ejs",{doctor:result,days:createDayboxobj(days),freetimes:freetimes,categories:categories});
+      res.end();
+    })
+  })
 })
 
 
@@ -848,7 +809,7 @@ router.post("/payment",function(req,res){
   }
   else{
   if(req.body.choice==undefined){
-    res.redirect(req.session.prevurl);
+    res.redirect("/");
     res.end();
   }
   reservedata=req.body.choice.split(":");
@@ -873,7 +834,7 @@ router.post("/payment",function(req,res){
             else{
               zarinpal.PaymentRequest({
                 Amount: req.body.cost , // In Tomans
-                CallbackURL: 'http://localhost/paymenthandler',
+                CallbackURL: 'http://reservation.drtajviz.com/paymenthandler',
                 Description: 'Dr tajviz payment',
                 Email: 'shayanthrn@gmail.com',
                 Mobile: '09128993687'
@@ -898,6 +859,7 @@ router.post("/payment",function(req,res){
   }
 })
 
+
 router.get("/paymenthandler",function(req,res){
   var query= url.parse(req.url,true).query;
   MongoClient.connect(dburl,function(err,db){
@@ -908,96 +870,52 @@ router.get("/paymenthandler",function(req,res){
       }
       else{
         if(query.Status=="NOK"){
-          // remove temp and go to paymentfail
-          zarinpal.PaymentVerification({
-            Amount: reserve.cost, // In Tomans
-            Authority: reserve.authority,
-            }).then(response => {
-            console.log("========veri response+++++")
-            console.log(response);
-            if (response.status === -21) {
-              console.log('Empty!');
-            } else {
-              console.log(`Verified! Ref ID: ${response.RefID}`);
-            }
-            }).catch(err => {
-              console.error(err);
-            });
+          strtime=reserve.time.start.hour+":"+reserve.time.start.min;
+          dbo.collection("Doctors").findOne({_id:reserve.doctor},function(err,doctor){
+            dbo.collection("TempReserves").deleteOne({authority:query.Authority},function(err,result){
+              res.render("paymentfail.ejs",{doctor:doctor,time:strtime});
+              res.end();
+            })
+          })
         }
         else{
           zarinpal.PaymentVerification({
           Amount: reserve.cost, // In Tomans
           Authority: reserve.authority,
           }).then(response => {
-          console.log("========veri response+++++")
-          console.log(response);
-          if (response.status === -21) {
-            console.log('Empty!');
+          if (response.status === 100 && response.RefID!=0) {
+            var reservation=reserve;
+            reservation.refid=response.RefID;
+            dbo.collection("Reservations").insertOne(reservation,function(err,result234){
+              dbo.collection("TempReserves").deleteOne({authority:query.Authority},function(err,aa){
+                dbo.collection("Doctors").updateOne({_id:reservation.doctor},{$addToSet:{reservations:reservation,unavailabletimes:reservation.time}},function(err,ss){
+                  dbo.collection("Users").updateOne({_id:reservation.user},{$addToSet:{reserves:reservation}},function(err,ad){
+                    strtime=reservation.time.start.hour+":"+reservation.time.start.min;
+                    res.render("paymentaccept.ejs",{doctor:result,time:strtime,resid:reservation.refid});
+                    res.end();
+                  })
+                })
+              })
+            })
           } else {
-            console.log(`Verified! Ref ID: ${response.RefID}`);
+              strtime=reserve.time.start.hour+":"+reserve.time.start.min;
+              dbo.collection("Doctors").findOne({_id:reserve.doctor},function(err,doctor){
+              dbo.collection("TempReserves").deleteOne({authority:query.Authority},function(err,result){
+              res.render("paymentfail.ejs",{doctor:doctor,time:strtime});
+              res.end();
+            })
+          })
           }
           }).catch(err => {
+            res.write("<html><body><p>there is a problem on server please try again later</p><a href='/' >go back to main page</a></body></html>");
             console.error(err);
+            res.end();
           });
         }
       }
     })
   })
 })
-
-
-
-
-
-// router.post("/paymenthandler",function(req,res){
-//   req.session.prevurl=req.session.currurl;
-//   req.session.currurl=req.url;
-//   if(req.cookies.usertoken==undefined){
-//     res.redirect("/signup");
-//     res.end();
-//   }
-//   else{
-//   if(req.body.choice==undefined){
-//     res.redirect("/");
-//     res.end();
-//   }
-//   reservedata=req.body.choice.split(":");
-//   MongoClient.connect(dburl,function(err,db){
-//     var dbo= db.db("mydb");
-//     dbo.collection("Doctors").findOne({name:req.body.doctor},function(err,result){
-//         date=new myDate(Number(reservedata[4]),Number(reservedata[3]),Number(reservedata[2]));
-//         start={hour:Number(reservedata[0]),min:Number(reservedata[1])};
-//         temp=(start.hour*60)+start.min+result.visitduration;
-//         end={hour:Math.floor(temp/60),min:temp%60}
-//         //
-//         var paymentack=1;
-//         /*
-
-//         payment
-
-//         */
-//         if(paymentack==0){
-//           strtime=reservedata[0]+":"+reservedata[1];
-//           res.render("paymentfail.ejs",{doctor:result,time:strtime});
-//         }
-//         else{
-//           unavb={start:start,end:end,date:date,dayofweek:new persianDate([Number(reservedata[2]),Number(reservedata[3]),Number(reservedata[4])]).format("dddd")};
-//           dbo.collection("Users").findOne({token:req.cookies.usertoken},function(err,user){
-//             reservation = new Reservation(user._id,result._id,unavb)
-//             dbo.collection("Reservations").insertOne(reservation,function(err,result2){
-//               dbo.collection("Doctors").updateOne({name:req.body.doctor},{$addToSet:{reservations:reservation,unavailabletimes:unavb}},function(err,result3){
-//                 dbo.collection("Users").updateOne({username:user.username},{$addToSet:{reserves:reservation}},function(err,result4){
-//                   strtime=reservedata[0]+":"+reservedata[1];
-//                   res.render("paymentaccept.ejs",{doctor:result,time:strtime,resid:reservation._id});
-//                 })
-//               })
-//             })
-//           })
-//         }
-//     })
-//   })
-//   }
-// })
 
 
 router.get("/signup",function(req,res){

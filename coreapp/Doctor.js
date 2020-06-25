@@ -14,7 +14,7 @@ class Doctor{
         this.image=path;
         this.background=background;
         this.visitduration=60;
-        this.visitcost=10000;
+        this.visitcost=3000;
         this.description=description;
         this.membershiptypes=membershiptypes;
         this.token="";
