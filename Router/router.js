@@ -83,17 +83,17 @@ router.get("/api/verification",function(req,res){
   }
 })
 
-///
+// ///
 
-var query=url.parse(req.url,true).query;
-  if(query.key!="pouyarahmati"){
-    res.write("noaccess");
-    res.end();
-  }
-  else{
+// var query=url.parse(req.url,true).query;
+//   if(query.key!="pouyarahmati"){
+//     res.write("noaccess");
+//     res.end();
+//   }
+//   else{
     
-  }
-///
+//   }
+// ///
 
 router.get("/api/login",function(req,res){
   var query=url.parse(req.url,true).query;
