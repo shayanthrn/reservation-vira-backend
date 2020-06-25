@@ -704,7 +704,9 @@ router.get("/category/:Category/:Doctor",function(req,res){
   })
 })
 
-// router.get("/reserve/:Doctor",function(req,res){
+router.get("/reserve/:Doctor",function(req,res){
+    res.write("<html><body><p>under development please contact vira co </p></body></html>");
+    res.end();
 //   req.session.prevurl=req.session.currurl;
 //   req.session.currurl=req.url;
 //   MongoClient.connect(dburl,function(err,db){
@@ -728,7 +730,7 @@ router.get("/category/:Category/:Doctor",function(req,res){
 //       res.end();
 //     })
 //   })
-// })
+})
 
 
 router.post("/payment",function(req,res){
