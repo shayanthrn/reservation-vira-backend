@@ -106,6 +106,7 @@ router.get("/api/login",function(req,res){
   MongoClient.connect(dburl,function(err,db){
     var dbo=db.db("mydb");
     dbo.collection("Users").findOne({phonenumber:query.phonenumber},function(err,user){
+      dbo.collection("signupcode").deleteOne({phonenumber:query.phonenumber})
       res.json({token:user.token});
       res.end();
     })
@@ -114,6 +115,7 @@ router.get("/api/login",function(req,res){
 })
 
 router.post("/api/signup",function(req,res){
+  dbo.collection("signupcode").deleteOne({phonenumber:query.phonenumber})
   var user=new User(req.body.phonenumber);
   user.sex=req.body.gender;
   user.firstname=req.body.firstname;
