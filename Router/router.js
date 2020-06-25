@@ -189,7 +189,48 @@ router.get("/api/getDoctors",function(req,res){
 })
 
 
-router.get("/api/dfs",function(req,res){
+router.get("/api/getDoctorsBycategory",function(req,res){
+  var query=url.parse(req.url,true).query;
+  if(query.key!="pouyarahmati"){
+    res.write("noaccess");
+    res.end();
+  }
+  else{
+    var data=[];
+    MongoClient.connect(dburl,function(err,db){
+      var dbo=db.db("mydb");
+      dbo.collection("Doctors").find({Categories:query.category}).forEach(function(doc){
+        data.push(doc);
+      },function(){
+        res.json({Doctors:data});
+        res.end();
+      })
+    })
+  }
+})
+
+
+router.get("/api/getDoctorsBycategory-city",function(req,res){
+  var query=url.parse(req.url,true).query;
+  if(query.key!="pouyarahmati"){
+    res.write("noaccess");
+    res.end();
+  }
+  else{
+    var data=[];
+    MongoClient.connect(dburl,function(err,db){
+      var dbo=db.db("mydb");
+      dbo.collection("Doctors").find({Categories:query.category,city:query.city}).forEach(function(doc){
+        data.push(doc);
+      },function(){
+        res.json({Doctors:data});
+        res.end();
+      })
+    })
+  }
+})
+
+router.get("/api/getDoctorsBycategory",function(req,res){
   var query=url.parse(req.url,true).query;
   if(query.key!="pouyarahmati"){
     res.write("noaccess");
