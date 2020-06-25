@@ -121,25 +121,75 @@ router.get("/api/login",function(req,res){
 })
 
 router.post("/api/signup",function(req,res){
-  dbo.collection("signupcode").deleteOne({phonenumber:query.phonenumber})
-  var user=new User(req.body.phonenumber);
-  user.sex=req.body.gender;
-  user.firstname=req.body.firstname;
-  user.lastname=req.body.lastname;
-  user.birthdate=req.body.birthdate;
-  let token1=tokgen.generate();
-  user.token=token1;
-  dbo.collection('Users').insertOne(user,function(err,result6){
-    if(err) res.json({status:"nok"})
-    else{
-      res.json({status:"ok",token:token1});
-    }
+  if(req.body.key!="pouyarahmati"){
+    res.write("noaccess");
     res.end();
-  })
+  }
+  else{
+    MongoClient.connect(dburl,function(err,db){
+      var dbo=db.db("mydb")
+      dbo.collection("signupcode").deleteOne({phonenumber:req.body.phonenumber})
+      var user=new User(req.body.phonenumber);
+      user.sex=req.body.gender;
+      user.firstname=req.body.firstname;
+      user.lastname=req.body.lastname;
+      user.birthdate=req.body.birthdate;
+      let token1=tokgen.generate();
+      user.token=token1;
+      dbo.collection('Users').insertOne(user,function(err,result6){
+        if(err) res.json({status:"nok"})
+        else{
+          res.json({status:"ok",token:token1});
+        }
+        res.end();
+      })
+    })
+  }
 })
 
 
-router.get("/api/get",function(req,res){
+router.get("/api/getCategories",function(req,res){
+  var query=url.parse(req.url,true).query;
+  if(query.key!="pouyarahmati"){
+    res.write("noaccess");
+    res.end();
+  }
+  else{
+    var data=[];
+    MongoClient.connect(dburl,function(err,db){
+      var dbo=db.db("mydb");
+      dbo.collection("Categories").find({}).forEach(function(doc){
+        data.push(doc);
+      },function(){
+        res.json({Categories:data});
+        res.end();
+      })
+    })
+  }
+})
+
+router.get("/api/getDoctors",function(req,res){
+  var query=url.parse(req.url,true).query;
+  if(query.key!="pouyarahmati"){
+    res.write("noaccess");
+    res.end();
+  }
+  else{
+    var data=[];
+    MongoClient.connect(dburl,function(err,db){
+      var dbo=db.db("mydb");
+      dbo.collection("Doctors").find({}).forEach(function(doc){
+        data.push(doc);
+      },function(){
+        res.json({Doctors:data});
+        res.end();
+      })
+    })
+  }
+})
+
+
+router.get("/api/dfs",function(req,res){
   var query=url.parse(req.url,true).query;
   if(query.key!="pouyarahmati"){
     res.write("noaccess");
@@ -362,6 +412,17 @@ router.post("/addDoctor",function(req,res){
 
 //-----------------------test route--------------------------//
 
+router.get("/test",function(req,res){
+  apikave.Send({
+    message: "خدمات پیام کوتاه کاوه نگار",
+    sender: "10008663",
+    receptor: "09192356516"
+},
+function(response, status) {
+    console.log(response);
+    console.log(status);
+});
+})
 
 //-----------------------test route--------------------------//
 
