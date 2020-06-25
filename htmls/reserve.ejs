@@ -5,7 +5,8 @@
 
 <head>
     <meta charset="utf-8" />
-    <base href="http://reservation.drtajviz.com/" >
+    <!-- <base href="http://reservation.drtajviz.com/" > -->
+    <base href="http://localhost">
     <link rel="apple-touch-icon" sizes="76x76" href="assets/img/apple-icon.png">
     <link rel="icon" type="image/png" href="assets/img/favicon.png">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
@@ -83,7 +84,7 @@
                         </div>
                         <section class="page-content default">
                             <div class="checkout-shipment">
-                               <form action="paymenthandler" method="POST">
+                               <form action="payment" method="POST">
                                 <ul>
                                     <li><span> نام دکتر :</span><span><%= doctor.name %></span></li>
                                     <li><span>  تخصص :</span><span><%= doctor.category %></span></li>
@@ -91,7 +92,6 @@
                                     <div class="row">
                                       <div class="col-12">
                                         <div class="reservation-carousel">
-                                          <!-- TODO: [BACKEND] add class 'disabled' if  all times are reserved -->
                                           <% for(let i=0;i<days.length;i++) { %>
                                               <% if(freetimes[i].length==0) { %>
                                                 <div class="carousel-cell m-2 disabled" data-key="<%= days[i].index %>">
@@ -151,6 +151,7 @@
                                             </div>
                                         </a>
                                         <input type="text" name="doctor" id="doctor" value="<%= doctor.name %>" style="visibility: hidden;">
+                                        <input type="text" name="cost" value="<%= doctor.visitcost %>" style="visibility: hidden;">
                                         </form>
                                     </div>
                                 </div>

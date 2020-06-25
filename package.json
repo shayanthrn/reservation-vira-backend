@@ -25,6 +25,7 @@
     "mv": "^2.1.1",
     "persian-date": "^1.1.0",
     "url": "^0.11.0",
-    "uuid-token-generator": "^1.0.0"
+    "uuid-token-generator": "^1.0.0",
+    "zarinpal-checkout": "^0.2.7"
   }
 }
