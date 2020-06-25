@@ -704,31 +704,31 @@ router.get("/category/:Category/:Doctor",function(req,res){
   })
 })
 
-router.get("/reserve/:Doctor",function(req,res){
-  req.session.prevurl=req.session.currurl;
-  req.session.currurl=req.url;
-  MongoClient.connect(dburl,function(err,db){
-    if(err) throw err;
-    var dbo=db.db("mydb");
-    days=[];
-    freetimes=[]
-    dbo.collection("Doctors").findOne({name:req.params.Doctor.split('-').join(' ')},function(err,result){
-      if(result==null){
-        res.redirect('/');
-      }
-      currentday=new persianDate();
-      days.push(currentday);
-      freetimes.push(getDoctimeslots(result,new myDate(currentday.toArray()[2],currentday.toArray()[1],currentday.toArray()[0])));
-      for(let i=0;i<14;i++){
-        currentday=currentday.add("d",1);
-        days.push(currentday);
-        freetimes.push(getDoctimeslots(result,new myDate(currentday.toArray()[2],currentday.toArray()[1],currentday.toArray()[0])));
-      }
-      res.render("reserve.ejs",{doctor:result,days:createDayboxobj(days),freetimes:freetimes,categories:categories});
-      res.end();
-    })
-  })
-})
+// router.get("/reserve/:Doctor",function(req,res){
+//   req.session.prevurl=req.session.currurl;
+//   req.session.currurl=req.url;
+//   MongoClient.connect(dburl,function(err,db){
+//     if(err) throw err;
+//     var dbo=db.db("mydb");
+//     days=[];
+//     freetimes=[]
+//     dbo.collection("Doctors").findOne({name:req.params.Doctor.split('-').join(' ')},function(err,result){
+//       if(result==null){
+//         res.redirect('/');
+//       }
+//       currentday=new persianDate();
+//       days.push(currentday);
+//       freetimes.push(getDoctimeslots(result,new myDate(currentday.toArray()[2],currentday.toArray()[1],currentday.toArray()[0])));
+//       for(let i=0;i<14;i++){
+//         currentday=currentday.add("d",1);
+//         days.push(currentday);
+//         freetimes.push(getDoctimeslots(result,new myDate(currentday.toArray()[2],currentday.toArray()[1],currentday.toArray()[0])));
+//       }
+//       res.render("reserve.ejs",{doctor:result,days:createDayboxobj(days),freetimes:freetimes,categories:categories});
+//       res.end();
+//     })
+//   })
+// })
 
 
 router.post("/payment",function(req,res){
