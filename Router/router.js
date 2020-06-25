@@ -106,9 +106,15 @@ router.get("/api/login",function(req,res){
   MongoClient.connect(dburl,function(err,db){
     var dbo=db.db("mydb");
     dbo.collection("Users").findOne({phonenumber:query.phonenumber},function(err,user){
-      dbo.collection("signupcode").deleteOne({phonenumber:query.phonenumber})
-      res.json({token:user.token});
-      res.end();
+      if(user==null){
+        res.json("not exist")
+        res.end();
+      }
+      else{
+        dbo.collection("signupcode").deleteOne({phonenumber:query.phonenumber})
+        res.json({token:user.token});
+        res.end();
+      }
     })
   })
   }
