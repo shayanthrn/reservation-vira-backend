@@ -288,6 +288,7 @@ router.get("/api/getTimeSlots",function(req,res){
 
 router.post("/api/payment",function(req,res){
   if(req.body.usertoken==undefined){
+    console.log(req.body);
     res.json({data:"user token not found"})
     res.end();
   }
