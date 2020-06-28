@@ -297,12 +297,7 @@ router.post("/api/payment",function(req,res){
     res.write({data:"choice is not defined"})
     res.end();
   }
-  reservedata=req.body.choice.split(":");
-  date=new myDate(Number(reservedata[4]),Number(reservedata[3]),Number(reservedata[2]));
-  start={hour:Number(reservedata[0]),min:Number(reservedata[1])};
-  temp=(start.hour*60)+start.min+result.visitduration;
-  end={hour:Math.floor(temp/60),min:temp%60}
-  unavb={start:start,end:end,date:date,dayofweek:new persianDate([Number(reservedata[2]),Number(reservedata[3]),Number(reservedata[4])]).format("dddd")};
+ 
   MongoClient.connect(dburl,function(err,db){
     var dbo=db.db("mydb");
     dbo.collection("Users").findOne({token:req.body.usertoken},function(err,user){
@@ -311,13 +306,19 @@ router.post("/api/payment",function(req,res){
         res.end();
       }
       else{
-        if(checkinterval(unavb)){
+        if(checkinterval(1)){
           dbo.collection("Doctors").findOne({name:req.body.doctor},function(err,doctor){
             if(doctor==null){
               res.write({data:"doctor not found"});
               res.end();
             }
             else{
+              reservedata=req.body.choice.split(":");
+              date=new myDate(Number(reservedata[4]),Number(reservedata[3]),Number(reservedata[2]));
+              start={hour:Number(reservedata[0]),min:Number(reservedata[1])};
+              temp=(start.hour*60)+start.min+doctor.visitduration;
+              end={hour:Math.floor(temp/60),min:temp%60}
+              unavb={start:start,end:end,date:date,dayofweek:new persianDate([Number(reservedata[2]),Number(reservedata[3]),Number(reservedata[4])]).format("dddd")};
               zarinpal.PaymentRequest({
                 Amount: req.body.cost , // In Tomans
                 CallbackURL: 'http://reservation.drtajviz.com/paymenthandler',
