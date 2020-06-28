@@ -27,7 +27,7 @@
         <div class="container">
             <div class="navbar-translate">
                 <a class="navbar-brand" href="#pablo">
-                    <img src="assets/img/logo12.png" style="height: 36px;" onerror="this.src='assets/img/altimage.png'" alt="">
+                    <img src="assets/img/logo.png" style="height: 36px;" alt="">
                 </a>
                 <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse"
                     data-target="#navigation" aria-controls="navigation-index" aria-expanded="false"
@@ -209,7 +209,7 @@
                                                     background-color:#515151;
                                                     color: #FFFFFF;" style="border-radius: 20px;">
                                                         <div style="height:auto; width: auto;">
-                                                            <img src="<%= Objects[i].image %>" style="background: transparent; min-height: 230px;min-width: 230px; max-width: 230px; max-height: 230px;" alt="not found">
+                                                            <img src="<%= Objects[i].image %>" style="background: transparent; min-height: 230px;min-width: 230px; max-width: 230px; max-height: 230px;" onerror="this.src='assets/img/altimage.png'" alt="not found">
                                                         </div>
                                                         <p class="card-text text-slate font-weight-bold text-14 mt-4">
                                                             <%= Objects[i].name %> 
