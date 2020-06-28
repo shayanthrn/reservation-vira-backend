@@ -242,6 +242,29 @@ router.get("/api/getDoctorsBycategory",function(req,res){
   }
 })
 
+router.get("/api/getCurUser",function(req,res){
+  var query=url.parse(req.url,true).query;
+  if(query.key!="pouyarahmati"){
+    res.write("noaccess");
+    res.end();
+  }
+  else{
+    MongoClient.connect(dburl,function(err,db){
+      var dbo=db.db("mydb");
+      dbo.collection("Users").findOne({token:query.token},function(err,user){
+        if(user==null){
+          res.write("not found");
+          res.end();
+        }
+        else{
+          res.json({user:user});
+          res.end();
+        }
+      })
+    })
+  }
+})
+
 
 //--------------------------api---------------------------//
 
