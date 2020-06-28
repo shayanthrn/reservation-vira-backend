@@ -187,9 +187,13 @@
                                                                  <%= doctor.name %>
                                                             </h1>
                                                             <h2 class="text-16 py-2">
-                                                              متخصص<% for(let i=0;i<doctor.categories.length;i++){  %>
-                                                                  <%=doctor.categories[i]+"," %>
-                                                                    <% } %>
+                                                            <% for(let i=0;i<doctor.categories.length;i++){  %>
+                                                                <% if(i==doctor.categories.length-1){ %>
+                                                                    <%= doctor.categories[i] %>
+                                                                <% else { %>
+                                                                <%= doctor.categories[i]+"," %>
+                                                                <% } %>
+                                                            <% } %>
                                                             </h2> 
                                                         </div>
                                                     </a> 
