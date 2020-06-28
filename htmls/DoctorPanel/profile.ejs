@@ -104,7 +104,13 @@
                     <h5>تخصص</h5>
                   </div>
                   <div class="col-md-6 col-lg-6">
-                    <p><%=doctor.category %></p>
+                    <p><% for(let i=0;i<doctor.categories.length;i++){  %>
+                      <% if(i==doctor.categories.length-1){ %>
+                          <%= doctor.categories[i] %>
+                      <% } else { %>
+                      <%= doctor.categories[i]+"," %>
+                      <% } %>
+                      <% } %></p>
                     <div class="form-group mb-2">
                       <input type="text" class="form-control form-control-sm" name="major" id="major" placeholder="تخصص" value="<%=doctor.category %>" required>
                     </div>
