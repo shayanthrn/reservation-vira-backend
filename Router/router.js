@@ -285,6 +285,65 @@ router.get("/api/getTimeSlots",function(req,res){
   }
 })
 
+
+router.post("/api/payment",function(req,res){
+  if(req.cookies.usertoken==undefined){
+    res.write("user token not found")
+    res.end();
+  }
+  else{
+  if(req.body.choice==undefined){
+    res.write("choice is not defined")
+    res.end();
+  }
+  reservedata=req.body.choice.split(":");
+  date=new myDate(Number(reservedata[4]),Number(reservedata[3]),Number(reservedata[2]));
+  start={hour:Number(reservedata[0]),min:Number(reservedata[1])};
+  temp=(start.hour*60)+start.min+result.visitduration;
+  end={hour:Math.floor(temp/60),min:temp%60}
+  unavb={start:start,end:end,date:date,dayofweek:new persianDate([Number(reservedata[2]),Number(reservedata[3]),Number(reservedata[4])]).format("dddd")};
+  MongoClient.connect(dburl,function(err,db){
+    var dbo=db.db("mydb");
+    dbo.collection("Users").findOne({token:req.cookies.usertoken},function(err,user){
+      if(user==null){
+        res.write("user not found");
+        res.end();
+      }
+      else{
+        if(checkinterval(unavb)){
+          dbo.collection("Doctors").findOne({name:req.body.doctor},function(err,doctor){
+            if(doctor==null){
+              res.write("doctor not found");
+              res.end();
+            }
+            else{
+              zarinpal.PaymentRequest({
+                Amount: req.body.cost , // In Tomans
+                CallbackURL: 'http://reservation.drtajviz.com/paymenthandler',
+                Description: 'Dr tajviz payment',
+                Email: 'shayanthrn@gmail.com',
+                Mobile: '09128993687'
+              }).then(response => {
+                if (response.status === 100) {
+                  reservation = new Reservation(user._id,doctor._id,unavb,response.authority,req.body.cost);
+                  dbo.collection("TempReserves").insertOne(reservation,function(err,reserve){
+                    res.json({url:response.url})
+                  })
+                }
+              }).catch(err => {
+                res.write("<html><body><p>there is a problem on server please try again later</p><a href='/' >go back to main page</a></body></html>");
+                console.error(err);
+                res.end();
+              });
+            }
+          })
+        }
+      }
+    })
+  })
+  }
+})
+
 //--------------------------api---------------------------//
 
 router.post("/changedocinfo",function(req,res){
