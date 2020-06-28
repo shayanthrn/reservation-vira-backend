@@ -257,7 +257,7 @@ router.post("/changedocinfo",function(req,res){
           res.redirect('noaccess');
         }
         else{
-          dbo.collection('Doctors').updateOne({token:req.cookies.doctortoken},{$set:{category:req.body.major,background:req.body.experience,address:req.body.address,phonenumber:req.body.phone,visitduration:Number(req.body.duration),visitcost:Number(req.body.cost),description:req.body.description}},function(err,res2){
+          dbo.collection('Doctors').updateOne({token:req.cookies.doctortoken},{$set:{background:req.body.experience,address:req.body.address,phonenumber:req.body.phone,visitduration:Number(req.body.duration),visitcost:Number(req.body.cost),description:req.body.description}},function(err,res2){
             if(req.files!=null){
               mv(req.files.image.tempFilePath,"public"+result.image,function(err){
                 console.log("public"+result.image)
