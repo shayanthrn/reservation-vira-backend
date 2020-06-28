@@ -112,14 +112,13 @@
                       <% } %>
                       <% } %></p>
                     <div class="form-group mb-2">
-                      <input type="text" class="form-control form-control-sm" name="major" id="major" placeholder="تخصص" value="" disabled>
-                      <p><% for(let i=0;i<doctor.categories.length;i++){  %>
+                      <input type="text" class="form-control form-control-sm" name="major" id="major" placeholder="تخصص" value="<% for(let i=0;i<doctor.categories.length;i++){  %>
                         <% if(i==doctor.categories.length-1){ %>
                             <%= doctor.categories[i] %>
                         <% } else { %>
-                        <%= doctor.categories[i]+"," %>
+                        <%= doctor.categories[i]+',' %>
                         <% } %>
-                        <% } %></p>
+                        <% } %>" disabled>
                     </div>
                   </div>
                 </div>
