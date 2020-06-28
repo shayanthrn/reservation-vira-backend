@@ -230,18 +230,6 @@ router.get("/api/getDoctorsBycategory-city",function(req,res){
   }
 })
 
-router.get("/api/getDoctorsBycategory",function(req,res){
-  var query=url.parse(req.url,true).query;
-  if(query.key!="pouyarahmati"){
-    res.write("noaccess");
-    res.end();
-  }
-  else{
-    res.write("noaccess");
-    res.end();
-  }
-})
-
 router.get("/api/getCurUser",function(req,res){
   var query=url.parse(req.url,true).query;
   if(query.key!="pouyarahmati"){
@@ -265,6 +253,37 @@ router.get("/api/getCurUser",function(req,res){
   }
 })
 
+
+router.get("/getTimeSlots",function(req,res){
+  var query=url.parse(req.url,true).query;
+  if(query.key!="pouyarahmati"){
+    res.write("noaccess");
+    res.end();
+  }
+  else{
+    MongoClient.connect(dburl,function(err,db){
+      var dbo=db.db("mydb");
+      days=[];
+      freetimes=[]
+      dbo.collection("Doctors").findOne({name:query.doctor},function(err,result){
+      if(result==null){
+        res.write('not found');
+        res.end();
+      }
+      currentday=new persianDate();
+      days.push(currentday);
+      freetimes.push(getDoctimeslots(result,new myDate(currentday.toArray()[2],currentday.toArray()[1],currentday.toArray()[0])));
+      for(let i=0;i<14;i++){
+        currentday=currentday.add("d",1);
+        days.push(currentday);
+        freetimes.push(getDoctimeslots(result,new myDate(currentday.toArray()[2],currentday.toArray()[1],currentday.toArray()[0])));
+      }
+      res.json({doctor:result,days:createDayboxobj(days),freetimes:freetimes});
+      res.end();
+    })
+    })
+  }
+})
 
 //--------------------------api---------------------------//
 
