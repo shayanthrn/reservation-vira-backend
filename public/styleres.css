@@ -8,7 +8,7 @@
 }
 
 .carousel-cell.active .card {
-  background-color: #ef5661;
+  background-color: #06cdd1;
   color: white !important;
 }
 
@@ -26,15 +26,15 @@
 }
 
 .text-red {
-  color: #ef5661;
+  color: #06cdd1;
 }
 
 .bg-red {
-  background-color: #ef5661;
+  background-color: #06cdd1;
 }
 
 .reserve-time:hover {
-  border-color: #ef5661 !important;
-  background-color: #ef5661 !important;
+  border-color: #06cdd1 !important;
+  background-color: #06cdd1 !important;
   color: white !important;
 }
