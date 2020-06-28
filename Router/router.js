@@ -257,7 +257,7 @@ router.post("/changedocinfo",function(req,res){
           res.redirect('noaccess');
         }
         else{
-          dbo.collection('Doctors').updateOne({token:req.cookies.doctortoken},{$set:{background:req.body.experience,address:req.body.address,phonenumber:req.body.phone,visitduration:Number(req.body.duration),visitcost:Number(req.body.cost),description:req.body.description}},function(err,res2){
+          dbo.collection('Doctors').updateOne({token:req.cookies.doctortoken},{$set:{city:req.body.city,workphone:req.body.workphone,medicalnumber:req.body.medicalnumber,codemeli:req.body.codemeli,background:req.body.experience,address:req.body.address,phonenumber:req.body.phone,visitduration:Number(req.body.duration),visitcost:Number(req.body.cost),description:req.body.description}},function(err,res2){
             if(req.files!=null){
               mv(req.files.image.tempFilePath,"public"+result.image,function(err){
                 console.log("public"+result.image)
@@ -424,6 +424,7 @@ router.post("/addDoctor",function(req,res){
     MongoClient.connect(dburl,function(err,db){
       var dbo=db.db("mydb");
       var cats=[];
+      var memtype=[];
       if(typeof req.body.categories=="string"){
         cats.push(req.body.categories);
       }
@@ -432,7 +433,15 @@ router.post("/addDoctor",function(req,res){
           cats.push(doc);
           })
       }
-      dbo.collection('Doctors').insertOne(new Doctor(req.body.username,req.body.pass,req.body.name,cats,req.body.medicalnumber,req.body.codemeli,req.body.workphone,req.body.phonenumber,req.body.address,req.body.city,"/docphotos/"+req.body.name+".png",req.body.background,req.body.description,req.body.membershiptypes,req.body.appknowledge),function(err,res2){
+      if(typeof req.body.membershiptypes=="string"){
+        memtype.push(req.body.membershiptypes)
+      }
+      else[
+        req.body.membershiptypes.forEach(function(doc2){
+          memtype.push(doc2);
+        })
+      ]
+      dbo.collection('Doctors').insertOne(new Doctor(req.body.username,req.body.pass,req.body.name,cats,req.body.medicalnumber,req.body.codemeli,req.body.workphone,req.body.phonenumber,req.body.address,req.body.city,"/docphotos/"+req.body.name+".png",req.body.background,req.body.description,memtype,req.body.appknowledge),function(err,res2){
         if(req.files!=null){
         mv(req.files.image.tempFilePath,"public/docphotos/"+req.body.name+".png",function(err){
           console.log("public/docphotos/"+req.body.name+".png")
