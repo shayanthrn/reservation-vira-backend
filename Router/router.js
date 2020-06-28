@@ -288,12 +288,12 @@ router.get("/api/getTimeSlots",function(req,res){
 
 router.post("/api/payment",function(req,res){
   if(req.cookies.usertoken==undefined){
-    res.write("user token not found")
+    res.json({data:"user token not found"})
     res.end();
   }
   else{
   if(req.body.choice==undefined){
-    res.write("choice is not defined")
+    res.write({data:"choice is not defined"})
     res.end();
   }
   reservedata=req.body.choice.split(":");
@@ -306,14 +306,14 @@ router.post("/api/payment",function(req,res){
     var dbo=db.db("mydb");
     dbo.collection("Users").findOne({token:req.cookies.usertoken},function(err,user){
       if(user==null){
-        res.write("user not found");
+        res.write({data:"user not found"});
         res.end();
       }
       else{
         if(checkinterval(unavb)){
           dbo.collection("Doctors").findOne({name:req.body.doctor},function(err,doctor){
             if(doctor==null){
-              res.write("doctor not found");
+              res.write({data:"doctor not found"});
               res.end();
             }
             else{
