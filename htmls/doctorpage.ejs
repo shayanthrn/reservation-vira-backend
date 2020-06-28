@@ -179,10 +179,10 @@
                                             <li class="card rounded-20 my-3 medicaitve">
                                                 <div class="row p-3">
                                                     <a class="row col-8 pr-0">
-                                                        <div  class="col-3 profile text-center">
-                                                            <img  src="<%= doctor.image %>" class=" rounded-circle ImageSize">
+                                                        <div  class="col-5 profile text-center">
+                                                            <img  src="<%= doctor.image %>" class=" rounded-circle ImageSize" style="min-height: 200px; max-height: 200px; min-width: 200px; max-width: 200px;">
                                                         </div> 
-                                                        <div  class="col-9 text-right">
+                                                        <div  class="col-9 text-right" style="font-size: 9px;">
                                                             <h1  class="text-18 font-weight-bold text-slate">
                                                                  <%= doctor.name %>
                                                             </h1>
@@ -206,13 +206,10 @@
                                                                     <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
                                                                     <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
                                                                 </svg>
-                                                                <span data-v-4606823b="" class="experience text-gray-200 mr-3"><%= doctor.background %></span>
+                                                                <span data-v-4606823b="" class="experience text-gray-200 mr-3"><%= doctor.background %> سال</span>
                                                             </li>
                                                             <li class="py-1 text-gray-200 font-weight-medium">
-                                                                آخرین نوبت خالی :
-                                                            </li>
-                                                            <li class="py-1 text-gray-200 font-weight-medium">
-                                                                <a href="reserve/<%= doctor.name.split(' ').join('-') %>" style="color: crimson;">
+                                                                <a href="reserve/<%= doctor.name.split(' ').join('-') %>" class="btn btn-danger">
                                                                     نوبت گیری
                                                                 </a>
                                                             </li>
