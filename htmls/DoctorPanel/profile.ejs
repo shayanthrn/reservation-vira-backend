@@ -90,7 +90,7 @@
               <div class="col-sm-12 col-md-10">
                 <div class="row">
                   <div class="col-md-4 col-lg-2">
-                    <h5>نام</h5>
+                    <h5>نام و نام خانوادگی</h5>
                   </div>
                   <div class="col-md-6 col-lg-6">
                     <p><%=doctor.name %></p>
@@ -124,6 +124,17 @@
                     <p><%= doctor.background %></p>
                     <div class="form-group mb-2">
                       <input type="text" class="form-control form-control-sm" name="experience" id="experience" placeholder="سابقه کار" value="<%= doctor.background %>" required>
+                    </div>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-md-4 col-lg-2">
+                    <h5>شماره نظام پزشکی</h5>
+                  </div>  
+                  <div class="col-md-6 col-lg-6">
+                    <p><%= doctor.medicalnumber %></p>
+                    <div class="form-group mb-2">
+                      <input type="text" class="form-control form-control-sm" name="medicalnumber" id="medicalnumber" placeholder="شماره نظام پزشکی" value="<%= doctor.medicalnumber %>" required>
                     </div>
                   </div>
                 </div>
