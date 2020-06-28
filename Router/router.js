@@ -421,29 +421,26 @@ router.post("/changepass",function(req,res){
 
 
 router.post("/addDoctor",function(req,res){
-  if(req.cookies.admintoken==undefined){
-    res.redirect('/noaccess');
-  }
-  else{
     MongoClient.connect(dburl,function(err,db){
       var dbo=db.db("mydb");
-      dbo.collection('Admins').findOne({token:req.cookies.admintoken},function(err,result){
-        if(result==null){
-          res.redirect('noaccess');
-        }
-        else{
-          dbo.collection('Doctors').insertOne(new Doctor(req.body.username,req.body.pass,req.body.name,req.body.categories,req.body.medicalnumber,req.body.codemeli,req.body.workphone,req.body.phonenumber,req.body.address,req.body.city,"/docphotos/"+req.body.name+".png",req.body.background,req.body.description,req.body.membershiptypes,req.body.appknowledge),function(err,res2){
-            if(req.files!=null){
-              mv(req.files.image.tempFilePath,"public/docphotos/"+req.body.name+".png",function(err){
-                console.log("public/docphotos/"+req.body.name+".png")
-              })
-            }
-            res.redirect('/'); //fixxxxxxxxxxxxxxxxxxxxxxxx
+      var cats=[];
+      if(typeof stringValue=="string"){
+        cats.push(req.body.categories);
+      }
+      else{
+        req.body.categories.forEach(function(doc){
+          cats.push(doc);
           })
+      }
+      dbo.collection('Doctors').insertOne(new Doctor(req.body.username,req.body.pass,req.body.name,cats,req.body.medicalnumber,req.body.codemeli,req.body.workphone,req.body.phonenumber,req.body.address,req.body.city,"/docphotos/"+req.body.name+".png",req.body.background,req.body.description,req.body.membershiptypes,req.body.appknowledge),function(err,res2){
+        if(req.files!=null){
+        mv(req.files.image.tempFilePath,"public/docphotos/"+req.body.name+".png",function(err){
+          console.log("public/docphotos/"+req.body.name+".png")
+        })
         }
+        res.redirect('/'); //fixxxxxxxxxxxxxxxxxxxxxxxx
       })
     })
-  }
 })
 
 
