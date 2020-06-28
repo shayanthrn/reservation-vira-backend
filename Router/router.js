@@ -424,6 +424,7 @@ router.post("/addDoctor",function(req,res){
     MongoClient.connect(dburl,function(err,db){
       var dbo=db.db("mydb");
       var cats=[];
+      console.log(typeof stringValue=="string")
       if(typeof stringValue=="string"){
         cats.push(req.body.categories);
       }
