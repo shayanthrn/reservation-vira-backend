@@ -140,6 +140,17 @@
                 </div>
                 <div class="row">
                   <div class="col-md-4 col-lg-2">
+                    <h5>کد ملی</h5>
+                  </div>  
+                  <div class="col-md-6 col-lg-6">
+                    <p><%= doctor.codemeli %></p>
+                    <div class="form-group mb-2">
+                      <input type="text" class="form-control form-control-sm" name="codemeli" id="codemeli" placeholder="کد ملی" value="<%= doctor.codemeli %>" required>
+                    </div>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-md-4 col-lg-2">
                     <h5>ادرس</h5>
                   </div>
                   <div class="col-md-6 col-lg-6">
@@ -157,6 +168,31 @@
                     <p><%=doctor.phonenumber %></p>
                     <div class="form-group mb-2">
                       <input type="text" class="form-control form-control-sm" name="phone" id="phone" placeholder="شماره تماس" value="<%=doctor.phonenumber %>" required>
+                    </div>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-md-4 col-lg-2">
+                    <h5>تلفن مطب</h5>
+                  </div>
+                  <div class="col-md-6 col-lg-6">
+                    <p><%=doctor.workphone %></p>
+                    <div class="form-group mb-2">
+                      <input type="text" class="form-control form-control-sm" name="workphone" id="workphone" placeholder="تلفن مطب" value="<%=doctor.workphone %>" required>
+                    </div>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-md-4 col-lg-2">
+                    <h5>استان</h5>
+                  </div>
+                  <div class="col-md-6 col-lg-6">
+                    <p><%=doctor.city %></p>
+                    <div class="form-group mb-2">
+                      <select class="form-control form-control-sm" name="city" id="city">
+                        <option value="ایلام">ایلام</option>
+                        <option value="کرمانشاه">کرمانشاه</option>
+                      </select>
                     </div>
                   </div>
                 </div>
