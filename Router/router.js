@@ -254,7 +254,7 @@ router.get("/api/getCurUser",function(req,res){
 })
 
 
-router.get("/getTimeSlots",function(req,res){
+router.get("/api/getTimeSlots",function(req,res){
   var query=url.parse(req.url,true).query;
   if(query.key!="pouyarahmati"){
     res.write("noaccess");
@@ -278,7 +278,7 @@ router.get("/getTimeSlots",function(req,res){
         days.push(currentday);
         freetimes.push(getDoctimeslots(result,new myDate(currentday.toArray()[2],currentday.toArray()[1],currentday.toArray()[0])));
       }
-      res.json({doctor:result,days:createDayboxobj(days),freetimes:freetimes});
+      res.json({days:createDayboxobj(days),freetimes:freetimes});
       res.end();
     })
     })
