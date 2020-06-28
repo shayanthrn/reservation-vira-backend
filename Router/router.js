@@ -287,7 +287,7 @@ router.get("/api/getTimeSlots",function(req,res){
 
 
 router.post("/api/payment",function(req,res){
-  if(req.cookies.usertoken==undefined){
+  if(req.body.usertoken==undefined){
     res.json({data:"user token not found"})
     res.end();
   }
@@ -304,7 +304,7 @@ router.post("/api/payment",function(req,res){
   unavb={start:start,end:end,date:date,dayofweek:new persianDate([Number(reservedata[2]),Number(reservedata[3]),Number(reservedata[4])]).format("dddd")};
   MongoClient.connect(dburl,function(err,db){
     var dbo=db.db("mydb");
-    dbo.collection("Users").findOne({token:req.cookies.usertoken},function(err,user){
+    dbo.collection("Users").findOne({token:req.body.usertoken},function(err,user){
       if(user==null){
         res.write({data:"user not found"});
         res.end();
