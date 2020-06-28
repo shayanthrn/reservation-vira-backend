@@ -294,7 +294,7 @@ router.post("/api/payment",function(req,res){
   }
   else{
   if(req.body.choice==undefined){
-    res.write({data:"choice is not defined"})
+    res.json({data:"choice is not defined"})
     res.end();
   }
  
@@ -302,14 +302,14 @@ router.post("/api/payment",function(req,res){
     var dbo=db.db("mydb");
     dbo.collection("Users").findOne({token:req.body.usertoken},function(err,user){
       if(user==null){
-        res.write({data:"user not found"});
+        res.json({data:"user not found"});
         res.end();
       }
       else{
         if(checkinterval(1)){
           dbo.collection("Doctors").findOne({name:req.body.doctor},function(err,doctor){
             if(doctor==null){
-              res.write({data:"doctor not found"});
+              res.json({data:"doctor not found"});
               res.end();
             }
             else{
