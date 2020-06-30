@@ -15,6 +15,7 @@ var Reservation = require('../coreapp/Reservation.js');
 var Category = require('../coreapp/Category.js');
 var dburl="mongodb://localhost:27017/";          //url of database            auth o doros kon 
 var lodash =require('lodash');
+var HealthCenter= require('../coreapp/HealthCenter.js');
 var time=require('../coreapp/resTime.js');
 var persianDate = require('persian-date');
 var myDate= require('../coreapp/myDate.js');
@@ -39,6 +40,168 @@ MongoClient.connect(dburl,function(err,db){
 })
 
 //------------------------api------------------------------//
+
+
+
+
+
+
+//banksalamat
+
+
+router.post("/api/addhealthcenter",function(req,res){
+  var query=url.parse(req.url,true).query;
+   if(query.key!="pouyarahmati"){
+     res.json({data:"noaccess"});
+     res.end();
+   }
+   else{
+      MongoClient.connect(dburl,function(err,db){
+        var dbo=db.db("mydb");
+        dbo.collection("HealthCenters").findOne({name:req.body.name,type:req.body.type},function(err,hc){
+          if(hc!=null){
+            res.json({data:"there is a healthcenter with this name"});
+            res.end();
+          }
+          else{
+            var newHC=new HealthCenter(req.body.type,req.body.name,req.body.isreserveable=="true",req.body.city,req.body.phonenumber,req.body.address);
+            dbo.collection("HealthCenters").insertOne(newHC,function(err,result){
+              res.json({data:result});
+              res.end();
+            })
+          }
+        })
+      })
+   }
+})
+
+router.get("/api/getAlltypesofHC",function(req,res){
+  var query=url.parse(req.url,true).query;
+   if(query.key!="pouyarahmati"){
+     res.json({data:"noaccess"});
+     res.end();
+   }
+   else{
+      MongoClient.connect(dburl,function(err,db){
+        var dbo=db.db("mydb");
+        dbo.collection("HealthCenters").distinct("type",function(err,result){
+          res.json({data:result});
+          res.end();
+        })
+      })
+   }
+})
+
+router.get("/api/getallHCbytype",function(req,res){
+  var query=url.parse(req.url,true).query;
+   if(query.key!="pouyarahmati"){
+     res.json({data:"noaccess"});
+     res.end();
+   }
+   else{
+      MongoClient.connect(dburl,function(err,db){
+        var dbo=db.db("mydb");
+        dbo.collection("HealthCenters").find({type:req.body.type},async function(err,result){
+          data=await result.toArray()
+          res.json({data:data});
+          res.end();
+        })
+      })
+   }
+})
+
+router.get("/api/getallHCbytypeandcity",function(req,res){
+  var query=url.parse(req.url,true).query;
+   if(query.key!="pouyarahmati"){
+     res.json({data:"noaccess"});
+     res.end();
+   }
+   else{
+      MongoClient.connect(dburl,function(err,db){
+        var dbo=db.db("mydb");
+        dbo.collection("HealthCenters").find({city:req.body.city,type:req.body.type},async function(err,result){
+          data=await result.toArray()
+          res.json({data:data});
+          res.end();
+        })
+      })
+   }
+})
+
+
+router.post("/api/addCategoryToHC",function(req,res){
+  var query=url.parse(req.url,true).query;
+   if(query.key!="pouyarahmati"){
+     res.json({data:"noaccess"});
+     res.end();
+   }
+   else{
+      MongoClient.connect(dburl,function(err,db){
+        var dbo=db.db("mydb");
+        var newcat = {name:req.body.catname,unavailabletimes:[],visitduration:Number(req.body.catduration),visitcost:Number(req.body.catcost)}
+        dbo.collection("HealthCenters").updateOne({name:req.body.name,type:req.body.type,isReserveable:true},{$addToSet:{categories:newcat}},function(err,result){
+          res.json({data:result});
+          res.end();
+        })
+      })
+   }
+})
+
+router.get("/api/getTimeslotsHC",function(req,res){
+  var query=url.parse(req.url,true).query;
+   if(query.key!="pouyarahmati"){
+     res.json({data:"noaccess"});
+     res.end();
+   }
+   else{
+    MongoClient.connect(dburl,function(err,db){
+      var dbo=db.db("mydb");
+      days=[];
+      freetimes=[]
+      dbo.collection("HealthCenters").findOne({name:query.name,type:query.type},function(err,result){
+      if(result==null){
+        res.json({data:'not found'});
+        res.end();
+      }
+      var catobj=null;
+      result.categories.forEach(function(doc){
+        if(doc.name==query.category){
+          catobj=doc;
+        }
+      })
+      if(catobj==null){
+        res.json({data:'invalid category'});
+        res.end();
+      }
+      else{
+        currentday=new persianDate();
+        days.push(currentday);
+        freetimes.push(getDoctimeslots(catobj,new myDate(currentday.toArray()[2],currentday.toArray()[1],currentday.toArray()[0])));
+        for(let i=0;i<14;i++){
+          currentday=currentday.add("d",1);
+          days.push(currentday);
+          freetimes.push(getDoctimeslots(catobj,new myDate(currentday.toArray()[2],currentday.toArray()[1],currentday.toArray()[0])));
+        }
+        res.json({days:createDayboxobj(days),freetimes:freetimes});
+        res.end();
+      }
+    })
+    })
+   }
+})
+
+
+router.post("/api/paymentHC",function(req,res){
+
+})
+
+
+router.get("/api/paymenthandlerHC",function(req,res){
+  
+})
+
+
+//banksalamat
 
 router.get("/api/verification",function(req,res){
   var query=url.parse(req.url,true).query;
@@ -565,7 +728,7 @@ router.post("/addDoctor",function(req,res){
 router.get("/test",function(req,res){
   apikave.VerifyLookup({
     token: "10203040",
-    token2: "دکتر مجید",
+    token2: "دکترمجید",
     token3: "مجیدی",
     template : "reserveACK",
     receptor: "09128993687"
@@ -1169,7 +1332,7 @@ router.get("/paymenthandler",function(req,res){
                   dbo.collection("Users").updateOne({_id:reservation.user},{$addToSet:{reserves:reservation}},function(err,ad){
                     strtime=reservation.time.start.hour+":"+reservation.time.start.min;
                     res.render("paymentaccept.ejs",{doctor:result,time:strtime,resid:reservation.refid});
-                    sendSMSforres(reservation);
+                    //sendSMSforres(reservation);
                     res.end();
                   })
                 })
