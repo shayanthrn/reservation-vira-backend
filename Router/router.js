@@ -1006,7 +1006,7 @@ router.get("/",function(req,res){
   })
 })
 
-router.get("/category//:Category",function(req,res){
+router.get("/category/:Category",function(req,res){
   req.session.prevurl=req.session.currurl;
   req.session.currurl=req.url;
   Doctors = [];
