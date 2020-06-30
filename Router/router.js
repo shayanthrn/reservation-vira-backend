@@ -636,11 +636,20 @@ function getDoctimeslots(doctor,date){
     if(doc.start.min<10){
       doc.start.min = "0" + doc.start.min
     }
+    else{
+      doc.start.min = doc.start.min.toString();
+    }
     if(doc.start.hour<10){
       doc.start.hour = "0" + doc.start.hour
     }
+    else{
+      doc.start.hour = doc.start.hour.toString();
+    }
     if(doc.end.min<10){
       doc.end.min = "0" + doc.end.min
+    }
+    else{
+      doc.end.min = doc.end.min.toString();
     }
     if(doc.end.hour<10){
       doc.end.hour = "0" + doc.end.hour
