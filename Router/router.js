@@ -632,6 +632,20 @@ function getDoctimeslots(doctor,date){
       });
     }
   }
+  timeslots.forEach(function(doc){
+    if(doc.start.min<10){
+      doc.start.min = "0" + doc.start.min
+    }
+    if(doc.start.hour<10){
+      doc.start.hour = "0" + doc.start.hour
+    }
+    if(doc.end.min<10){
+      doc.end.min = "0" + doc.end.min
+    }
+    if(doc.start.hour<10){
+      doc.end.hour = "0" + doc.end.hour
+    }
+  })
   return timeslots;
 }
 
