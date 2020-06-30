@@ -1323,18 +1323,24 @@ router.post('/loginDoc',function(req,res){
   req.session.currurl=req.url;
   MongoClient.connect(dburl,function(err,db){
     var dbo=db.db("mydb");
-    dbo.collection("Doctors").findOne({username:req.body.username},function(err,result){
-      if(result==null){
+    dbo.collection("Doctors").findOne({username:req.body.username},function(err,doctor){
+      if(doctor==null){
         res.render('logindoctor.ejs',{wrongflag:1});
         res.end();
       }
       else{
-        if(req.body.pass!=result.password){
+        if(req.body.pass!=doctor.password){
           res.render('logindoctor.ejs',{wrongflag:1});
           res.end();
         }
         else{
-          let mytoken=tokgen.generate();
+          let mytoken;
+          if(doctor.token=""){
+            mytoken=tokgen.generate();
+          }
+          else{
+            mytoken=doctor.token;
+          }
           dbo.collection("Doctors").updateOne({username:req.body.username},{$set:{token:mytoken}},function(err,result2){
             res.cookie('doctortoken',mytoken);
             res.redirect('/Doctorpanel/dashboard');
@@ -1368,7 +1374,13 @@ router.post('/loginAdmin',function(req,res){
           res.end();
         }
         else{
-          let mytoken=tokgen.generate();
+          let mytoken;
+          if(result.token=""){
+            mytoken=tokgen.generate();
+          }
+          else{
+            mytoken=result.token;
+          }
           dbo.collection("Admins").updateOne({username:req.body.username},{$set:{token:mytoken}},function(err,result2){
             res.cookie('admintoken',mytoken);
             res.redirect('/AdminPanel/addDoctor');
