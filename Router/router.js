@@ -1538,7 +1538,7 @@ router.post('/loginAdmin',function(req,res){
         }
         else{
           let mytoken;
-          if(result.token=""){
+          if(result.token==""){
             mytoken=tokgen.generate();
           }
           else{
