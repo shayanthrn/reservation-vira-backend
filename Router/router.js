@@ -851,32 +851,48 @@ router.post("/changepass",function(req,res){
 router.post("/addDoctor",function(req,res){
     MongoClient.connect(dburl,function(err,db){
       var dbo=db.db("mydb");
-      var cats=[];
-      var memtype=[];
-      if(typeof req.body.categories=="string"){
-        cats.push(req.body.categories);
-      }
-      else{
-        req.body.categories.forEach(function(doc){
-          cats.push(doc);
-          })
-      }
-      if(typeof req.body.membershiptypes=="string"){
-        memtype.push(req.body.membershiptypes)
-      }
-      else[
-        req.body.membershiptypes.forEach(function(doc2){
-          memtype.push(doc2);
-        })
-      ]
-      dbo.collection('Doctors').insertOne(new Doctor(req.body.username,req.body.pass,req.body.name,cats,req.body.medicalnumber,req.body.codemeli,req.body.workphone,req.body.phonenumber,req.body.address,req.body.city,"/docphotos/"+req.body.name+".png",req.body.background,req.body.description,memtype,req.body.appknowledge),function(err,res2){
-        if(req.files!=null){
-        mv(req.files.image.tempFilePath,"public/docphotos/"+req.body.name+".png",function(err){
-          console.log("public/docphotos/"+req.body.name+".png")
-        })
+      dbo.collection("Doctors").findOne({name:req.body.name},function(err,res1){
+        if(res1!=null){
+          db.close();
+          res.redirect('/doctorsignup')
         }
-        db.close();
-        res.redirect('/'); //fixxxxxxxxxxxxxxxxxxxxxxxx
+        else{
+          dbo.collection("Doctors").findOne({username:req.body.username},function(err,res2){
+            if(res2!=null){
+              db.close();
+              res.redirect('/doctorsignup')
+            }
+            else{
+              var cats=[];
+              var memtype=[];
+              if(typeof req.body.categories=="string"){
+                cats.push(req.body.categories);
+              }
+              else{
+                req.body.categories.forEach(function(doc){
+                  cats.push(doc);
+                  })
+              }
+              if(typeof req.body.membershiptypes=="string"){
+                memtype.push(req.body.membershiptypes)
+              }
+              else[
+                req.body.membershiptypes.forEach(function(doc2){
+                  memtype.push(doc2);
+                })
+              ]
+              dbo.collection('Doctors').insertOne(new Doctor(req.body.username,req.body.pass,req.body.name,cats,req.body.medicalnumber,req.body.codemeli,req.body.workphone,req.body.phonenumber,req.body.address,req.body.city,"/docphotos/"+req.body.name+".png",req.body.background,req.body.description,memtype,req.body.appknowledge),function(err,res2){
+                if(req.files!=null){
+                mv(req.files.image.tempFilePath,"public/docphotos/"+req.body.name+".png",function(err){
+                  console.log("public/docphotos/"+req.body.name+".png")
+                })
+                }
+                db.close();
+                res.redirect('/'); //fixxxxxxxxxxxxxxxxxxxxxxxx
+              })
+            }
+          })
+        }
       })
     })
 })
