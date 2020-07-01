@@ -76,6 +76,7 @@ router.post("/api/addhealthcenter",function(req,res){
             var newHC=new HealthCenter(req.body.type,req.body.name,req.body.isreserveable=="true",req.body.city,req.body.phonenumber,req.body.address);
             dbo.collection("HealthCenters").insertOne(newHC,function(err,result){
               res.json({data:result});
+              db.close();
               res.end();
             })
           }
@@ -95,6 +96,7 @@ router.get("/api/getAlltypesofHC",function(req,res){
         var dbo=db.db("mydb");
         dbo.collection("HealthCenters").distinct("type",function(err,result){
           res.json({data:result});
+          db.close();
           res.end();
         })
       })
@@ -113,6 +115,7 @@ router.get("/api/getallHCbytype",function(req,res){
         dbo.collection("HealthCenters").find({type:req.body.type},async function(err,result){
           data=await result.toArray()
           res.json({data:data});
+          db.close();
           res.end();
         })
       })
@@ -131,6 +134,7 @@ router.get("/api/getallHCbytypeandcity",function(req,res){
         dbo.collection("HealthCenters").find({city:req.body.city,type:req.body.type},async function(err,result){
           data=await result.toArray()
           res.json({data:data});
+          db.close();
           res.end();
         })
       })
@@ -150,6 +154,7 @@ router.post("/api/addCategoryToHC",function(req,res){
         var newcat = {name:req.body.catname,unavailabletimes:[],visitduration:Number(req.body.catduration),visitcost:Number(req.body.catcost)}
         dbo.collection("HealthCenters").updateOne({name:req.body.name,type:req.body.type,isReserveable:true},{$addToSet:{categories:newcat}},function(err,result){
           res.json({data:result});
+          db.close();
           res.end();
         })
       })
@@ -237,6 +242,7 @@ router.post("/api/addExperimentFile",function(req,res){
                 dbo.collection("Experiments").insertOne({userid:user._id,hcid:hc._id,dateuploaded:now,description:req.body.description,path:path},function(err,result){
                   mv(req.files.file.tempFilePath,path,function(err){
                     res.json({data:"file uploaded successfully"});
+                    db.close();
                     res.end();
                   })
                 })
@@ -267,12 +273,14 @@ router.get("/api/getAllExperimentsOfuser",function(req,res){
         dbo.collection("Users").findOne({phonenumber:query.phonenumber},function(err,user){
           if(user==null){
             res.json({data:"user not found"});
+            db.close();
             res.end();
           }
           else{
             dbo.collection("Experiments").find({userid:user._id},async function(err,cursor){
               result= await cursor.toArray();
               res.json({data:result});
+              db.close();
               res.end();
             })
           }
@@ -293,12 +301,14 @@ router.get("/api/getAllExperimentsOfHC",function(req,res){
         dbo.collection("HealthCenters").findOne({name:query.name,type:query.type},function(err,HC){
           if(HC==null){
             res.json({data:"HC not found"});
+            db.close();
             res.end();
           }
           else{
             dbo.collection("Experiments").find({hcid:HC._id},async function(err,cursor){
               result= await cursor.toArray();
               res.json({data:result});
+              db.close();
               res.end();
             })
           }
@@ -350,12 +360,14 @@ router.get("/api/verification",function(req,res){
                   myresponse={func:"login",code:verifycode};
                 }
                 res.json(myresponse)
+                db.close();
                 res.end();
               })
           })
         }
         else{
           res.write("problem in sending");
+          db.close();
           res.end();
         }
       });
@@ -388,11 +400,13 @@ router.get("/api/login",function(req,res){
     dbo.collection("Users").findOne({phonenumber:query.phonenumber},function(err,user){
       if(user==null){
         res.json("not exist")
+        db.close();
         res.end();
       }
       else{
         dbo.collection("signupcode").deleteOne({phonenumber:query.phonenumber})
         res.json({token:user.token});
+        db.close();
         res.end();
       }
     })
@@ -421,6 +435,7 @@ router.post("/api/signup",function(req,res){
         else{
           res.json({status:"ok",token:token1});
         }
+        db.close();
         res.end();
       })
     })
@@ -442,6 +457,7 @@ router.get("/api/getCategories",function(req,res){
         data.push(doc);
       },function(){
         res.json({Categories:data});
+        db.close();
         res.end();
       })
     })
@@ -462,6 +478,7 @@ router.get("/api/getDoctors",function(req,res){
         data.push(doc);
       },function(){
         res.json({Doctors:data});
+        db.close();
         res.end();
       })
     })
@@ -483,6 +500,7 @@ router.get("/api/getDoctorsBycategory",function(req,res){
         data.push(doc);
       },function(){
         res.json({Doctors:data});
+        db.close();
         res.end();
       })
     })
@@ -504,6 +522,7 @@ router.get("/api/getDoctorsBycategory-city",function(req,res){
         data.push(doc);
       },function(){
         res.json({Doctors:data});
+        db.close();
         res.end();
       })
     })
@@ -522,10 +541,12 @@ router.get("/api/getCurUser",function(req,res){
       dbo.collection("Users").findOne({token:query.token},function(err,user){
         if(user==null){
           res.write("not found");
+          db.close();
           res.end();
         }
         else{
           res.json({user:user});
+          db.close();
           res.end();
         }
       })
@@ -548,6 +569,7 @@ router.get("/api/getTimeSlots",function(req,res){
       dbo.collection("Doctors").findOne({name:query.doctor},function(err,result){
       if(result==null){
         res.write('not found');
+        db.close();
         res.end();
       }
       currentday=new persianDate();
@@ -559,6 +581,7 @@ router.get("/api/getTimeSlots",function(req,res){
         freetimes.push(getDoctimeslots(result,new myDate(currentday.toArray()[2],currentday.toArray()[1],currentday.toArray()[0])));
       }
       res.json({days:createDayboxobj(days),freetimes:freetimes});
+      db.close();
       res.end();
     })
     })
@@ -583,6 +606,7 @@ router.post("/api/payment",function(req,res){
     dbo.collection("Users").findOne({token:req.body.usertoken},function(err,user){
       if(user==null){
         res.json({data:"user not found"});
+        db.close();
         res.end();
       }
       else{
@@ -590,6 +614,7 @@ router.post("/api/payment",function(req,res){
           dbo.collection("Doctors").findOne({name:req.body.doctor},function(err,doctor){
             if(doctor==null){
               res.json({data:"doctor not found"});
+              db.close();
               res.end();
             }
             else{
@@ -615,6 +640,7 @@ router.post("/api/payment",function(req,res){
               }).catch(err => {
                 res.write("<html><body><p>there is a problem on server please try again later</p><a href='/' >go back to main page</a></body></html>");
                 console.error(err);
+                db.close();
                 res.end();
               });
             }
@@ -637,6 +663,7 @@ router.post("/changedocinfo",function(req,res){
       var dbo=db.db("mydb");
       dbo.collection('Doctors').findOne({token:req.cookies.doctortoken},function(err,result){
         if(result==null){
+          db.close();
           res.redirect('noaccess');
         }
         else{
@@ -646,6 +673,7 @@ router.post("/changedocinfo",function(req,res){
                 console.log("public"+result.image)
               })
             }
+            db.close();
             res.redirect('/doctorpanel/profile');
           })
         }
@@ -664,6 +692,7 @@ router.get("/addunavbeveryday",function(req,res){
       var dbo=db.db("mydb");
       dbo.collection('Doctors').findOne({token:req.cookies.doctortoken},function(err,result){
         if(result==null){
+          db.close();
           res.redirect('noaccess');
         }
         else{
@@ -671,16 +700,19 @@ router.get("/addunavbeveryday",function(req,res){
           totime= {hour:Number(query.toTime.split(":")[0]),min:Number(query.toTime.split(":")[1])};
           if(Number.isNaN(fromtime.hour)||Number.isNaN(fromtime.min)||Number.isNaN(totime.hour)||Number.isNaN(totime.min)){
             res.write("invalid");
+            db.close();
             res.end();
           }
           else{
             if((fromtime.hour*60)+fromtime.min>(totime.hour*60)+totime.min){
               dbo.collection('Doctors').updateOne({token:req.cookies.doctortoken},{$addToSet:{unavailabletimes:{date:"*",dayofweek:"*",start:fromtime,end:{hour:23,min:59}}}});
               dbo.collection('Doctors').updateOne({token:req.cookies.doctortoken},{$addToSet:{unavailabletimes:{date:"*",dayofweek:"*",start:{hour:0,min:0},end:totime}}});
+              db.close();
               res.redirect('/doctorpanel/visittimes');
             }
             else{
             dbo.collection('Doctors').updateOne({token:req.cookies.doctortoken},{$addToSet:{unavailabletimes:{date:"*",dayofweek:"*",start:fromtime,end:totime}}},function(result2){
+              db.close();
               res.redirect('/doctorpanel/visittimes');
             })
             }
@@ -701,12 +733,14 @@ router.get("/addunavbdayofweek",function(req,res){
       var dbo=db.db("mydb");
       dbo.collection('Doctors').findOne({token:req.cookies.doctortoken},function(err,result){
         if(result==null){
+          db.close();
           res.redirect('noaccess');
         }
         else{
           fromtime = {hour:Number(query.fromTime.split(":")[0]),min:Number(query.fromTime.split(":")[1])};
           totime= {hour:Number(query.toTime.split(":")[0]),min:Number(query.toTime.split(":")[1])};
           if(Number.isNaN(fromtime.hour)||Number.isNaN(fromtime.min)||Number.isNaN(totime.hour)||Number.isNaN(totime.min)){
+            db.close();
             res.write("invalid");
             res.end();
           }
@@ -714,10 +748,12 @@ router.get("/addunavbdayofweek",function(req,res){
             if((fromtime.hour*60)+fromtime.min>(totime.hour*60)+totime.min){
               dbo.collection('Doctors').updateOne({token:req.cookies.doctortoken},{$addToSet:{unavailabletimes:{date:"*",dayofweek:query.dayofweek,start:fromtime,end:{hour:23,min:59}}}});
               dbo.collection('Doctors').updateOne({token:req.cookies.doctortoken},{$addToSet:{unavailabletimes:{date:"*",dayofweek:query.dayofweek,start:{hour:0,min:0},end:totime}}});
+              db.close();
               res.redirect('/doctorpanel/visittimes');
             }
             else{
             dbo.collection('Doctors').updateOne({token:req.cookies.doctortoken},{$addToSet:{unavailabletimes:{date:"*",dayofweek:query.dayofweek,start:fromtime,end:totime}}},function(result2){
+              db.close();
               res.redirect('/doctorpanel/visittimes');
             })
             }
@@ -739,13 +775,16 @@ router.get("/addunavb",function(req,res){
       var dbo=db.db("mydb");
       dbo.collection('Doctors').findOne({token:req.cookies.doctortoken},function(err,result){
         if(result==null){
+          db.close();
           res.redirect('noaccess');
         }
         else{
           fromtime = {hour:Number(query.fromTime.split(":")[0]),min:Number(query.fromTime.split(":")[1])};
           totime= {hour:Number(query.toTime.split(":")[0]),min:Number(query.toTime.split(":")[1])};
           if(Number.isNaN(fromtime.hour)||Number.isNaN(fromtime.min)||Number.isNaN(totime.hour)||Number.isNaN(totime.min)){
+            
             res.write("invalid");
+            db.close();
             res.end();
           }
           else{
@@ -754,10 +793,12 @@ router.get("/addunavb",function(req,res){
             if((fromtime.hour*60)+fromtime.min>(totime.hour*60)+totime.min){
               dbo.collection('Doctors').updateOne({token:req.cookies.doctortoken},{$addToSet:{unavailabletimes:{date:date,dayofweek:querydate.format("dddd"),start:fromtime,end:{hour:23,min:59}}}})
               dbo.collection('Doctors').updateOne({token:req.cookies.doctortoken},{$addToSet:{unavailabletimes:{date:date,dayofweek:querydate.format("dddd"),start:{hour:0,min:0},end:totime}}})
+              db.close();
               res.redirect('/doctorpanel/visittimes');
             }
             else{
             dbo.collection('Doctors').updateOne({token:req.cookies.doctortoken},{$addToSet:{unavailabletimes:{date:date,dayofweek:querydate.format("dddd"),start:fromtime,end:totime}}},function(result2){
+              db.close();
               res.redirect('/doctorpanel/visittimes');
             })
             }
@@ -778,22 +819,26 @@ router.post("/changepass",function(req,res){
       var dbo=db.db("mydb");
       dbo.collection('Doctors').findOne({token:req.cookies.doctortoken},function(err,result){
         if(result==null){
+          db.close();
           res.redirect('noaccess');
         }
         else{
           if(result.password==req.body.oldPassword){
               if(req.body.confirmPassword==req.body.newPassword){
                 dbo.collection("Doctors").updateOne({token:req.cookies.doctortoken},{ $set:{password:req.body.newPassword}},function(err,result3){
+                  db.close();
                   res.redirect("/doctorpanel/systemicinfo");
                 })
               }
               else{
                 res.write("not confirmed");
+                db.close();
                 res.end();
               }
           }
           else{
             res.write("wrong pass");
+            db.close();
             res.end();
           }
         }
@@ -830,6 +875,7 @@ router.post("/addDoctor",function(req,res){
           console.log("public/docphotos/"+req.body.name+".png")
         })
         }
+        db.close();
         res.redirect('/'); //fixxxxxxxxxxxxxxxxxxxxxxxx
       })
     })
@@ -966,10 +1012,12 @@ function sendSMSforres(reservation){
           console.log(status);
           if(status==200){
             console.log("hehe");
+            db.close();
             res.end();
           }
           else{
             res.write("<html><body><p>there is a problem on server please try again later</p></body></html>");
+            db.close();
             res.end();
           }
         });
@@ -995,6 +1043,7 @@ router.get('/doctorpanel/dashboard',function(req,res){
       var dbo=db.db("mydb");
       dbo.collection('Doctors').findOne({token:req.cookies.doctortoken},function(err,result){
         if(result==null){
+          db.close();
           res.redirect('noaccess');
         }
         else{
@@ -1013,6 +1062,7 @@ router.get('/doctorpanel/dashboard',function(req,res){
             }
           })
           res.render('DoctorPanel/dashboard.ejs',{visittimes:visittimes});
+          db.close();
           res.end();
         }
       })
@@ -1029,10 +1079,12 @@ router.get('/doctorpanel/profile',function(req,res){
       var dbo=db.db("mydb");
       dbo.collection('Doctors').findOne({token:req.cookies.doctortoken},function(err,result){
         if(result==null){
+          db.close();
           res.redirect('noaccess');
         }
         else{
           res.render('DoctorPanel/profile.ejs',{doctor:result});
+          db.close();
           res.end();
         }
       })
@@ -1052,6 +1104,7 @@ router.get('/doctorpanel/patients',function(req,res){
       var dbo=db.db("mydb");
       dbo.collection('Doctors').findOne({token:req.cookies.doctortoken},function(err,result){
         if(result==null){
+          db.close();
           res.redirect('noaccess');
         }
         else{
@@ -1062,8 +1115,8 @@ router.get('/doctorpanel/patients',function(req,res){
             result2.forEach(function(doc){
               patients.push(doc);
             },function(){
-              console.log(patients);
               res.render('DoctorPanel/patients.ejs',{patients:patients});
+              db.close();
               res.end();
             })
           })
@@ -1082,10 +1135,12 @@ router.get('/doctorpanel/visittimes',function(req,res){
       var dbo=db.db("mydb");
       dbo.collection('Doctors').findOne({token:req.cookies.doctortoken},function(err,result){
         if(result==null){
+          db.close();
           res.redirect('noaccess');
         }
         else{
           res.render('DoctorPanel/addunavb.ejs');
+          db.close();
           res.end();
         }
       })
@@ -1102,10 +1157,12 @@ router.get('/doctorpanel/systemicinfo',function(req,res){
       var dbo=db.db("mydb");
       dbo.collection('Doctors').findOne({token:req.cookies.doctortoken},function(err,result){
         if(result==null){
+          db.close();
           res.redirect('noaccess');
         }
         else{
           res.render('DoctorPanel/settings.ejs');
+          db.close();
           res.end();
         }
       })
@@ -1131,6 +1188,7 @@ router.get("/AdminPanel/users/:userid",function(req,res){
         if(result==null){
           dbo.collection('Admins').findOne({token:req.cookies.admintoken},function(err,result2){
             if(result2==null){
+              db.close();
               res.redirect('noaccess');
             }
             else{
@@ -1142,10 +1200,12 @@ router.get("/AdminPanel/users/:userid",function(req,res){
                   });
                   Promise.all(promises).then(function(value){
                       res.render("AdminPanel/patients-profile.ejs",{user:result3,reservations:value});
+                      db.close();
                       res.end();
                   });
                 }
                 else{
+                  db.close();
                   res.redirect("/AdminPanel/users");
                 }
               })
@@ -1161,10 +1221,12 @@ router.get("/AdminPanel/users/:userid",function(req,res){
               });
               Promise.all(promises).then(function(value){
                   res.render("AdminPanel/patients-profile.ejs",{user:result3,reservations:value});
+                  db.close();
                   res.end();
               });
             }
             else{
+              db.close();
               res.redirect("/AdminPanel/users");
             }
           })
@@ -1189,6 +1251,7 @@ router.get("/Adminpanel/reserves/:resid",function(req,res){
         if(result==null){
           dbo.collection('Admins').findOne({token:req.cookies.admintoken},function(err,result2){
             if(result2==null){
+              db.close();
               res.redirect('noaccess');
             }
             else{
@@ -1214,10 +1277,12 @@ router.get("/Adminpanel/addDoctor",function(req,res){
       var dbo=db.db("mydb");
       dbo.collection("Admins").findOne({token:req.cookies.admintoken},function(err,result){
         if(result==null){
+          db.close();
           res.redirect('/noaccess');
         }
         else{
           res.render("AdminPanel/doctors-add.ejs",{categories:categories});
+          db.close();
           res.end();
         }
       })
@@ -1307,6 +1372,7 @@ router.get("/category/:Category/:Doctor",function(req,res){
     var dbo=db.db("mydb");
     dbo.collection("Doctors").findOne({name:req.params.Doctor.split('-').join(' ')},function(err,result){
       res.render("doctorpage.ejs",{doctor:result,categories:categories,user:""});      //fix this
+      db.close();
       res.end();
     })
   })
@@ -1322,6 +1388,7 @@ router.get("/reserve/:Doctor",function(req,res){
     freetimes=[]
     dbo.collection("Doctors").findOne({name:req.params.Doctor.split('-').join(' ')},function(err,result){
       if(result==null){
+        db.close();
         res.redirect('/');
       }
       currentday=new persianDate();
@@ -1333,6 +1400,7 @@ router.get("/reserve/:Doctor",function(req,res){
         freetimes.push(getDoctimeslots(result,new myDate(currentday.toArray()[2],currentday.toArray()[1],currentday.toArray()[0])));
       }
       res.render("reserve.ejs",{doctor:result,days:createDayboxobj(days),freetimes:freetimes,categories:categories});
+      db.close();
       res.end();
     })
   })
@@ -1357,12 +1425,14 @@ router.post("/payment",function(req,res){
     dbo.collection("Users").findOne({token:req.cookies.usertoken},function(err,user){
       if(user==null){
         res.redirect("/signup"+"?from="+query.from);
+        db.close();
         res.end();
       }
       else{
         if(checkinterval(1)){
           dbo.collection("Doctors").findOne({name:req.body.doctor},function(err,doctor){
             if(doctor==null){
+              db.close();
               res.redirect("/noaccess");
             }
             else{
@@ -1388,6 +1458,7 @@ router.post("/payment",function(req,res){
               }).catch(err => {
                 res.write("<html><body><p>there is a problem on server please try again later</p><a href='/' >go back to main page</a></body></html>");
                 console.error(err);
+                db.close();
                 res.end();
               });
             }
@@ -1406,6 +1477,7 @@ router.get("/paymenthandler",function(req,res){
     var dbo=db.db("mydb");
     dbo.collection("TempReserves").findOne({authority:query.Authority},function(err,reserve){
       if(reserve==null){
+        db.close();
         res.redirect("/noaccess");
       }
       else{
@@ -1414,6 +1486,7 @@ router.get("/paymenthandler",function(req,res){
           dbo.collection("Doctors").findOne({_id:reserve.doctor},function(err,doctor){
             dbo.collection("TempReserves").deleteOne({authority:query.Authority},function(err,result){
               res.render("paymentfail.ejs",{doctor:doctor,time:strtime});
+              db.close();
               res.end();
             })
           })
@@ -1490,11 +1563,13 @@ router.post('/signup',function(req,res){
           if(status==200){
             dbo.collection("signupcode").updateOne({phonenumber:req.body.phonenumber},{$set:{code:verifycode,phonenumber:req.body.phonenumber,date:new Date().getTime()}},{upsert:true},function(err,result){
                 res.render("verify.ejs",{phonenumber:req.body.phonenumber,text:""});
+                db.close();
                 res.end();
             })
           }
           else{
             res.write("<html><body><p>there is a problem on server please try again later</p></body></html>");
+            db.close();
             res.end();
           }
         });
@@ -1522,18 +1597,21 @@ router.post("/verifynumber",function(req,res){
                   var user=new User(req.body.phonenumber);
                   dbo.collection('Users').insertOne(user,function(err,result6){
                     res.render('submitinfo.ejs',{phonenumber:req.body.phonenumber});
+                    db.close();
                     res.end();
                   })
                 }
                 else{
                     if(result4!=""){
                       res.cookie('usertoken',result4.token);
+                      db.close();
                       res.redirect(req.session.gobackafterlogin)
                     }
                     else{
                       let token1=tokgen.generate();
                       res.cookie('usertoken',token1);
                       dbo.collection("Users").updateOne({phonenumber:req.body.phonenumber},{$set:{token:token1}},function(err,result5){
+                        db.close();
                         res.redirect(req.session.gobackafterlogin);
                         })
                     }
@@ -1543,6 +1621,7 @@ router.post("/verifynumber",function(req,res){
           }
           else{
             res.render("verify.ejs",{phonenumber:req.body.phonenumber,text:"کد وارد شده معتبر نیست"});
+            db.close();
             res.end();
           }
       }
@@ -1569,6 +1648,7 @@ router.post('/submitinfo',function(req,res){
     let token1=tokgen.generate();
     res.cookie('usertoken',token1);
     dbo.collection("Users").updateOne({phonenumber:req.body.phonenumber},{$set:{sex:req.body.sex,firstname:req.body.firstname,lastname:req.body.lastname,birthdate:bdate,token:token1}},function(err,result){
+      db.close();
       res.redirect('/');
     })
   })
@@ -1590,11 +1670,13 @@ router.post('/loginDoc',function(req,res){
     dbo.collection("Doctors").findOne({username:req.body.username},function(err,doctor){
       if(doctor==null){
         res.render('logindoctor.ejs',{wrongflag:1});
+        db.close();
         res.end();
       }
       else{
         if(req.body.pass!=doctor.password){
           res.render('logindoctor.ejs',{wrongflag:1});
+          db.close();
           res.end();
         }
         else{
@@ -1607,6 +1689,7 @@ router.post('/loginDoc',function(req,res){
           }
           dbo.collection("Doctors").updateOne({username:req.body.username},{$set:{token:mytoken}},function(err,result2){
             res.cookie('doctortoken',mytoken);
+            db.close();
             res.redirect('/Doctorpanel/dashboard');
           })
         }
@@ -1630,11 +1713,13 @@ router.post('/loginAdmin',function(req,res){
     dbo.collection("Admins").findOne({username:req.body.username},function(err,result){
       if(result==null){
         res.render('AdminPanel/loginadmin.ejs',{wrongflag:1});
+        db.close();
         res.end();
       }
       else{
         if(req.body.pass!=result.password){
           res.render('AdminPanel/loginadmin.ejs',{wrongflag:1});
+          db.close();
           res.end();
         }
         else{
@@ -1647,6 +1732,7 @@ router.post('/loginAdmin',function(req,res){
           }
           dbo.collection("Admins").updateOne({username:req.body.username},{$set:{token:mytoken}},function(err,result2){
             res.cookie('admintoken',mytoken);
+            db.close();
             res.redirect('/AdminPanel/addDoctor');
           })
         }
@@ -1664,6 +1750,7 @@ router.get('/exit',function(req,res){
     res.clearCookie('usertoken');
     res.clearCookie('doctortoken');
     res.clearCookie('admintoken');
+    db.close();
     res.redirect('/');
     res.end();
   })
