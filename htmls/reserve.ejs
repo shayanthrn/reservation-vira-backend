@@ -83,7 +83,7 @@
                         </div>
                         <section class="page-content default">
                             <div class="checkout-shipment">
-                               <form action="payment" method="POST">
+                               <form action="payment?from=/reserve/<%=doctor.name%>" method="POST">
                                 <ul>
                                     <li><span> نام دکتر :</span><span><%= doctor.name %></span></li>
                                     <li><span>  تخصص :</span><span><%= doctor.category %></span></li>

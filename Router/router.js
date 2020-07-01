@@ -28,6 +28,7 @@ const { ObjectID } = require('mongodb');
 const ZarinpalCheckout = require('zarinpal-checkout');
 const { debugPort } = require('process');
 const { Buffer } = require('buffer');
+const { query } = require('express');
 const zarinpal = ZarinpalCheckout.create('3392f819-3761-4add-babb-4d1d70021603', false);
 
 
@@ -312,7 +313,7 @@ router.get("/api/sendTicket",function(req,res){
 })
 
 router.get('/api/getAlltickets',function(req,res){
-  
+
 })
 
 
@@ -1339,10 +1340,11 @@ router.get("/reserve/:Doctor",function(req,res){
 
 
 router.post("/payment",function(req,res){
+  var query= url.parse(req.url,true).query;
   req.session.prevurl=req.session.currurl;
   req.session.currurl=req.url;
   if(req.cookies.usertoken==undefined){
-    res.redirect("/signup");
+    res.redirect("/signup"+"?from="+query.from);
     res.end();
   }
   else{
@@ -1354,7 +1356,7 @@ router.post("/payment",function(req,res){
     var dbo=db.db("mydb");
     dbo.collection("Users").findOne({token:req.cookies.usertoken},function(err,user){
       if(user==null){
-        res.redirect("/signup");
+        res.redirect("/signup"+"?from="+query.from);
         res.end();
       }
       else{
@@ -1460,7 +1462,8 @@ router.get("/paymenthandler",function(req,res){
 router.get("/signup",function(req,res){
   req.session.prevurl=req.session.currurl;
   req.session.currurl=req.url;
-  req.session.gobackafterlogin=req.session.prevurl;
+  var query= url.parse(req.url,true).query;
+  req.session.gobackafterlogin=query.from;
   console.log(req.session)
   res.render('signup.ejs',{data:""});
   res.end();
