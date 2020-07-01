@@ -1498,7 +1498,7 @@ router.post('/loginDoc',function(req,res){
         }
         else{
           let mytoken;
-          if(doctor.token=""){
+          if(doctor.token==""){
             mytoken=tokgen.generate();
           }
           else{
