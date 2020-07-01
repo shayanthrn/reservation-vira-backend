@@ -27,10 +27,8 @@ var md5 = require('md5');
 const { ObjectID } = require('mongodb');
 const ZarinpalCheckout = require('zarinpal-checkout');
 const { debugPort } = require('process');
+const { Buffer } = require('buffer');
 const zarinpal = ZarinpalCheckout.create('3392f819-3761-4add-babb-4d1d70021603', false);
-var mongo = require('mongodb');
-var Grid =mongo.Grid;
-
 
 
 
@@ -209,6 +207,114 @@ router.post("/api/paymentHC",function(req,res){
 router.get("/api/paymenthandlerHC",function(req,res){
   
 })
+
+
+router.post("/api/addExperimentFile",function(req,res){
+  var query=url.parse(req.url,true).query;
+   if(query.key!="pouyarahmati"){
+     res.json({data:"noaccess"});
+     res.end();
+   }
+   else{
+    if(req.files!=null){
+      MongoClient.connect(dburl,function(err,db){
+        var dbo=db.db("mydb");
+        dbo.collection("Users").findOne({phonenumber:req.body.phonenumber},function(err,user){
+          if(user==null){
+            res.json({data:"user not found"});
+            res.end();
+          }
+          else{
+            dbo.collection("HealthCenters").findOne({name:req.body.hcname,type:req.body.hctype},function(err,hc){
+              if(hc==null){
+                res.json({data:"HC not found"});
+                res.end();
+              }
+              else{
+                var now=new Date();
+                path="/data/Experiments/"+now.getTime()+".zip";
+                dbo.collection("Experiments").insertOne({userid:user._id,hcid:hc._id,dateuploaded:now,description:req.body.description,path:path},function(err,result){
+                  mv(req.files.file.tempFilePath,path,function(err){
+                    res.json({data:"file uploaded successfully"});
+                    res.end();
+                  })
+                })
+              }
+            })
+          }
+        })
+        
+      })
+    }
+    else{
+      res.json({data:"no file uploaded"});
+      res.end();
+    }
+   }
+})
+
+
+router.get("/api/getAllExperimentsOfuser",function(req,res){
+  var query=url.parse(req.url,true).query;
+   if(query.key!="pouyarahmati"){
+     res.json({data:"noaccess"});
+     res.end();
+   }
+   else{
+      MongoClient.connect(dburl,function(err,db){
+        var dbo=db.db("mydb");
+        dbo.collection("Users").findOne({phonenumber:query.phonenumber},function(err,user){
+          if(user==null){
+            res.json({data:"user not found"});
+            res.end();
+          }
+          else{
+            dbo.collection("Experiments").find({userid:user._id},async function(err,cursor){
+              result= await cursor.toArray();
+              res.json({data:result});
+              res.end();
+            })
+          }
+        })
+      })
+   }
+})
+
+router.get("/api/getAllExperimentsOfHC",function(req,res){
+  var query=url.parse(req.url,true).query;
+   if(query.key!="pouyarahmati"){
+     res.json({data:"noaccess"});
+     res.end();
+   }
+   else{
+      MongoClient.connect(dburl,function(err,db){
+        var dbo=db.db("mydb");
+        dbo.collection("HealthCenters").findOne({name:query.name,type:query.type},function(err,HC){
+          if(HC==null){
+            res.json({data:"HC not found"});
+            res.end();
+          }
+          else{
+            dbo.collection("Experiments").find({hcid:HC._id},async function(err,cursor){
+              result= await cursor.toArray();
+              res.json({data:result});
+              res.end();
+            })
+          }
+        })
+      })
+   }
+})
+
+
+router.get("/api/sendTicket",function(req,res){
+
+})
+
+router.get('/api/getAlltickets',function(req,res){
+  
+})
+
 
 
 //banksalamat
@@ -736,25 +842,7 @@ router.post("/addDoctor",function(req,res){
 //-----------------------test route--------------------------//
 
 router.get("/test",function(req,res){
-  apikave.VerifyLookup({
-    token: "10203040",
-    token2: "دکترمجید",
-    token3: "مجیدی",
-    template : "reserveACK",
-    receptor: "09128993687"
-  },
-  function(response, status) {
-    console.log(response);
-    console.log(status);
-    if(status==200){
-      console.log("hehe");
-      res.end();
-    }
-    else{
-      res.write("<html><body><p>there is a problem on server please try again later</p></body></html>");
-      res.end();
-    }
-  });
+
 })
 
 //-----------------------test route--------------------------//
