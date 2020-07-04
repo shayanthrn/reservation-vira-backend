@@ -143,11 +143,35 @@
                                         </div>
                                         <a href="#" class="selenium-next-step-shipping">
                                             <div class="parent-btn">
-                                                <button class="dk-btn dk-btn-info" type="submit">
+                                                <button class="dk-btn dk-btn-info" type="submit" data-toggle="modal" data-target="#exampleModalLong">
                                                     پرداخت
                                                     <i class="now-ui-icons shopping_basket"></i>
                                                 </button>
                                             </div>
+                                            <!-- modal -->
+                                            <div class="modal fade" id="exampleModalLong" tabindex="-1" role="dialog" aria-labelledby="exampleModalLongTitle" aria-hidden="true">
+                                                <div class="modal-dialog" role="document">
+                                                  <div class="modal-content">
+                                                    <div class="modal-header">
+                                                      <h5 class="modal-title" id="exampleModalLongTitle">Modal title</h5>
+                                                      <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                        <span aria-hidden="true">&times;</span>
+                                                      </button>
+                                                    </div>
+                                                    <div class="modal-body">
+                                                      test
+                                                    </div>
+                                                    <div class="modal-footer">
+                                                      <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                                      <button type="button" class="btn btn-primary">Save changes</button>
+                                                    </div>
+                                                  </div>
+                                                </div>
+                                              </div>
+
+
+
+                                            <!-- modal -->
                                         </a>
                                         <input type="text" name="doctor" id="doctor" value="<%= doctor.name %>" style="visibility: hidden;">
                                         <input type="text" name="cost" value="<%= doctor.visitcost %>" style="visibility: hidden;">
