@@ -94,10 +94,10 @@
             <h1 class="h2">اصلاح کردن تخصص</h1>
           </div>
 
-          <form class="" action="index.html" method="GET">
+          <form action="editcategory" enctype="multipart/form-data" method="POST">
             <div class="row">
               <div class="col-sm-6 col-md-2 mb-5">
-                <img class="img-fluid" src="../assets/placeholder.png">
+                <img class="img-fluid" src="<%= category.image %>" onerror="this.src='assets/img/altimage.png'">
                 <div class="form-group mt-2">
                   <input type="file" class="form-control-file" name="image" id="image">
                 </div>
@@ -109,7 +109,7 @@
                   </div>
                   <div class="col-md-6 col-lg-6">
                     <div class="form-group mb-2">
-                      <input type="text" class="form-control form-control-sm" name="specialty" id="specialty" placeholder="تخصص" value="پوست" required>
+                      <input type="text" class="form-control form-control-sm" name="name" id="name" placeholder="تخصص" value="<%= category.name %>" required>
                     </div>
                   </div>
                 </div>

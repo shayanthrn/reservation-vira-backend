@@ -1334,6 +1334,7 @@ router.post("/addCategory",function(req,res){
 })
 
 router.get("/Adminpanel/editcategory",function(req,res){
+  var query= url.parse(req.url,true).query;
   // if(req.cookies.admintoken==undefined){
   //   res.redirect('/noaccess');
   // }
@@ -1346,9 +1347,11 @@ router.get("/Adminpanel/editcategory",function(req,res){
         //   res.redirect('/noaccess');
         // }
         // else{
-          res.render("AdminPanel/specialty-edit.ejs");
-          db.close();
-          res.end();
+          dbo.collection("Categories").findOne({name:query.category},function(err,category){
+            res.render("AdminPanel/specialty-edit.ejs",{category:category});
+            db.close();
+            res.end();
+          })
         //}
       })
     })
