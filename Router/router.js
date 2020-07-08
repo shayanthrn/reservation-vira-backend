@@ -1355,6 +1355,28 @@ router.get("/Adminpanel/editcategory",function(req,res){
   //}
 })
 
+router.get("/Adminpanel/categories",function(req,res){
+  // if(req.cookies.admintoken==undefined){
+  //   res.redirect('/noaccess');
+  // }
+  // else{
+    MongoClient.connect(dburl,function(err,db){
+      var dbo=db.db("mydb");
+      dbo.collection("Admins").findOne({token:req.cookies.admintoken},function(err,result){
+        // if(result==null){
+        //   db.close();
+        //   res.redirect('/noaccess');
+        // }
+        // else{
+          res.render("AdminPanel/specialties.ejs");
+          db.close();
+          res.end();
+        //}
+      })
+    })
+  //}
+})
+
 
 //------------------------adminpanel---------------------------//
 //=======================doctor signup========================//
