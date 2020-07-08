@@ -1368,9 +1368,14 @@ router.get("/Adminpanel/categories",function(req,res){
         //   res.redirect('/noaccess');
         // }
         // else{
-          res.render("AdminPanel/specialties.ejs");
-          db.close();
-          res.end();
+          var cats=[]
+          dbo.collection("Categories").find({}).forEach(function(doc){
+            cats.push(doc);
+          },function(){
+            res.render("AdminPanel/specialties.ejs",{categories:cats});
+            db.close();
+            res.end();
+          })
         //}
       })
     })

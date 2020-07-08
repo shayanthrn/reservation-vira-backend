@@ -99,21 +99,22 @@
           </div>
 
           <div class="row">
+            <% for( let i=0 ; i< categories.length ; i++) { %>
             <!-- for loop here -->
             <div class="col-xl-4 col-sm-6 col-xs-12">
               <div class="card mb-3">
                 <div class="row no-gutters">
                   <div class="col-md-4">
-                    <div class="specialty-img" style="background-image: url('../assets/placeholder.png');">
+                    <div class="specialty-img" style="background-image: url('<%=categories[i].image %>');">
                     </div>
                   </div>
                   <div class="col-md-8">
                     <div class="card-body p-2 h-100 d-flex flex-column justify-content-between">
                       <h5 class="card-title">
-                        مغز و اعصاب
+                       <%= categories[i].name %>
                       </h5>
                       <div class="d-flex justify-content-end">
-                        <a class="btn btn-light btn-sm mr-2" href="">
+                        <a class="btn btn-info btn-sm mr-2" href="">
                           <i class="fa fa-edit"></i>
                           اصلاح
                         </a>
@@ -127,6 +128,7 @@
                 </div>
               </div>
             </div>
+            <% } %>
             <!-- end for -->
           </div>
 
