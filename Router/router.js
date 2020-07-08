@@ -1333,7 +1333,7 @@ router.post("/addCategory",function(req,res){
 
 })
 
-router.get("/Adminpanel/addcategory",function(req,res){
+router.get("/Adminpanel/editcategory",function(req,res){
   // if(req.cookies.admintoken==undefined){
   //   res.redirect('/noaccess');
   // }
