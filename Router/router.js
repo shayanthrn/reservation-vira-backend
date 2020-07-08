@@ -1330,7 +1330,31 @@ router.get("/Adminpanel/addcategory",function(req,res){
 })
 
 router.post("/addCategory",function(req,res){
-
+  // if(req.cookies.admintoken==undefined){
+  //   res.redirect('/noaccess');
+  // }
+  // else{
+    MongoClient.connect(dburl,function(err,db){
+      var dbo=db.db("mydb");
+      dbo.collection("Admins").findOne({token:req.cookies.admintoken},function(err,result){
+        // if(result==null){
+        //   db.close();
+        //   res.redirect('/noaccess');
+        // }
+        // else{
+          dbo.collection("Categories").insertOne({name:req.body.name,image:"/catphotos/"+req.body.name.split(' ').join('-')+".png"},function(err,insert){
+            if(req.files!=null){
+              mv(req.files.image.tempFilePath,"public"+"/catphotos/"+req.body.name.split(' ').join('-')+".png",function(err){
+                console.log("public"+"/catphotos/"+req.body.name.split(' ').join('-')+".png")
+              })
+            }
+            db.close();
+            res.redirect('/Adminpanel/categories');
+          })
+        //}
+      })
+    })
+  //}
 })
 
 router.get("/Adminpanel/editcategory",function(req,res){
