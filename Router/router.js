@@ -1440,6 +1440,40 @@ router.get("/Adminpanel/categories",function(req,res){
 })
 
 
+router.get("/removecategory",function(req,res){
+  var query= url.parse(req.url,true).query;
+  // if(req.cookies.admintoken==undefined){
+  //   res.redirect('/noaccess');
+  // }
+  // else{
+    MongoClient.connect(dburl,function(err,db){
+      var dbo=db.db("mydb");
+      dbo.collection("Admins").findOne({token:req.cookies.admintoken},function(err,result){
+        // if(result==null){
+        //   db.close();
+        //   res.redirect('/noaccess');
+        // }
+        // else{
+          dbo.collection("Categories").deleteOne({name:query.name},function(err,deleted){
+            fs.unlink('public/catphotos/'+query.name.split(' ').join('-')+".png", function(err) {
+              if(err && err.code == 'ENOENT') {
+                  // file doens't exist
+                  console.info("File doesn't exist, won't remove it.");
+              } else if (err) {
+                  // other errors, e.g. maybe we don't have enough permission
+                  console.error("Error occurred while trying to remove file");
+              } else {
+                  console.info(`removed`);
+              }
+          });
+          })
+        //}
+      })
+    })
+  //}
+})
+
+
 //------------------------adminpanel---------------------------//
 //=======================doctor signup========================//
 
