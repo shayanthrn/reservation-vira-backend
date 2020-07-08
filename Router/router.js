@@ -1454,8 +1454,8 @@ router.get("/removecategory",function(req,res){
         //   res.redirect('/noaccess');
         // }
         // else{
-          dbo.collection("Categories").deleteOne({name:query.name},function(err,deleted){
-            fs.unlink('public/catphotos/'+query.name.split(' ').join('-')+".png", function(err) {
+          dbo.collection("Categories").deleteOne({name:query.category},function(err,deleted){
+            fs.unlink('public/catphotos/'+query.category.split(' ').join('-')+".png", function(err) {
               if(err && err.code == 'ENOENT') {
                   // file doens't exist
                   console.info("File doesn't exist, won't remove it.");
@@ -1465,6 +1465,7 @@ router.get("/removecategory",function(req,res){
               } else {
                   console.info(`removed`);
               }
+              res.redirect("adminpanel/categories")
           });
           })
         //}
