@@ -49,7 +49,7 @@ function categories(){
   })
   setTimeout(function(){
     console.log(basiccategories.length)
-  },1000)
+  },5000)
 }
 
 //------------------------api------------------------------//
