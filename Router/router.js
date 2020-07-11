@@ -1957,7 +1957,7 @@ router.get('/exit',function(req,res){
 router.get('*',async function(req,res){        // 404 page should be displayed here// should be at the end
   req.session.prevurl=req.session.currurl;
   req.session.currurl=req.url;
-  categories();
+  await categories();
   console.log(basiccategories)
   res.render("404.ejs",{categories:basiccategories,user:""});
   res.end();
