@@ -48,6 +48,9 @@ function categories(){
         console.log(basiccategories)
       })
   })
+  setTimeout(function(){
+    console.log(basiccategories)
+  },1000)
 }
 
 //------------------------api------------------------------//
