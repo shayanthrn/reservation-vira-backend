@@ -44,13 +44,16 @@ function categories(){
         categories.push(doc);
       },function(){
         db.close();
-        throw "finish"
+        throw "finish";
       })
     })
   }
   catch(e){
-    if(e=="finish")
+    if(e=="finish"){
+      console.log(categories)
       return categories;
+    }
+    
   }
 }
 
