@@ -37,16 +37,20 @@ const zarinpal = ZarinpalCheckout.create('3392f819-3761-4add-babb-4d1d70021603',
 
 function categories(){
   var categories=[];
+  var flag=1;
   MongoClient.connect(dburl,function(err,db){
     var dbo=db.db("mydb");
     dbo.collection('Categories').find({}).forEach(function(doc){
       categories.push(doc);
     },function(){
       db.close();
-      console.log("now")
-      return categories;
+      flag=0;
     })
   })
+  while(flag==1){
+
+  }
+  return categories;
 }
 
 //------------------------api------------------------------//
