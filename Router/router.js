@@ -1957,12 +1957,10 @@ router.get('/exit',function(req,res){
 router.get('*',function(req,res){        // 404 page should be displayed here// should be at the end
   req.session.prevurl=req.session.currurl;
   req.session.currurl=req.url;
-  test=categories();
-  test.then(array =>{
-    console.log(array)
+  categories().then(basiccategories=>{
+    res.render("404.ejs",{categories:basiccategories,user:""});
+    res.end();
   })
-  res.render("404.ejs",{categories:basiccategories,user:""});
-  res.end();
 });
 
 module.exports = router;
