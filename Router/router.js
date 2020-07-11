@@ -45,12 +45,12 @@ function categories(){
         basiccategories.push(doc);
       },function(){
         db.close();
-        console.log(basiccategories)
       })
   })
   setTimeout(function(){
-    console.log(basiccategories)
+    console.log(basiccategories.length)
   },1000)
+  return 1;
 }
 
 //------------------------api------------------------------//
@@ -1302,7 +1302,7 @@ router.get("/Adminpanel/addDoctor",function(req,res){
           res.redirect('/noaccess');
         }
         else{
-          categories();
+          a=categories();
           res.render("AdminPanel/doctors-add.ejs",{categories:basiccategories});
           db.close();
           res.end();
@@ -1485,7 +1485,7 @@ router.get("/removecategory",function(req,res){
 //=======================doctor signup========================//
 
 router.get("/DoctorSignup",function(req,res){
-  categories();
+  a=categories();
   res.render("doctorsignup.ejs",{categories:basiccategories});
   res.end();
 })
@@ -1505,7 +1505,7 @@ router.get("/",function(req,res){
       Categories.push(doc);
     },function(){
       if(req.cookies.usertoken==undefined){
-        categories();
+        a=categories();
         res.render('index.ejs',{Objects:Categories,type:"category",category:"",user:"",categories:basiccategories});
         res.end();
         db.close();
@@ -1517,7 +1517,7 @@ router.get("/",function(req,res){
             res.clearCookie('usertoken');
             res.redirect('/');
           }
-          categories();
+          a=categories();
           res.render('index.ejs',{Objects:Categories,type:"category",category:"",user:result,categories:basiccategories});
           res.end();
           db.close();
@@ -1538,7 +1538,7 @@ router.get("/category/:Category",function(req,res){
       Doctors.push(doc);
     },function(){
       if(req.cookies.usertoken==undefined){
-        categories();
+        a=categories();
         res.render("index.ejs",{Objects:Doctors,type:"doc",category:req.params.Category,user:"",categories:basiccategories});
         res.end();
         db.close();
@@ -1550,7 +1550,7 @@ router.get("/category/:Category",function(req,res){
             res.clearCookie('usertoken');
             res.redirect('/category//'+req.params.Category);
           }
-          categories();
+          a=categories();
           res.render('index.ejs',{Objects:Doctors,type:"doc",category:req.params.Category.split(' ').join('-'),user:result,categories:basiccategories});
           res.end();
           db.close();
@@ -1567,7 +1567,7 @@ router.get("/category/:Category/:Doctor",function(req,res){
     if (err) throw err;
     var dbo=db.db("mydb");
     dbo.collection("Doctors").findOne({name:req.params.Doctor.split('-').join(' ')},function(err,result){
-      categories();
+      a=categories();
       res.render("doctorpage.ejs",{doctor:result,categories:basiccategories,user:""});      //fix this
       db.close();
       res.end();
@@ -1596,7 +1596,7 @@ router.get("/reserve/:Doctor",function(req,res){
         days.push(currentday);
         freetimes.push(getDoctimeslots(result,new myDate(currentday.toArray()[2],currentday.toArray()[1],currentday.toArray()[0])));
       }
-      categories();
+      a=categories();
       res.render("reserve.ejs",{doctor:result,days:createDayboxobj(days),freetimes:freetimes,categories:basiccategories});
       db.close();
       res.end();
@@ -1958,7 +1958,7 @@ router.get('/exit',function(req,res){
 router.get('*',function(req,res){        // 404 page should be displayed here// should be at the end
   req.session.prevurl=req.session.currurl;
   req.session.currurl=req.url;
-  categories();
+  a=categories();
   res.render("404.ejs",{categories:basiccategories,user:""});
   res.end();
 });
