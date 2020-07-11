@@ -37,7 +37,7 @@ const zarinpal = ZarinpalCheckout.create('3392f819-3761-4add-babb-4d1d70021603',
 var basiccategories=[];
 
 
-function categories(){
+async function categories(){
   basiccategories=[];
   MongoClient.connect(dburl,function(err,db){
       var dbo=db.db("mydb");
@@ -1957,7 +1957,7 @@ router.get('/exit',function(req,res){
 router.get('*',function(req,res){        // 404 page should be displayed here// should be at the end
   req.session.prevurl=req.session.currurl;
   req.session.currurl=req.url;
-  categories();
+  await categories();
   console.log(basiccategories)
   res.render("404.ejs",{categories:basiccategories,user:""});
   res.end();
