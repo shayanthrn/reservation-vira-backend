@@ -35,6 +35,8 @@ const zarinpal = ZarinpalCheckout.create('3392f819-3761-4add-babb-4d1d70021603',
 
 
 var basiccategories=[];
+
+
 function categories(){
   basiccategories=[];
   MongoClient.connect(dburl,function(err,db){
@@ -43,6 +45,7 @@ function categories(){
         basiccategories.push(doc);
       },function(){
         db.close();
+        console.log(basiccategories)
       })
   })
 }
@@ -1953,7 +1956,6 @@ router.get('*',function(req,res){        // 404 page should be displayed here// 
   req.session.prevurl=req.session.currurl;
   req.session.currurl=req.url;
   categories();
-  console.log(basiccategories)
   res.render("404.ejs",{categories:basiccategories,user:""});
   res.end();
 });
