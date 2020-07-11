@@ -43,6 +43,7 @@ function categories(){
       categories.push(doc);
     },function(){
       db.close();
+      console.log("now")
       return categories;
     })
   })
