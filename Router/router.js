@@ -35,7 +35,7 @@ const zarinpal = ZarinpalCheckout.create('3392f819-3761-4add-babb-4d1d70021603',
 
 
 
-function categories(){
+async function categories(){
   var categories=[];
   var flag=1;
   MongoClient.connect(dburl,function(err,db){
@@ -44,13 +44,9 @@ function categories(){
       categories.push(doc);
     },function(){
       db.close();
-      flag=0;
     })
   })
-  while(flag==1){
-
-  }
-  return categories;
+  return await categories;
 }
 
 //------------------------api------------------------------//
