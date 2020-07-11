@@ -1954,6 +1954,7 @@ router.get('*',function(req,res){        // 404 page should be displayed here// 
   req.session.prevurl=req.session.currurl;
   req.session.currurl=req.url;
   let basiccategories=categories();
+  console.log(basiccategories)
   res.render("404.ejs",{categories:basiccategories,user:""});
   res.end();
 });
