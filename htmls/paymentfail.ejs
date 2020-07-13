@@ -23,7 +23,12 @@
        .backtoapp {
            visibility: visible;
         }
-        }   
+        } 
+        @media screen and (max-width : 1920px){
+        .backtoapp{
+        visibility:hidden;
+        }
+        }  
     </style>
 </head>
 
@@ -78,7 +83,7 @@
                                 <h1>عملیات پرداخت ناموفق بود و رزرو شما انجام نشد.</h1>
                             </div>
                             <div class="order-info default">
-                                <a class="btn-primary backtoapp" style="visibility: hidden;">
+                                <a class="btn-primary backtoapp">
                                     بازگشت به صفحه رزرو
                                 </a>
                                 <div class="table-responsive default mt-3 mb-3">
