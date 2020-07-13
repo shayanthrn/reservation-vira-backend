@@ -910,7 +910,8 @@ router.post("/addDoctor",function(req,res){
 //-----------------------test route--------------------------//
 
 router.get("/test",function(req,res){
-
+    res.render("test.ejs");
+    res.end();
 })
 
 //-----------------------test route--------------------------//
