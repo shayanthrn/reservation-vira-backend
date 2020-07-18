@@ -78,14 +78,22 @@ router.post("/api/addhealthcenter",function(req,res){
             res.end();
           }
           else{
-            var newHC=new HealthCenter(req.body.type,req.body.name,req.body.isReserveable=="true",req.body.codemeli,req.body.codeofHC,req.body.city,req.body.phonenumber,req.body.address,req.body.directphonenumber,req.body.background,req.body.appknowledge,req.body.username,req.body.password,req.body.categories);
-            if(req.body.type=="pharmacy"){
-              newHC.medicalnumber=req.body.medicalnumber;
-            }
-            dbo.collection("HealthCenters").insertOne(newHC,function(err,result){
-              res.json({data:result});
-              db.close();
-              res.end();
+            dbo.collection("HealthCenters").findOne({username:req.body.username},function(err,hc2){
+              if(hc2!=null){
+                res.json({data:"there is a healthcenter with this username"});
+                res.end();
+              }
+              else{
+                var newHC=new HealthCenter(req.body.type,req.body.name,req.body.isReserveable=="true",req.body.codemeli,req.body.codeofHC,req.body.city,req.body.phonenumber,req.body.address,req.body.directphonenumber,req.body.background,req.body.appknowledge,req.body.username,req.body.password);
+                if(req.body.type=="pharmacy"){
+                  newHC.medicalnumber=req.body.medicalnumber;
+                }
+                dbo.collection("HealthCenters").insertOne(newHC,function(err,result){
+                  res.json({data:result});
+                  db.close();
+                  res.end();
+                  })
+              }
             })
           }
         })
@@ -914,7 +922,7 @@ router.post('/addHC',function(req,res){
     bodypost.isReserveable="true";
   }
   console.log(bodypost)
-  const options = {
+  var options = {
     url: 'http://reservation.drtajviz.com/api/addhealthcenter?key=pouyarahmati',
     json: true,
     body: bodypost
@@ -926,6 +934,24 @@ router.post('/addHC',function(req,res){
     }
     console.log(`Status: ${resp.statusCode}`);
     console.log(body);
+    if(query.type!="pharmacy"){
+      req.body.categories.forEach(function(doc){
+        options = {
+          url: 'http://reservation.drtajviz.com/api/addCategoryToHC?key=pouyarahmati',
+          json: true,
+          body: {
+            name:req.body.name,
+            type:query.type,
+            catname:doc,
+            catduration:"30",
+            catcost:"3000"
+          }
+        };
+        request.post(options,(err, resp2, body2) =>{
+          console.log(body);
+        })
+      })
+    }
     res.redirect("/HCsignup");
   });
 })
