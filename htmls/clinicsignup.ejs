@@ -68,17 +68,18 @@
                   </div>
                 </div>
                 <div class="row">
-                  <div class="col-md-4 col-lg-2">
-                    <p style="font-weight: bold;"> دسته بندی ها</p>
-                  </div>
-                  <div class="col-md-6 col-lg-6">
-                    <div class="form-group mb-2 checkbox-groupp required">
-                      <input type="checkbox" id="1" name="categories" value="test">
-                      <label for="1"> test</label><br>
-                    
+                    <div class="col-md-4 col-lg-2">
+                      <p style="font-weight: bold;"> تخصص ها</p>
+                    </div>
+                    <div class="col-md-6 col-lg-6">
+                      <div class="form-group mb-2 checkbox-groupp required">
+                        <% for(let i=0;i<categories.length;i++) { %>
+                        <input type="checkbox" id="<%= i %>" name="categories" value="<%=categories[i].name %>">
+                        <label for="<%= i %>"> <%=categories[i].name%></label><br>
+                        <% } %>
+                      </div>
                     </div>
                   </div>
-                </div>
                 <div class="row">
                   <div class="col-md-4 col-lg-2">
                     <p style="font-weight: bold;">شماره ثبت</p>

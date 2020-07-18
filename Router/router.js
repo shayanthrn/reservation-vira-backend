@@ -1504,7 +1504,10 @@ router.get("/pharmacysignup",function(req,res){
 })
 
 router.get("/clinicsignup",function(req,res){
-  res.render("clinicsignup.ejs");
+  categories().then(basiccategories=>{
+    res.render("clinicsignup.ejs",{categories:basiccategories});
+    res.end();
+  })
 })
 
 router.get("/labsignup",function(req,res){
