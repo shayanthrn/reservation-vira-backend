@@ -24,6 +24,8 @@
     "mongodb": "^3.5.7",
     "mv": "^2.1.1",
     "persian-date": "^1.1.0",
+    "request": "^2.88.2",
+    "requestify": "^0.2.5",
     "url": "^0.11.0",
     "uuid-token-generator": "^1.0.0",
     "zarinpal-checkout": "^0.2.7"

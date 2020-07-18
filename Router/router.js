@@ -19,7 +19,8 @@ var HealthCenter= require('../coreapp/HealthCenter.js');
 var time=require('../coreapp/resTime.js');
 var persianDate = require('persian-date');
 var myDate= require('../coreapp/myDate.js');
-var Kavenegar = require('kavenegar');
+var Kavenegar = require('kavenegar');v
+var requset = require('request');
 var apikave = Kavenegar.KavenegarApi({
   apikey:"534438436D6364307552744278336A334B694F46343179417642536E66686568"
   });
@@ -77,7 +78,10 @@ router.post("/api/addhealthcenter",function(req,res){
             res.end();
           }
           else{
-            var newHC=new HealthCenter(req.body.type,req.body.name,req.body.isreserveable=="true",req.body.city,req.body.phonenumber,req.body.address);
+            var newHC=new HealthCenter(req.body.type,req.body.name,req.body.isreserveable=="true",req.body.codemeli,req.body.codeofHC,req.body.city,req.body.phonenumber,req.body.address,req.body.directphonenumber,req.body.background,req.body.appknowledge,req.body.username,req.body.password,req.body.categories);
+            if(req.body.type=="pharmacy"){
+              newHC.medicalnumber=req.body.medicalnumber;
+            }
             dbo.collection("HealthCenters").insertOne(newHC,function(err,result){
               res.json({data:result});
               db.close();
@@ -902,12 +906,24 @@ router.post("/addDoctor",function(req,res){
     })
 })
 
-router.post("/addHC",function(req,res){
-  var query= url.parse(req.url,true).query;
-  console.log(query);
+router.post('/addHC',function(req,res){
+  var query=url.parse(req.url,true).query;
+  bodypost=req.body;
+  bodypost.type=query.type;
+  const options = {
+    url: 'http://reservation.drtajviz.com/api/addhealthcenter',
+    json: true,
+    body: bodypost
+  };
+
+  request.post(options, (err, resp, body) => {
+    if (err) {
+        return console.log(err);
+    }
+    console.log(`Status: ${resp.statusCode}`);
+    console.log(body);
+  });
 })
-
-
 
 
 //-----------------------test route--------------------------//
