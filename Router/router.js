@@ -911,7 +911,7 @@ router.post('/addHC',function(req,res){
   bodypost=req.body;
   bodypost.type=query.type;
   const options = {
-    url: 'http://reservation.drtajviz.com/api/addhealthcenter',
+    url: 'http://reservation.drtajviz.com/api/addhealthcenter?key=pouyarahmati',
     json: true,
     body: bodypost
   };
