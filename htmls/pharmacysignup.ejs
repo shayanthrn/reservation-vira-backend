@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html dir="rtl" class="fa-events-icons-ready" lang="en" >
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="">
+  <base href="http://reservation.drtajviz.com/" >
+  <meta name="author" content="">
+  <link rel="apple-touch-icon" sizes="76x76" href="assets/img/logo.png">
+  <link rel="icon" type="image/png" href="assets/img/logo.png">
+
+  <title></title>
+
+  <link rel="stylesheet" href="https://cdn.rtlcss.com/bootstrap/v4.1.3/css/bootstrap.min.css" integrity="sha384-Jt6Tol1A2P9JBesGeCxNrxkmRFSjWCBW1Af7CSQSKsfMVQCqnUVWhZzG0puJMCK6" crossorigin="anonymous">
+  <link href="assets/panelassests/dashboard.rtl.css" rel="stylesheet">
+  
+
+  <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+  <script>window.jQuery || document.write('<script src="assets/panelassests/jquery-slim.min.js"><\/script>')</script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+  <script src="https://cdn.rtlcss.com/bootstrap/v4.1.3/js/bootstrap.min.js" integrity="sha384-C/pvytx0t5v9BEbkMlBAGSPnI1TQU1IrTJ6DJbC8GBHqdMnChcb6U4xg4uRkIQCV" crossorigin="anonymous"></script>
+  <script src="https://use.fontawesome.com/6d68f18b97.js"></script>
+  <link href="https://use.fontawesome.com/6d68f18b97.css" media="all" rel="stylesheet">
+
+  <link rel="stylesheet" href="https://unpkg.com/persian-datepicker@latest/dist/css/persian-datepicker.min.css">
+</head>
+
+<body>
+
+  <nav class="navbar fixed-top navbar-expand-lg nav-dark">
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarTogglerDemo" aria-controls="navbarTogglerDemo" aria-expanded="false" aria-label="Toggle navigation">
+      <i class="fa fa-bars menu-icon"></i>
+    </button>
+    
+  </nav>
+
+
+  <div class="container-fluid" style="background-image:url(./assets/img/doctorsignup.jpg); background-size:cover;">
+    <div class="row">
+      
+      <main role="main" class=" ml-sm-auto col-lg-9 col-xl-10 px-4" id="doctors-add">
+        <div class="container-fluid">
+          <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+            <h1 class="h2">عضویت پزشکان</h1>
+          </div>
+
+          <form class="" action="addDoctor" enctype="multipart/form-data" method="POST">
+            <div class="row">
+              <div class="col-sm-12 col-md-10">
+                <div class="row">
+                  <div class="col-md-4 col-lg-2">
+                    <p style="font-weight: bold;">عکس ( 512*512)</p>
+                  </div>
+                  <div class="col-md-6 col-lg-6">
+                    <div class="form-group mb-2">
+                      <input type="file" class="form-control-file" name="image" id="image">
+                    </div>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-md-4 col-lg-2">
+                    <p style="font-weight: bold;"> نام و نام خانوادگی</p>
+                  </div>
+                  <div class="col-md-6 col-lg-6">
+                    <div class="form-group mb-2">
+                      <input type="text" class="form-control form-control-sm" name="name" id="name" value="" placeholder="نام و نام خانوادگی" required>
+                    </div>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-md-4 col-lg-2">
+                    <p style="font-weight: bold;"> تخصص ها</p>
+                  </div>
+                  <div class="col-md-6 col-lg-6">
+                    <div class="form-group mb-2 checkbox-groupp required">
+                      <% for(let i=0;i<categories.length;i++) { %>
+                      <input type="checkbox" id="<%= i %>" name="categories" value="<%=categories[i].name %>">
+                      <label for="<%= i %>"> <%=categories[i].name%></label><br>
+                      <% } %>
+                    </div>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-md-4 col-lg-2">
+                    <p style="font-weight: bold;">شماره نظام پزشکی</p>
+                  </div>  
+                  <div class="col-md-6 col-lg-6">
+                    <div class="form-group mb-2">
+                      <input type="text" class="form-control form-control-sm" name="medicalnumber" id="medicalnumber" placeholder="شماره نظام پزشکی" value="" required>
+                    </div>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-md-4 col-lg-2">
+                    <p style="font-weight: bold;">  کد ملی</p>
+                  </div>  
+                  <div class="col-md-6 col-lg-6">
+                    <div class="form-group mb-2">
+                      <input type="text" class="form-control form-control-sm" name="codemeli" id="codemeli" placeholder="کد ملی " value="" required>
+                    </div>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-md-4 col-lg-2">
+                    <p style="font-weight: bold;"> تلفن مطب</p>
+                  </div>  
+                  <div class="col-md-6 col-lg-6">
+                    <div class="form-group mb-2">
+                      <input type="text" class="form-control form-control-sm" name="workphone" id="workphone" placeholder="تلفن مطب" value="" required>
+                    </div>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-md-4 col-lg-2">
+                    <p style="font-weight: bold;"> شماره همراه مستقيم </p>
+                  </div>  
+                  <div class="col-md-6 col-lg-6">
+                    <div class="form-group mb-2">
+                      <input type="text" class="form-control form-control-sm" name="phonenumber" id="phonenumber" placeholder="شماره همراه مستقيم " value="" required>
+                    </div>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-md-4 col-lg-2">
+                    <p style="font-weight: bold;">سابقه کار</p>
+                  </div>  
+                  <div class="col-md-6 col-lg-6">
+                    <div class="form-group mb-2">
+                      <input type="number" class="form-control form-control-sm" name="background" id="background" placeholder="سابقه کار" value="" required>
+                    </div>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-md-4 col-lg-2">
+                    <p style="font-weight: bold;">استان</p>
+                  </div>
+                  <div class="col-md-6 col-lg-6">
+                    <div class="form-group mb-2">
+                      <select name="city">
+                        <option value="ایلام">ایلام</option>
+                        <option value="کرمانشاه">کرمانشاه</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-md-4 col-lg-2">
+                    <p style="font-weight: bold;">ادرس</p>
+                  </div>
+                  <div class="col-md-6 col-lg-6">
+                    <div class="form-group mb-2">
+                      <input type="text" class="form-control form-control-sm" name="address" id="address" placeholder="ادرس" value="" required>
+                    </div>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-md-4 col-lg-2">
+                    <p style="font-weight: bold;">توضیحات شخصی</p>
+                  </div>
+                  <div class="col-md-6 col-lg-6">
+                    <div class="form-group mb-2">
+                      <textarea class="form-control form-control-sm" name="description" id="description" rows="5"></textarea>
+                    </div>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-md-4 col-lg-2">
+                    <p style="font-weight: bold;"> نوع عضويت</p>
+                  </div>
+                  <div class="col-md-6 col-lg-6">
+                    <div class="form-group mb-2 checkbox-group required">
+                      <input type="checkbox" id="reserve" name="membershiptypes" value="reserve" >
+                      <label for="reserve"> رزرو</label><br>
+                      <input type="checkbox" id="teleconsultant" name="membershiptypes" value="teleconsultant" >
+                      <label for="reserve"> مشاوره تلفنی</label><br>
+                      <input type="checkbox" id="chatconsultant" name="membershiptypes" value="chatconsultant" >
+                      <label for="reserve"> مشاوره متنی</label><br>
+                    </div>
+                    
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-md-4 col-lg-2">
+                    <p style="font-weight: bold;">ميزان آشنايي با سايت و اپليكيشن</p>
+                  </div>
+                  <div class="col-md-6 col-lg-6">
+                    <div class="form-group mb-2">
+                      <select name="appknowledge">
+                        <option value="high">زیاد</option>
+                        <option value="medium">متوسط</option>
+                        <option value="low">کم</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-md-4 col-lg-2">
+                    <p style="font-weight: bold;">نام کاربری</p>
+                  </div>
+                  <div class="col-md-6 col-lg-6">
+                    <div class="form-group mb-2">
+                      <input type="text" class="form-control" id="username" name="username" value="" required>
+                    </div>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-md-4 col-lg-2">
+                    <p style="font-weight: bold;">رمز عبور</p>
+                  </div>
+                  <div class="col-md-6 col-lg-6">
+                    <div class="form-group mb-2">
+                      <input type="password" class="form-control" name="pass" id="pass" required>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <hr>
+            <div class="row">
+              <div class="col">
+                <div class="float-right">
+                  <button type="submit" onclick="return myfunction()" class="btn btn-success edit-button" style="margin: 24px;">
+                    <i class="fa fa-plus"></i>
+                    ثبت اطلاعات برای بررسی
+                  </button>
+                  <script>
+                    function myfunction(){
+                      if($('div.checkbox-group.required :checkbox:checked').length == 0){
+                        alert("لطفا نوع عضویت را مشخص کنید")
+                        return false
+                      }
+                      else{
+                        if($('div.checkbox-groupp.required :checkbox:checked').length == 0){
+                          alert("لطفا تخصص  را مشخص کنید")
+                          return false
+                        }
+                        else{
+                          return true
+                        }
+                      }
+                    }
+                    </script>
+                </div>
+              </div>
+            </div>
+          </form>
+        </div>
+      </main>
+
+    </div>
+  </div>
+
+</body>
+</html>

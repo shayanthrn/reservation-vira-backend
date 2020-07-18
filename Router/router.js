@@ -1484,7 +1484,7 @@ router.get("/removecategory",function(req,res){
 
 
 //------------------------adminpanel---------------------------//
-//=======================doctor signup========================//
+//======================= signup========================//
 
 router.get("/DoctorSignup",function(req,res){
   categories().then(basiccategories=>{
@@ -1498,7 +1498,19 @@ router.get("/HCsignup",function(req,res){
     res.end();
 })
 
-//=======================doctor signup========================//
+router.get("/pharmacysignup",function(req,res){
+  res.render("pharmacysignup.ejs");
+  res.end();
+})
+
+router.get("/clinicsignup",function(req,res){
+  res.render("clinicsignup.ejs");
+})
+
+router.get("/labsignup",function(req,res){
+  res.render("labsignup.ejs");
+})
+//======================= signup========================//
 
 
 
