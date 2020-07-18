@@ -78,7 +78,7 @@ router.post("/api/addhealthcenter",function(req,res){
             res.end();
           }
           else{
-            var newHC=new HealthCenter(req.body.type,req.body.name,req.body.isreserveable=="true",req.body.codemeli,req.body.codeofHC,req.body.city,req.body.phonenumber,req.body.address,req.body.directphonenumber,req.body.background,req.body.appknowledge,req.body.username,req.body.password,req.body.categories);
+            var newHC=new HealthCenter(req.body.type,req.body.name,req.body.isReserveable=="true",req.body.codemeli,req.body.codeofHC,req.body.city,req.body.phonenumber,req.body.address,req.body.directphonenumber,req.body.background,req.body.appknowledge,req.body.username,req.body.password,req.body.categories);
             if(req.body.type=="pharmacy"){
               newHC.medicalnumber=req.body.medicalnumber;
             }
