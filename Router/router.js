@@ -910,6 +910,9 @@ router.post('/addHC',function(req,res){
   var query=url.parse(req.url,true).query;
   bodypost=req.body;
   bodypost.type=query.type;
+  if(bodypost.type!="pharmacy"){
+    bodypost.isReserveable=true;
+  }
   const options = {
     url: 'http://reservation.drtajviz.com/api/addhealthcenter?key=pouyarahmati',
     json: true,
@@ -922,6 +925,7 @@ router.post('/addHC',function(req,res){
     }
     console.log(`Status: ${resp.statusCode}`);
     console.log(body);
+    res.redirect("/HCsignup");
   });
 })
 
