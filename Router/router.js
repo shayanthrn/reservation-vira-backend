@@ -911,7 +911,7 @@ router.post('/addHC',function(req,res){
   bodypost=req.body;
   bodypost.type=query.type;
   if(bodypost.type!="pharmacy"){
-    bodypost.isReserveable=true;
+    bodypost.isReserveable="true";
   }
   console.log(bodypost)
   const options = {
