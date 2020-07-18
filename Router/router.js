@@ -935,7 +935,14 @@ router.post('/addHC',function(req,res){
     console.log(`Status: ${resp.statusCode}`);
     console.log(body);
     if(query.type!="pharmacy"){
-      req.body.categories.forEach(function(doc){
+      var cats=[];
+      if(typeof req.body.categories=="string"){
+        cats.push(req.body.categories);
+      }
+      else{
+        cats=req.body.categories;
+      }
+      cats.forEach(function(doc){
         options = {
           url: 'http://reservation.drtajviz.com/api/addCategoryToHC?key=pouyarahmati',
           json: true,
