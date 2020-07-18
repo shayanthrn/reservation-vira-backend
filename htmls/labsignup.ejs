@@ -41,7 +41,7 @@
       <main role="main" class=" ml-sm-auto col-lg-9 col-xl-10 px-4" id="doctors-add">
         <div class="container-fluid">
           <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-            <h1 class="h2">عضویت پزشکان</h1>
+            <h1 class="h2">عضویت آزمایشگاه و سنوگرافی</h1>
           </div>
 
           <form class="" action="addDoctor" enctype="multipart/form-data" method="POST">
@@ -59,17 +59,17 @@
                 </div>
                 <div class="row">
                   <div class="col-md-4 col-lg-2">
-                    <p style="font-weight: bold;"> نام و نام خانوادگی</p>
+                    <p style="font-weight: bold;">نام</p>
                   </div>
                   <div class="col-md-6 col-lg-6">
                     <div class="form-group mb-2">
-                      <input type="text" class="form-control form-control-sm" name="name" id="name" value="" placeholder="نام و نام خانوادگی" required>
+                      <input type="text" class="form-control form-control-sm" name="name" id="name" value="" placeholder="نام" required>
                     </div>
                   </div>
                 </div>
                 <div class="row">
                   <div class="col-md-4 col-lg-2">
-                    <p style="font-weight: bold;"> تخصص ها</p>
+                    <p style="font-weight: bold;"> دسته بندی ها</p>
                   </div>
                   <div class="col-md-6 col-lg-6">
                     <div class="form-group mb-2 checkbox-groupp required">
@@ -81,17 +81,17 @@
                 </div>
                 <div class="row">
                   <div class="col-md-4 col-lg-2">
-                    <p style="font-weight: bold;">شماره نظام پزشکی</p>
+                    <p style="font-weight: bold;">شماره ثبت</p>
                   </div>  
                   <div class="col-md-6 col-lg-6">
                     <div class="form-group mb-2">
-                      <input type="text" class="form-control form-control-sm" name="medicalnumber" id="medicalnumber" placeholder="شماره نظام پزشکی" value="" required>
+                      <input type="text" class="form-control form-control-sm" name="registerationnum" id="registerationnum" placeholder="شماره ثبت" value="" required>
                     </div>
                   </div>
                 </div>
                 <div class="row">
                   <div class="col-md-4 col-lg-2">
-                    <p style="font-weight: bold;">  کد ملی</p>
+                    <p style="font-weight: bold;"> کد ملی</p>
                   </div>  
                   <div class="col-md-6 col-lg-6">
                     <div class="form-group mb-2">
@@ -101,11 +101,11 @@
                 </div>
                 <div class="row">
                   <div class="col-md-4 col-lg-2">
-                    <p style="font-weight: bold;"> تلفن مطب</p>
+                    <p style="font-weight: bold;"> تلفن مرکز</p>
                   </div>  
                   <div class="col-md-6 col-lg-6">
                     <div class="form-group mb-2">
-                      <input type="text" class="form-control form-control-sm" name="workphone" id="workphone" placeholder="تلفن مطب" value="" required>
+                      <input type="text" class="form-control form-control-sm" name="workphone" id="workphone" placeholder="تلفن مرکز" value="" required>
                     </div>
                   </div>
                 </div>
@@ -121,11 +121,11 @@
                 </div>
                 <div class="row">
                   <div class="col-md-4 col-lg-2">
-                    <p style="font-weight: bold;">سابقه کار</p>
+                    <p style="font-weight: bold;">سابقه فعالیت</p>
                   </div>  
                   <div class="col-md-6 col-lg-6">
                     <div class="form-group mb-2">
-                      <input type="number" class="form-control form-control-sm" name="background" id="background" placeholder="سابقه کار" value="" required>
+                      <input type="number" class="form-control form-control-sm" name="background" id="background" placeholder="سابقه فعالیت" value="" required>
                     </div>
                   </div>
                 </div>
@@ -150,32 +150,6 @@
                     <div class="form-group mb-2">
                       <input type="text" class="form-control form-control-sm" name="address" id="address" placeholder="ادرس" value="" required>
                     </div>
-                  </div>
-                </div>
-                <div class="row">
-                  <div class="col-md-4 col-lg-2">
-                    <p style="font-weight: bold;">توضیحات شخصی</p>
-                  </div>
-                  <div class="col-md-6 col-lg-6">
-                    <div class="form-group mb-2">
-                      <textarea class="form-control form-control-sm" name="description" id="description" rows="5"></textarea>
-                    </div>
-                  </div>
-                </div>
-                <div class="row">
-                  <div class="col-md-4 col-lg-2">
-                    <p style="font-weight: bold;"> نوع عضويت</p>
-                  </div>
-                  <div class="col-md-6 col-lg-6">
-                    <div class="form-group mb-2 checkbox-group required">
-                      <input type="checkbox" id="reserve" name="membershiptypes" value="reserve" >
-                      <label for="reserve"> رزرو</label><br>
-                      <input type="checkbox" id="teleconsultant" name="membershiptypes" value="teleconsultant" >
-                      <label for="reserve"> مشاوره تلفنی</label><br>
-                      <input type="checkbox" id="chatconsultant" name="membershiptypes" value="chatconsultant" >
-                      <label for="reserve"> مشاوره متنی</label><br>
-                    </div>
-                    
                   </div>
                 </div>
                 <div class="row">
