@@ -19,8 +19,8 @@ var HealthCenter= require('../coreapp/HealthCenter.js');
 var time=require('../coreapp/resTime.js');
 var persianDate = require('persian-date');
 var myDate= require('../coreapp/myDate.js');
-var Kavenegar = require('kavenegar');v
-var requset = require('request');
+var Kavenegar = require('kavenegar');
+var request = require('request');
 var apikave = Kavenegar.KavenegarApi({
   apikey:"534438436D6364307552744278336A334B694F46343179417642536E66686568"
   });
