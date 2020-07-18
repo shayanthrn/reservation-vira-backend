@@ -913,6 +913,7 @@ router.post('/addHC',function(req,res){
   if(bodypost.type!="pharmacy"){
     bodypost.isReserveable=true;
   }
+  console.log(bodypost)
   const options = {
     url: 'http://reservation.drtajviz.com/api/addhealthcenter?key=pouyarahmati',
     json: true,
