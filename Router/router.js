@@ -902,7 +902,7 @@ router.post("/addDoctor",function(req,res){
     })
 })
 
-router.get("/addHC",function(req,res){
+router.post("/addHC",function(req,res){
   var query= url.parse(req.url,true).query;
   console.log(query);
 })
