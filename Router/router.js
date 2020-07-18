@@ -155,7 +155,7 @@ router.post("/api/addCategoryToHC",function(req,res){
    else{
       MongoClient.connect(dburl,function(err,db){
         var dbo=db.db("mydb");
-        var newcat = {name:req.body.catname,unavailabletimes:[],visitduration:Number(req.body.catduration),visitcost:Number(req.body.catcost)}
+        var newcat = {name:req.body.catname,unavailabletimes:[],reservations:[],visitduration:Number(req.body.catduration),visitcost:Number(req.body.catcost)}
         dbo.collection("HealthCenters").updateOne({name:req.body.name,type:req.body.type,isReserveable:true},{$addToSet:{categories:newcat}},function(err,result){
           res.json({data:result});
           db.close();
@@ -1491,6 +1491,11 @@ router.get("/DoctorSignup",function(req,res){
     res.render("doctorsignup.ejs",{categories:basiccategories});
     res.end();
   })
+})
+
+router.get("/HCsignup",function(req,res){
+    res.render("HCsignup.ejs");
+    res.end();
 })
 
 //=======================doctor signup========================//

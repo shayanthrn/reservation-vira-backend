@@ -7,7 +7,7 @@ class HealthCenter{
         this.phonenubmber=phonenubmber;
         this.address=address;
         if(isReserveable==true){
-            this.categories=[]
+            this.categories=[];
         }
     }
 }
