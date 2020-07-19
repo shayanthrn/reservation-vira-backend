@@ -969,8 +969,15 @@ router.post('/addHC',function(req,res){
 //-----------------------test route--------------------------//
 
 router.get("/test",function(req,res){
-    res.render("test.ejs");
-    res.end();
+    // res.render("test.ejs");
+    // res.end();
+    MongoClient.connect(dburl,function(err,db){
+      var dbo=db.db("mydb");
+      dbo.collection("Categories").find({name:{$regex:'.*'}},async function(err,result){
+        array=await result.toArray();
+        console.log(array);
+      })
+    })
 })
 
 //-----------------------test route--------------------------//
@@ -1614,11 +1621,18 @@ router.get("/",function(req,res){
 router.get("/category/:Category",function(req,res){
   req.session.prevurl=req.session.currurl;
   req.session.currurl=req.url;
+  var query=url.parse(req.url,true).query;
+  if(query.city=="all"){
+    qcity={$regex:'.*'}
+  }
+  else {
+    qcity=query.city;
+  }
   Doctors = [];
   MongoClient.connect(dburl,function(err,db){
     if(err) throw err;
     var dbo= db.db("mydb");
-    dbo.collection("Doctors").find({categories:req.params.Category.split('-').join(' ')}).forEach(function(doc,err){
+    dbo.collection("Doctors").find({categories:req.params.Category.split('-').join(' '),city:qcity}).forEach(function(doc,err){
       Doctors.push(doc);
     },function(){
       if(req.cookies.usertoken==undefined){
