@@ -866,6 +866,44 @@ router.post("/changepass",function(req,res){
 })
 
 
+router.post("/changepassHC",function(req,res){
+  if(req.cookies.HCtoken==undefined){
+    res.redirect('/noaccess');
+  }
+  else{
+    MongoClient.connect(dburl,function(err,db){
+      var dbo=db.db("mydb");
+      dbo.collection('HealthCenters').findOne({token:req.cookies.HCtoken},function(err,HC){
+        if(HC==null){
+          db.close();
+          res.redirect('noaccess');
+        }
+        else{
+          if(HC.password==req.body.oldPassword){
+              if(req.body.confirmPassword==req.body.newPassword){
+                dbo.collection("HealthCenters").updateOne({token:req.cookies.HCtoken},{ $set:{password:req.body.newPassword}},function(err,result3){
+                  db.close();
+                  res.redirect("/HCpanel/systemicinfo");
+                })
+              }
+              else{
+                res.write("not confirmed");
+                db.close();
+                res.end();
+              }
+          }
+          else{
+            res.write("wrong pass");
+            db.close();
+            res.end();
+          }
+        }
+      })
+    })
+  }
+})
+
+
 router.post("/addDoctor",function(req,res){
     MongoClient.connect(dburl,function(err,db){
       var dbo=db.db("mydb");
