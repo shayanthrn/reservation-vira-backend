@@ -17,6 +17,7 @@ class HealthCenter{
         this.username=username;
         this.password=password;
         this.image=image;
+        this.token="";
     }
 }
 

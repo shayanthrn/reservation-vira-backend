@@ -1998,6 +1998,49 @@ router.post('/loginDoc',function(req,res){
   })
 })
 
+router.get('/loginHC',function(req,res){
+  req.session.prevurl=req.session.currurl;
+  req.session.currurl=req.url;
+  res.render('loginHC.ejs',{wrongflag:0});
+  res.end();
+});
+
+router.post('/loginHC',function(req,res){
+  req.session.prevurl=req.session.currurl;
+  req.session.currurl=req.url;
+  MongoClient.connect(dburl,function(err,db){
+    var dbo=db.db("mydb");
+    dbo.collection("HealthCenters").findOne({username:req.body.username},function(err,HC){
+      if(HC==null){
+        res.render('loginHC.ejs',{wrongflag:1});
+        db.close();
+        res.end();
+      }
+      else{
+        if(req.body.pass!=HC.password){
+          res.render('loginHC.ejs',{wrongflag:1});
+          db.close();
+          res.end();
+        }
+        else{
+          let mytoken;
+          if(HC.token==""){
+            mytoken=tokgen.generate();
+          }
+          else{
+            mytoken=HC.token;
+          }
+          dbo.collection("HealthCenters").updateOne({username:req.body.username},{$set:{token:mytoken}},function(err,result2){
+            res.cookie('HCtoken',mytoken);
+            db.close();
+            res.redirect('/HCpanel/dashboard');
+          })
+        }
+      }
+    })
+  })
+})
+
 router.get("/loginAdmin",function(req,res){
   req.session.prevurl=req.session.currurl;
   req.session.currurl=req.url;
@@ -2050,6 +2093,7 @@ router.get('/exit',function(req,res){
     res.clearCookie('usertoken');
     res.clearCookie('doctortoken');
     res.clearCookie('admintoken');
+    res.clearCookie('HCtoken');
     db.close();
     res.redirect('/');
     res.end();
