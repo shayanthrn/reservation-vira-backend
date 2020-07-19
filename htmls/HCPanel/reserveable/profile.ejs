@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html dir="rtl" class="fa-events-icons-ready" lang="en"><head>
+  <meta charset="utf-8">
+  <base href="http://reservation.drtajviz.com/" >
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="">
+  <meta name="author" content="">
+  <title>پروفایل - دکتر تجویز</title>
+  <link rel="icon" href="favicon.ico">
+
+  <title></title>
+
+  <link rel="stylesheet" href="https://cdn.rtlcss.com/bootstrap/v4.1.3/css/bootstrap.min.css" integrity="sha384-Jt6Tol1A2P9JBesGeCxNrxkmRFSjWCBW1Af7CSQSKsfMVQCqnUVWhZzG0puJMCK6" crossorigin="anonymous">
+  <link href="assets/panelassests/dashboard.rtl.css" rel="stylesheet">
+  <script src="https://use.fontawesome.com/6d68f18b97.js"></script><link href="https://use.fontawesome.com/6d68f18b97.css" media="all" rel="stylesheet">
+
+</head>
+
+<body>
+
+  <nav class="navbar fixed-top navbar-expand-lg nav-dark">
+    <a class="navbar-brand mr-2" href="#">داشبورد برند</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarTogglerDemo" aria-controls="navbarTogglerDemo" aria-expanded="false" aria-label="Toggle navigation">
+      <i class="fa fa-bars menu-icon"></i>
+    </button>
+  </nav>
+
+
+  <div class="container-fluid">
+    <div class="row">
+      
+        <nav class="col-lg-3 col-xl-2 d-lg-block sidebar collapse" id="navbarTogglerDemo">
+            <div class="sidebar-sticky">
+              <ul class="nav flex-column">       
+                <li class="nav-item">
+                  <a class="nav-link active" href="/HCpanel/dashboard">
+                    <i class="fa fa-tachometer"></i>
+                    داشبورد
+                  </a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="/HCpanel/profile">
+                    <i class="fa fa-user-md"></i>
+                    پروفایل
+                  </a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="/HCpanel/patients">
+                    <i class="fa fa-users"></i>
+                    بیماران
+                  </a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="/HCpanel/visittimes">
+                    <i class="fa fa-calendar"></i>
+                    تعیین زمانبندی
+                  </a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="/HCpanel/systemicinfo">
+                    <i class="fa fa-cog"></i>
+                    اطلاعات سیستم
+                  </a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="/exit">
+                    <i class="fa fa-sign-out"></i>
+                    خروج
+                  </a>
+                </li>
+              </ul>
+    
+              </div>
+          </nav>
+
+      <main role="main" class=" ml-sm-auto col-lg-9 col-xl-10 px-4" id="profile">
+        <div class="container-fluid">
+          <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+            <h1 class="h2">پروفایل</h1>
+          </div>
+
+          <form class="hidden-form" action="changeHCinfo" enctype="multipart/form-data" method="POST">
+            <div class="row">
+              <div class="col-sm-6 col-md-2 mb-5">
+                <img class="img-fluid" src="<%=HC.image %>" alt="not found">
+                <div class="form-group mt-2">
+                  <input type="file" class="form-control-file" name="image" id="image">
+                </div>
+              </div>
+              <div class="col-sm-12 col-md-10">
+                <div class="row">
+                  <div class="col-md-4 col-lg-2">
+                    <h5>نام</h5>
+                  </div>
+                  <div class="col-md-6 col-lg-6">
+                    <p><%=HC.name %></p>
+                    <div class="form-group mb-2">
+                      <input type="text" class="form-control form-control-sm" name="name" id="name" placeholder="نام" value="<%=HC.name %>" disabled>
+                    </div>
+                  </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-4 col-lg-2">
+                      <h5>کد داروخانه</h5>
+                    </div>
+                    <div class="col-md-6 col-lg-6">
+                      <p><%=HC.codeofHC %></p>
+                      <div class="form-group mb-2">
+                        <input type="text" class="form-control form-control-sm" name="codeofHC" id="codeofHC" placeholder="کد داروخانه" value="<%=HC.codeofHC %>" required>
+                      </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-4 col-lg-2">
+                      <h5>کد ملی دکتر داروساز</h5>
+                    </div>
+                    <div class="col-md-6 col-lg-6">
+                      <p><%=HC.codemeli %></p>
+                      <div class="form-group mb-2">
+                        <input type="text" class="form-control form-control-sm" name="codemeli" id="codemeli" placeholder="کد ملی" value="<%=HC.codemeli %>" required>
+                      </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-4 col-lg-2">
+                      <h5>استان</h5>
+                    </div>
+                    <div class="col-md-6 col-lg-6">
+                      <p><%=HC.city %></p>
+                      <div class="form-group mb-2">
+                        <select class="form-control form-control-sm" name="city" id="city">
+                          <option value="ایلام">ایلام</option>
+                          <option value="کرمانشاه">کرمانشاه</option>
+                        </select>
+                      </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-4 col-lg-2">
+                      <h5>تلفن مرکز</h5>
+                    </div>
+                    <div class="col-md-6 col-lg-6">
+                      <p><%=HC.phonenumber %></p>
+                      <div class="form-group mb-2">
+                        <input type="text" class="form-control form-control-sm" name="phonenumber" id="phonenumber" placeholder="تلفن مرکز" value="<%=HC.phonenumber %>" required>
+                      </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-4 col-lg-2">
+                      <h5>تلفن مستقیم</h5>
+                    </div>
+                    <div class="col-md-6 col-lg-6">
+                      <p><%=HC.directphonenumber %></p>
+                      <div class="form-group mb-2">
+                        <input type="text" class="form-control form-control-sm" name="directphonenumber" id="directphonenumber" placeholder="تلفن مستقیم" value="<%=HC.directphonenumber %>" required>
+                      </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-4 col-lg-2">
+                      <h5>سابقه فعالیت</h5>
+                    </div>
+                    <div class="col-md-6 col-lg-6">
+                      <p><%=HC.background %></p>
+                      <div class="form-group mb-2">
+                        <input type="text" class="form-control form-control-sm" name="background" id="background" placeholder="سابقه فعالیت" value="<%=HC.background %>" required>
+                      </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-4 col-lg-2">
+                      <h5>ادرس</h5>
+                    </div>
+                    <div class="col-md-6 col-lg-6">
+                      <p><%=HC.address %></p>
+                      <div class="form-group mb-2">
+                        <input type="text" class="form-control form-control-sm" name="address" id="address" placeholder="ادرس" value="<%=HC.address %>" required>
+                      </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-4 col-lg-2">
+                      <h5> شماره نظام پزشکی دکتر داروساز</h5>
+                    </div>  
+                    <div class="col-md-6 col-lg-6">
+                      <p><%= HC.medicalnumber %></p>
+                      <div class="form-group mb-2">
+                        <input type="text" class="form-control form-control-sm" name="medicalnumber" id="medicalnumber" placeholder="شماره نظام پزشکی" value="<%= HC.medicalnumber %>" required>
+                      </div>
+                    </div>
+                  </div>
+              </div>
+            </div>
+            <hr>
+            <div class="row">
+              <div class="col">
+                <div class="float-right">
+                  <button type="button" class="btn btn-primary edit-button">
+                    <i class="fa fa-edit"></i>
+                    اصلاح
+                  </button>
+                  <button type="button" class="btn edit-button back-button">
+                    <i class="fa fa-arrow-right"></i>
+                    بازگشت
+                  </button>
+                  <button type="submit" class="btn btn-success submit-button">
+                    <i class="fa fa-check"></i>
+                    تغییر
+                  </button>
+                </div>
+              </div>
+            </div>
+          </form>
+        </div>
+      </main>
+
+    </div>
+  </div>
+  
+
+
+  <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+  <script>window.jQuery || document.write('<script src="assets/panelassests/jquery-slim.min.js"><\/script>')</script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+  <script src="https://cdn.rtlcss.com/bootstrap/v4.1.3/js/bootstrap.min.js" integrity="sha384-C/pvytx0t5v9BEbkMlBAGSPnI1TQU1IrTJ6DJbC8GBHqdMnChcb6U4xg4uRkIQCV" crossorigin="anonymous"></script>
+
+  <script type="text/javascript">
+    $profileForm = $("#profile form")
+
+    $("#profile .edit-button, #profile .back-button").on('click', function () {
+      $profileForm.toggleClass("edit")
+    })
+  </script>
+
+</body>
+</html>
