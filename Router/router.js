@@ -1200,7 +1200,23 @@ router.get('/HCpanel/dashboard',function(req,res){
             db.close();
           }
           else{
-            res.render("/HCPanel/reserveable/dashboard.ejs",{HC:HC});
+            var visittimes=[];
+            var currentday=new persianDate();
+            visittimes.push({date1:{year:currentday.toArray()[0],month:currentday.format("MMMM"),day:currentday.toArray()[2]},date:{year:currentday.toArray()[0],month:currentday.toArray()[1],day:currentday.toArray()[2]},times:[],dayofweek:currentday.format("dddd")});
+            for(let i=0;i<5;i++){
+              currentday=currentday.add('d',1);
+              visittimes.push({date1:{year:currentday.toArray()[0],month:currentday.format("MMMM"),day:currentday.toArray()[2]},date:{year:currentday.toArray()[0],month:currentday.toArray()[1],day:currentday.toArray()[2]},times:[],dayofweek:currentday.format("dddd")});
+            }
+            for(let k=0;k<HC.categories.length;k++){
+              HC.categories[k].reservations.forEach(function(doc){
+                for(i=0;i<6;i++){
+                  if(lodash.isEqual(visittimes[i].date,doc.time.date)){
+                    visittimes[i].times.push(doc);
+                  }
+                }
+              })
+            }
+            res.render("/HCPanel/reserveable/dashboard.ejs",{visittimes:visittimes});
             res.end();
             db.close();
           }
