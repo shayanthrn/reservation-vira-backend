@@ -1135,8 +1135,8 @@ router.get('/HCpanel/dashboard',function(req,res){
           }
           else{
             res.render("/HCPanel/reserveable/dashboard.ejs",{HC:HC});
-            db.close();
             res.end();
+            db.close();
           }
         }
       })
@@ -1159,13 +1159,13 @@ router.get('/HCpanel/profile',function(req,res){
           if(HC.isReserveable==false){
             res.render("/HCPanel/unreserveable/profile.ejs",{HC:HC});
             console.log("here bitch")
-            db.close();
             res.end();
+            db.close();
           }
           else{
             res.render("/HCPanel/reserveable/profile.ejs",{HC:HC});
-            db.close();
             res.end();
+            db.close();
           }
         }
       })
