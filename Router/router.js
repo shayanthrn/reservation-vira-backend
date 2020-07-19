@@ -30,6 +30,7 @@ const ZarinpalCheckout = require('zarinpal-checkout');
 const { debugPort } = require('process');
 const { Buffer } = require('buffer');
 const { query } = require('express');
+const fileUpload = require('express-fileupload');
 const zarinpal = ZarinpalCheckout.create('3392f819-3761-4add-babb-4d1d70021603', false);
 
 
@@ -64,6 +65,8 @@ function categories(){
 
 
 router.post("/api/addhealthcenter",function(req,res){
+  console.log("Hereeeeeeeeeeeeeeeeeeeee");
+  console.log(req.files);
   var query=url.parse(req.url,true).query;
    if(query.key!="pouyarahmati"){
      res.json({data:"noaccess"});
@@ -925,7 +928,8 @@ router.post('/addHC',function(req,res){
   var options = {
     url: 'http://reservation.drtajviz.com/api/addhealthcenter?key=pouyarahmati',
     json: true,
-    body: bodypost
+    body: bodypost,
+    file:req.files
   };
 
   request.post(options, (err, resp, body) => {
@@ -952,14 +956,13 @@ router.post('/addHC',function(req,res){
             catname:doc,
             catduration:"30",
             catcost:"3000"
-          }
+          },
         };
         request.post(options,(err, resp2, body2) =>{
           console.log(body);
         })
       })
     }
-    console.log(req.files);
     res.redirect("/HCsignup");
   });
 })
