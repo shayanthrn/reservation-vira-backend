@@ -65,10 +65,6 @@ function categories(){
 
 
 router.post("/api/addhealthcenter",function(req,res){
-  console.log("hereeeeee");
-  console.log(req.body);
-  console.log("hereeeeee");
-  console.log(req.files);
   var query=url.parse(req.url,true).query;
    if(query.key!="pouyarahmati"){
      res.json({data:"noaccess"});
@@ -89,7 +85,7 @@ router.post("/api/addhealthcenter",function(req,res){
                 res.end();
               }
               else{
-                var newHC=new HealthCenter(req.body.type,req.body.name,req.body.isReserveable=="true",req.body.codemeli,req.body.codeofHC,req.body.city,req.body.phonenumber,req.body.address,req.body.directphonenumber,req.body.background,req.body.appknowledge,req.body.username,req.body.password);
+                var newHC=new HealthCenter(req.body.type,req.body.name,req.body.isReserveable=="true",req.body.codemeli,req.body.codeofHC,req.body.city,req.body.phonenumber,req.body.address,req.body.directphonenumber,req.body.background,req.body.appknowledge,req.body.username,req.body.password,req.body.image);
                 if(req.body.type=="pharmacy"){
                   newHC.medicalnumber=req.body.medicalnumber;
                 }
@@ -926,20 +922,20 @@ router.post('/addHC',function(req,res){
   if(bodypost.type!="pharmacy"){
     bodypost.isReserveable="true";
   }
-  console.log(bodypost)
+  bodypost.image="/"+query.type+"photos/"+req.body.name.split(' ').join('-')+".png";
+  if(req.files!=null){
+    mv(req.files.image.tempFilePath,"public"+"/"+query.type+"photos/"+req.body.name.split(' ').join('-')+".png",function(err){
+      console.log("public"+"/"+query.type+"photos/"+req.body.name.split(' ').join('-')+".png")
+    })
+  }
+  
   var options = {
     url: 'http://reservation.drtajviz.com/api/addhealthcenter?key=pouyarahmati',
     json: true,
     body: bodypost,
-    formData: req.files
   };
 
   request.post(options, (err, resp, body) => {
-    if (err) {
-        return console.log(err);
-    }
-    console.log(`Status: ${resp.statusCode}`);
-    console.log(body);
     if(query.type!="pharmacy"){
       var cats=[];
       if(typeof req.body.categories=="string"){
