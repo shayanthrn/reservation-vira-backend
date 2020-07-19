@@ -2062,6 +2062,8 @@ router.get('*',function(req,res){        // 404 page should be displayed here// 
   req.session.currurl=req.url;
   categories().then(basiccategories=>{
     res.render("404.ejs",{categories:basiccategories,user:""});
+    res.statusCode=404;
+    console.log(res.statusCode)
     res.end();
   })
 });
