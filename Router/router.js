@@ -1172,6 +1172,33 @@ router.get('/HCpanel/profile',function(req,res){
   }
 })
 
+router.get('/HCpanel/systemicinfo',function(req,res){
+  if(req.cookies.HCtoken==undefined){
+    res.redirect('/noaccess');
+  }
+  else{
+    MongoClient.connect(dburl,function(err,db){
+      var dbo=db.db("mydb");
+      dbo.collection("HealthCenters").findOne({token:req.cookies.HCtoken},function(err,HC){
+        if(HC==null){
+          res.redirect('/noaccess');
+        }
+        else{
+          if(HC.isReserveable==false){
+            res.render("HCPanel/unreserveable/systemicinfo.ejs");
+            res.end();
+            db.close();
+          }
+          else{
+            res.render("HCPanel/reserveable/systemicinfo.ejs");
+            res.end();
+            db.close();
+          }
+        }
+      })
+    })
+  }
+})
 
 
 //-----------------------HCpanel------------------------------//
