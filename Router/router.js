@@ -1216,7 +1216,7 @@ router.get('/HCpanel/dashboard',function(req,res){
                 }
               })
             }
-            res.render("/HCPanel/reserveable/dashboard.ejs",{visittimes:visittimes});
+            res.render("HCPanel/reserveable/dashboard.ejs",{visittimes:visittimes});
             res.end();
             db.close();
           }
