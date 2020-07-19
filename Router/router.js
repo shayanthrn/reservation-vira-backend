@@ -1157,6 +1157,7 @@ router.get('/HCpanel/profile',function(req,res){
         }
         else{
           if(HC.isReserveable==false){
+            console.log(HC);
             res.render("/HCPanel/unreserveable/profile.ejs",{HC:HC});
             res.end();
             db.close();
