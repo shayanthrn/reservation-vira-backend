@@ -65,8 +65,10 @@ function categories(){
 
 
 router.post("/api/addhealthcenter",function(req,res){
-  console.log("Hereeeeeeeeeeeeeeeeeeeee");
-  console.log(req);
+  console.log("hereeeeee");
+  console.log(req.body);
+  console.log("hereeeeee");
+  console.log(req.files);
   var query=url.parse(req.url,true).query;
    if(query.key!="pouyarahmati"){
      res.json({data:"noaccess"});
@@ -929,7 +931,7 @@ router.post('/addHC',function(req,res){
     url: 'http://reservation.drtajviz.com/api/addhealthcenter?key=pouyarahmati',
     json: true,
     body: bodypost,
-    file:req.files
+    formData: req.files
   };
 
   request.post(options, (err, resp, body) => {
