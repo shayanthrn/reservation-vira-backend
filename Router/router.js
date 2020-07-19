@@ -700,6 +700,34 @@ router.post("/changedocinfo",function(req,res){
   }
 })
 
+router.post("/changeHCinfo",function(req,res){
+  if(req.cookies.HCtoken==undefined){
+    res.redirect('/noaccess');
+  }
+  else{
+    MongoClient.connect(dburl,function(err,db){
+      var dbo=db.db("mydb");
+      dbo.collection('HealthCenters').findOne({token:req.cookies.HCtoken},function(err,HC){
+        if(HC==null){
+          db.close();
+          res.redirect('noaccess');
+        }
+        else{
+          dbo.collection('HealthCenters').updateOne({token:req.cookies.HCtoken},{$set:{codeofHC:req.body.codeofHC,codemeli:req.body.codemeli,city:req.body.city,phonenumber:req.body.phonenumber,directphonenumber:req.body.directphonenumber,background:req.body.background,address:req.body.address,medicalnumber:req.body.medicalnumber}},function(err,res2){
+            if(req.files!=null){
+              mv(req.files.image.tempFilePath,"public"+HC.image,function(err){
+                console.log("public"+HC.image)
+              })
+            }
+            db.close();
+            res.redirect('/HCpanel/profile');
+          })
+        }
+      })
+    })
+  }
+})
+
 router.get("/addunavbeveryday",function(req,res){
   var query = url.parse(req.url,true).query;
   if(req.cookies.doctortoken==undefined){
