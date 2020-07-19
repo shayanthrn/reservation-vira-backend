@@ -66,7 +66,7 @@ function categories(){
 
 router.post("/api/addhealthcenter",function(req,res){
   console.log("Hereeeeeeeeeeeeeeeeeeeee");
-  console.log(req.files);
+  console.log(req);
   var query=url.parse(req.url,true).query;
    if(query.key!="pouyarahmati"){
      res.json({data:"noaccess"});
