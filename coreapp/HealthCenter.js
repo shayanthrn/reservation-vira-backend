@@ -1,12 +1,12 @@
 class HealthCenter{
-    constructor(type,name,isReserveable,codemeli,codeofHC,city,phonenubmber,address,directphonenumber,background,appknowledge,username,password,image){
+    constructor(type,name,isReserveable,codemeli,codeofHC,city,phonenumber,address,directphonenumber,background,appknowledge,username,password,image){
         this.type=type;
         this.name=name;
         this.codeofHC=codeofHC;
         this.codemeli=codemeli;
         this.isReserveable=isReserveable;
         this.city=city;
-        this.phonenubmber=phonenubmber;
+        this.phonenumber=phonenumber;
         this.directphonenumber=directphonenumber;
         this.background=background;
         this.address=address;
