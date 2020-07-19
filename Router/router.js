@@ -959,6 +959,7 @@ router.post('/addHC',function(req,res){
         })
       })
     }
+    console.log(req.files);
     res.redirect("/HCsignup");
   });
 })
