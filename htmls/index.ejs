@@ -190,11 +190,17 @@
 
 
                                 <div>
-                                    <select>
-                                        <option>همه</option>
-                                        <option><a href="#?city=ایلام">ایلام</a></option>
-                                        <option>کرمانشاه</option>
+                                    <select onchange="javascript:handleSelect(this)">
+                                        <option value="all">همه</option>
+                                        <option value="ایلام">ایلام</option>
+                                        <option value="کرمانشاه">کرمانشاه</option>
                                     </select>
+                                    <script type="text/javascript">
+                                        function handleSelect(elm)
+                                        {
+                                        window.location = elm.value+".php";
+                                        }
+                                    </script>
                                 </div>
                                 <% } %> 
                             </ul>
