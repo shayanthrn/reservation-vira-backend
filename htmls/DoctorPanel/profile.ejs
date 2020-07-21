@@ -98,7 +98,7 @@
                     </div>
                   </div>
                 </div>
-                <div class="row">
+                <!-- <div class="row">
                   <div class="col-md-4 col-lg-2">
                     <h5>تخصص</h5>
                   </div>
@@ -129,7 +129,7 @@
                       </div>
                     </div>
                   </div>
-                </div>
+                </div> -->
                 <div class="row">
                   <div class="col-md-4 col-lg-2">
                     <h5>سابقه کار</h5>
@@ -288,7 +288,7 @@
       $profileForm.toggleClass("edit")
     })
   </script>
-<!-- 
+
 <script>
   // Create a "close" button and append it to each list item
   var myNodelist = document.getElementsByClassName("checklist");
@@ -311,12 +311,12 @@
     }
   }
   
-  // var options = document.getElementsByClassName("options");
-  //   for(i =0 ; i<options.length;i++){
-  //     if(options[i].value==inputValue){
-  //       options[i].remove();
-  //     }
-  //   }
+  var options = document.getElementsByClassName("options");
+    for(i =0 ; i<options.length;i++){
+      if(options[i].value==inputValue){
+        options[i].remove();
+      }
+    }
   
   // Create a new list item when clicking on the "Add" button
   function newElement() {
@@ -353,22 +353,22 @@
       }
     }
     
-    // var options = document.getElementsByClassName("options");
-    // for(i =0 ; i<options.length;i++){
-    //   if(options[i].value==inputValue){
-    //     options[i].remove();
-    //   }
-    // }
+    var options = document.getElementsByClassName("options");
+    for(i =0 ; i<options.length;i++){
+      if(options[i].value==inputValue){
+        options[i].remove();
+      }
+    }
   }
 
-  // function checkdatalist(){
-  //   const currentValue = document.getElementById('myInput').value;
-  //   document.getElementById("addcat").disabled =
-  //   currentValue.length === 0 ||
-  //   document.querySelector('option[value="' + currentValue + '"]') === null;
-  // }
+  function checkdatalist(){
+    const currentValue = document.getElementById('myInput').value;
+    document.getElementById("addcat").disabled =
+    currentValue.length === 0 ||
+    document.querySelector('option[value="' + currentValue + '"]') === null;
+  }
 
-  </script> -->
+  </script>
 
 </body>
 </html>
