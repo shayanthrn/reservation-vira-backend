@@ -79,7 +79,7 @@
             <h1 class="h2">پروفایل</h1>
           </div>
 
-          <form class="hidden-form" action="changeDocinfo" enctype="multipart/form-data" method="POST">
+          <form class="hidden-form" action="changeDocinfo1111" enctype="multipart/form-data" method="GET">
             <div class="row">
               <div class="col-sm-6 col-md-2 mb-5">
                 <img class="img-fluid" src="<%=doctor.image %>" alt="not found">
@@ -112,7 +112,42 @@
                       <% } %>
                       <% } %></p>
                     <div class="form-group mb-2">
-                      <input type="text" class="form-control form-control-sm" name="major" id="major" placeholder="تخصص" value="<% for(let i=0;i<doctor.categories.length;i++){%><% if(i==doctor.categories.length-1){ %><%= doctor.categories[i] %><% } else { %><%= doctor.categories[i]+',' %><% } %><% } %>" disabled>
+                      <div id="myDIV" class="header">
+                        <h2 style="margin:5px">My To Do List</h2>
+                        <input list="mylist" id="myInput" placeholder="Title...">
+                        <datalist id="mylist">
+                          <option value="Edge">
+                          <option value="Firefox">
+                          <option value="Chrome">
+                          <option value="Opera">
+                          <option value="Safari">
+                          <option value="Edge">
+                          <option value="Firefox">
+                          <option value="Chrome">
+                          <option value="Opera">
+                          <option value="Safari">
+                          <option value="Edge">
+                          <option value="Firefox">
+                          <option value="Chrome">
+                          <option value="Opera">
+                          <option value="Safari">
+                          <option value="Edge">
+                          <option value="Firefox">
+                          <option value="Chrome">
+                          <option value="Opera">
+                          <option value="Safari">
+                        </datalist>
+                        <span onclick="newElement()" class="addBtn">Add</span>
+
+                        <ul id="myUL">
+                          <li class="checklist">Hit the gym</li>
+                          <li class="checklist">Pay bills</li>
+                          <li class="checklist">Meet George</li>
+                          <li class="checklist">Buy eggs</li>
+                          <li class="checklist">Read a book</li>
+                          <li class="checklist">Organize office</li>
+                      </ul>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -261,6 +296,7 @@
   
 
 
+
   <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
   <script>window.jQuery || document.write('<script src="assets/panelassests/jquery-slim.min.js"><\/script>')</script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
@@ -272,6 +308,63 @@
     $("#profile .edit-button, #profile .back-button").on('click', function () {
       $profileForm.toggleClass("edit")
     })
+  </script>
+
+<script>
+  // Create a "close" button and append it to each list item
+  var myNodelist = document.getElementsByClassName("checklist");
+  var i;
+  for (i = 0; i < myNodelist.length; i++) {
+    var span = document.createElement("SPAN");
+    var txt = document.createTextNode("\u00D7");
+    span.className = "close";
+    span.appendChild(txt);
+    myNodelist[i].appendChild(span);
+  }
+  
+  // Click on a close button to hide the current list item
+  var close = document.getElementsByClassName("close");
+  var i;
+  for (i = 0; i < close.length; i++) {
+    close[i].onclick = function() {
+      var div = this.parentElement;
+      this.parentElement.remove();
+    }
+  }
+  
+  // Create a new list item when clicking on the "Add" button
+  function newElement() {
+    var li = document.createElement("li");
+    var input = document.createElement("input");
+    var inputValue = document.getElementById("myInput").value;
+    var t = document.createTextNode(inputValue);
+    input.value=inputValue;
+    input.type="checkbox";
+    input.checked=true;
+    input.name="categories";
+    li.className="checklist";
+    li.appendChild(t);
+    li.appendChild(input);
+    if (inputValue === '') {
+      alert("تخصص وارد شده معتبر نیست");
+    } else {
+      document.getElementById("myUL").appendChild(li);
+    }
+    document.getElementById("myInput").value = "";
+  
+    var span = document.createElement("SPAN");
+    var txt = document.createTextNode("\u00D7");
+    span.className = "close";
+    span.appendChild(txt);
+    li.appendChild(span);
+  
+    for (i = 0; i < close.length; i++) {
+      close[i].onclick = function() {
+        var div = this.parentElement;
+        this.parentElement.remove();
+      }
+    }
+  }
   </script>
 
 </body>

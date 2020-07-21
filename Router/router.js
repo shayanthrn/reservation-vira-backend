@@ -1035,15 +1035,8 @@ router.post('/addHC',function(req,res){
 //-----------------------test route--------------------------//
 
 router.get("/test",function(req,res){
-    // res.render("test.ejs");
-    // res.end();
-    MongoClient.connect(dburl,function(err,db){
-      var dbo=db.db("mydb");
-      dbo.collection("Categories").find({name:{$regex:'.*'}},async function(err,result){
-        array=await result.toArray();
-        console.log(array);
-      })
-    })
+    res.render("test.ejs");
+    res.end();
 })
 
 //-----------------------test route--------------------------//
