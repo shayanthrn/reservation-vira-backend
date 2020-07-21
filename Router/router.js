@@ -1334,8 +1334,8 @@ router.get('/doctorpanel/profile',function(req,res){
         else{
           categories().then(basiccategories=>{
             res.render('DoctorPanel/profile.ejs',{doctor:result,categories:basiccategories});
-            db.close();
             res.end();
+            db.close();
           })
         }
       })
