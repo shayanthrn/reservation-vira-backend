@@ -1332,11 +1332,9 @@ router.get('/doctorpanel/profile',function(req,res){
           res.redirect('noaccess');
         }
         else{
-          categories().then(basiccategories=>{
-            res.render('DoctorPanel/profile.ejs',{doctor:result,categories:basiccategories});
-            res.end();
-            db.close();
-          })
+          res.render('DoctorPanel/profile.ejs',{doctor:result});
+          db.close();
+          res.end();  
         }
       })
     })
