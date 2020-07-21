@@ -113,40 +113,17 @@
                       <% } %></p>
                     <div class="form-group mb-2">
                       <div id="myDIV" class="header">
-                        <h2 style="margin:5px">My To Do List</h2>
+                        <h4 style="margin:5px">انتخاب تخصص</h4>
                         <input list="mylist" id="myInput" placeholder="Title...">
                         <datalist id="mylist">
-                          <option value="Edge">
-                          <option value="Firefox">
-                          <option value="Chrome">
-                          <option value="Opera">
-                          <option value="Safari">
-                          <option value="Edge">
-                          <option value="Firefox">
-                          <option value="Chrome">
-                          <option value="Opera">
-                          <option value="Safari">
-                          <option value="Edge">
-                          <option value="Firefox">
-                          <option value="Chrome">
-                          <option value="Opera">
-                          <option value="Safari">
-                          <option value="Edge">
-                          <option value="Firefox">
-                          <option value="Chrome">
-                          <option value="Opera">
-                          <option value="Safari">
+                          <option value="1"></option>
                         </datalist>
-                        <span onclick="newElement()" class="addBtn">Add</span>
-
+                        <span onclick="newElement()" class="addBtn">اضافه</span>
                         <ul id="myUL">
-                          <li class="checklist">Hit the gym</li>
-                          <li class="checklist">Pay bills</li>
-                          <li class="checklist">Meet George</li>
-                          <li class="checklist">Buy eggs</li>
-                          <li class="checklist">Read a book</li>
-                          <li class="checklist">Organize office</li>
-                      </ul>
+                          <% for(let i=0;i<doctor.categories.length;i++) { %>
+                            <li class="checklist"><%doctor.categories[i]%><input type="checkbox" name="categories" value="<%doctor.categories[i]%>"></li>
+                          <% } %>
+                        </ul>
                       </div>
                     </div>
                   </div>
@@ -342,6 +319,7 @@
     input.type="checkbox";
     input.checked=true;
     input.name="categories";
+    input.style.visibility="hidden";
     li.className="checklist";
     li.appendChild(t);
     li.appendChild(input);
