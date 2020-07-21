@@ -307,7 +307,11 @@
   for (i = 0; i < close.length; i++) {
     close[i].onclick = function() {
       var div = this.parentElement;
-      this.parentElement.remove();
+        var opt=document.createElement("option");
+        opt.value=div.mydata;
+        opt.className="options";
+        this.parentElement.remove();
+        document.getElementById("mylist").appendChild(opt);
     }
   }
   
@@ -334,6 +338,7 @@
     input.style.visibility="hidden";
     li.className="checklist";
     li.style.listStyle="none";
+    li.mydata=inputValue;
     li.appendChild(t);
     li.appendChild(input);
     if (inputValue === '') {
@@ -352,7 +357,11 @@
     for (i = 0; i < close.length; i++) {
       close[i].onclick = function() {
         var div = this.parentElement;
+        var opt=document.createElement("option");
+        opt.value=div.mydata;
+        opt.className="options";
         this.parentElement.remove();
+        document.getElementById("mylist").appendChild(opt);
       }
     }
     
