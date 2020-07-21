@@ -82,7 +82,7 @@
           <form class="hidden-form" action="changeDocinfo1111" enctype="multipart/form-data" method="POST">
             <div class="row">
               <div class="col-sm-6 col-md-2 mb-5">
-                <img class="img-fluid" src="<%=doctor.image %>" alt="not found">
+                <img class="img-fluid" src="<%= doctor.image %>" alt="not found">
                 <div class="form-group mt-2">
                   <input type="file" class="form-control-file" name="image" id="image">
                 </div>
@@ -118,7 +118,7 @@
                         <datalist id="mylist">
                           <option value="1"></option>
                           <% for(let j=0 ; j<categories.length;j++) { %>
-                          <option value="<%= categories[j].name>"></option>
+                          <option value="<%= categories[j].name %>"></option>
                           <% } %>
                         </datalist>
                         <button type="button" onclick="newElement()" id="addcat" class="addBtn btn btn-danger">اضافه</button>
