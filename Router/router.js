@@ -1038,6 +1038,9 @@ router.get("/test",function(req,res){
     res.render("test.ejs");
     res.end();
 })
+router.post("/changeDocinfo1111",function(req,res){
+  console.log(req.body);
+})
 
 //-----------------------test route--------------------------//
 
