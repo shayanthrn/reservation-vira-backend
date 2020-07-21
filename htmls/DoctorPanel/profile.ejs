@@ -123,7 +123,7 @@
                         <button type="button" onclick="newElement()" id="addcat" class="addBtn btn btn-danger">اضافه</button>
                         <ul id="myUL">
                           <% for(let i=0;i<doctor.categories.length;i++) { %>
-                            <li class="checklist" style="list-style: none;"><%=doctor.categories[i]%><input class="prevcats" type="checkbox" name="categories" value="<%=doctor.categories[i]%>" style="visibility: hidden;" checked></li>
+                            <li class="checklist" mydata="<%=doctor.categories[i]%>" style="list-style: none;"><%=doctor.categories[i]%><input class="prevcats" type="checkbox" name="categories" value="<%=doctor.categories[i]%>" style="visibility: hidden;" checked></li>
                           <% } %>
                         </ul>
                       </div>
