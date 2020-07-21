@@ -13,66 +13,6 @@
   <link rel="stylesheet" href="https://cdn.rtlcss.com/bootstrap/v4.1.3/css/bootstrap.min.css" integrity="sha384-Jt6Tol1A2P9JBesGeCxNrxkmRFSjWCBW1Af7CSQSKsfMVQCqnUVWhZzG0puJMCK6" crossorigin="anonymous">
   <link href="assets/panelassests/dashboard.rtl.css" rel="stylesheet">
   <script src="https://use.fontawesome.com/6d68f18b97.js"></script><link href="https://use.fontawesome.com/6d68f18b97.css" media="all" rel="stylesheet">
-
-  <style>
-
-    /* Style the close button */
-    .close {
-      position: absolute;
-      right: 0;
-      top: 0;
-      padding: 12px 16px 12px 16px;
-    }
-    
-    .close:hover {
-      background-color: #f44336;
-      color: white;
-    }
-    
-    /* Style the header */
-    .header {
-      background-color: #f44336;
-      padding: 30px 40px;
-      color: white;
-      text-align: center;
-    }
-    
-    /* Clear floats after the header */
-    .header:after {
-      content: "";
-      display: table;
-      clear: both;
-    }
-    
-    /* Style the input */
-    input {
-      margin: 0;
-      border: none;
-      border-radius: 0;
-      width: 75%;
-      padding: 10px;
-      float: left;
-      font-size: 16px;
-    }
-    
-    /* Style the "Add" button */
-    .addBtn {
-      padding: 10px;
-      width: 25%;
-      background: #d9d9d9;
-      color: #555;
-      float: left;
-      text-align: center;
-      font-size: 16px;
-      cursor: pointer;
-      transition: 0.3s;
-      border-radius: 0;
-    }
-    
-    .addBtn:hover {
-      background-color: #bbb;
-    }
-    </style>
 </head>
 
 <body>
@@ -177,7 +117,7 @@
                         <datalist id="mylist">
                           <option value="1"></option>
                         </datalist>
-                        <button type="button" onclick="newElement()" id="addcat" class="addBtn">اضافه</button>
+                        <button type="button" onclick="newElement()" id="addcat" class="addBtn btn btn-danger">اضافه</button>
                         <ul id="myUL">
                           <% for(let i=0;i<doctor.categories.length;i++) { %>
                             <li class="checklist" style="list-style: none;"><%=doctor.categories[i]%><input type="checkbox" name="categories" value="<%=doctor.categories[i]%>" style="visibility: hidden;" checked></li>
