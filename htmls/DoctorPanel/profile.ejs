@@ -114,7 +114,7 @@
                     <div class="form-group mb-2">
                       <div id="myDIV" class="header">
                         <h4 style="margin:5px">انتخاب تخصص</h4>
-                        <input list="mylist" id="myInput" placeholder="تخصص">
+                        <input oninput="checkdatalist()" list="mylist" id="myInput" placeholder="تخصص">
                         <datalist id="mylist">
                           <option value="1"></option>
                         </datalist>
@@ -344,6 +344,14 @@
       }
     }
   }
+
+  function checkdatalist(){
+    const currentValue = document.getElementById('myInput').value;
+    document.getElementById("mySubmit").disabled =
+    currentValue.length === 0 ||
+    document.querySelector('option[value="' + currentValue + '"]') === null;
+  }
+
   </script>
 
 </body>
