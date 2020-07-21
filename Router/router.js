@@ -684,8 +684,14 @@ router.post("/changedocinfo",function(req,res){
           res.redirect('noaccess');
         }
         else{
-          console.log(req.body);
-          dbo.collection('Doctors').updateOne({token:req.cookies.doctortoken},{$set:{city:req.body.city,workphone:req.body.workphone,medicalnumber:req.body.medicalnumber,codemeli:req.body.codemeli,background:req.body.experience,address:req.body.address,phonenumber:req.body.phone,visitduration:Number(req.body.duration),description:req.body.description}},function(err,res2){
+          var cats=[]
+          if(typeof req.body.categories=="string"){
+            cats.push(req.body.categories);
+          }
+          else{
+            cats=req.body.categories;
+          }
+          dbo.collection('Doctors').updateOne({token:req.cookies.doctortoken},{$set:{categories:cats,city:req.body.city,workphone:req.body.workphone,medicalnumber:req.body.medicalnumber,codemeli:req.body.codemeli,background:req.body.experience,address:req.body.address,phonenumber:req.body.phone,visitduration:Number(req.body.duration),description:req.body.description}},function(err,res2){
             if(req.files!=null){
               mv(req.files.image.tempFilePath,"public"+result.image,function(err){
                 console.log("public"+result.image)
