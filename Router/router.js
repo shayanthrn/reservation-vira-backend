@@ -1578,40 +1578,40 @@ router.get("/Adminpanel/addDoctor",function(req,res){
 
 
 router.get("/Adminpanel/addcategory",function(req,res){
-  // if(req.cookies.admintoken==undefined){
-  //   res.redirect('/noaccess');
-  // }
-  // else{
+  if(req.cookies.admintoken==undefined){
+    res.redirect('/noaccess');
+  }
+  else{
     MongoClient.connect(dburl,function(err,db){
       var dbo=db.db("mydb");
       dbo.collection("Admins").findOne({token:req.cookies.admintoken},function(err,result){
-        // if(result==null){
-        //   db.close();
-        //   res.redirect('/noaccess');
-        // }
-        // else{
+        if(result==null){
+          db.close();
+          res.redirect('/noaccess');
+        }
+        else{
           res.render("AdminPanel/specialty-add.ejs");
           db.close();
           res.end();
-        //}
+        }
       })
     })
-  //}
+  }
 })
 
 router.post("/addCategory",function(req,res){
-  // if(req.cookies.admintoken==undefined){
-  //   res.redirect('/noaccess');
-  // }
-  // else{
+  if(req.cookies.admintoken==undefined){
+    res.redirect('/noaccess');
+  }
+  else{
     MongoClient.connect(dburl,function(err,db){
       var dbo=db.db("mydb");
       dbo.collection("Admins").findOne({token:req.cookies.admintoken},function(err,result){
-        // if(result==null){
-        //   db.close();
-        //   res.redirect('/noaccess');
-        // }
-        // else{
+        if(result==null){
+          db.close();
+          res.redirect('/noaccess');
+        }
+        else{
           dbo.collection("Categories").insertOne({name:req.body.name,image:"/catphotos/"+req.body.name.split(' ').join('-')+".png"},function(err,insert){
             if(req.files!=null){
               mv(req.files.image.tempFilePath,"public"+"/catphotos/"+req.body.name.split(' ').join('-')+".png",function(err){
@@ -1621,52 +1621,52 @@ router.post("/addCategory",function(req,res){
             db.close();
             res.redirect('/Adminpanel/categories');
           })
-        //}
+        }
       })
     })
-  //}
+  }
 })
 
 router.get("/Adminpanel/editcategory",function(req,res){
   var query= url.parse(req.url,true).query;
-  // if(req.cookies.admintoken==undefined){
-  //   res.redirect('/noaccess');
-  // }
-  // else{
+  if(req.cookies.admintoken==undefined){
+    res.redirect('/noaccess');
+  }
+  else{
     MongoClient.connect(dburl,function(err,db){
       var dbo=db.db("mydb");
       dbo.collection("Admins").findOne({token:req.cookies.admintoken},function(err,result){
-        // if(result==null){
-        //   db.close();
-        //   res.redirect('/noaccess');
-        // }
-        // else{
+        if(result==null){
+          db.close();
+          res.redirect('/noaccess');
+        }
+        else{
           dbo.collection("Categories").findOne({name:query.category},function(err,category){
             res.render("AdminPanel/specialty-edit.ejs",{category:category});
             db.close();
             res.end();
           })
-        //}
+        }
       })
     })
-  //}
+  }
 })
 
 
 router.post("/editcategory",function(req,res){
   var query= url.parse(req.url,true).query;
-  // if(req.cookies.admintoken==undefined){
-  //   res.redirect('/noaccess');
-  // }
-  // else{
+  if(req.cookies.admintoken==undefined){
+    res.redirect('/noaccess');
+  }
+  else{
     MongoClient.connect(dburl,function(err,db){
       var dbo=db.db("mydb");
       dbo.collection("Admins").findOne({token:req.cookies.admintoken},function(err,result){
-        // if(result==null){
-        //   db.close();
-        //   res.redirect('/noaccess');
-        // }
-        // else{
+        if(result==null){
+          db.close();
+          res.redirect('/noaccess');
+        }
+        else{
           dbo.collection("Categories").updateOne({name:query.name},{$set:{name:req.body.name,image:"/catphotos/"+req.body.name.split(' ').join('-')+".png"}},function(err,update){
             if(req.files!=null){
               mv(req.files.image.tempFilePath,"public"+"/catphotos/"+req.body.name.split(' ').join('-')+".png",function(err){
@@ -1676,25 +1676,25 @@ router.post("/editcategory",function(req,res){
             db.close();
             res.redirect('/Adminpanel/categories');
           })
-        //}
+        }
       })
     })
-  //}
+  }
 })
 
 router.get("/Adminpanel/categories",function(req,res){
-  // if(req.cookies.admintoken==undefined){
-  //   res.redirect('/noaccess');
-  // }
-  // else{
+  if(req.cookies.admintoken==undefined){
+    res.redirect('/noaccess');
+  }
+  else{
     MongoClient.connect(dburl,function(err,db){
       var dbo=db.db("mydb");
       dbo.collection("Admins").findOne({token:req.cookies.admintoken},function(err,result){
-        // if(result==null){
-        //   db.close();
-        //   res.redirect('/noaccess');
-        // }
-        // else{
+        if(result==null){
+          db.close();
+          res.redirect('/noaccess');
+        }
+        else{
           var cats=[]
           dbo.collection("Categories").find({}).forEach(function(doc){
             cats.push(doc);
@@ -1703,27 +1703,27 @@ router.get("/Adminpanel/categories",function(req,res){
             db.close();
             res.end();
           })
-        //}
+        }
       })
     })
-  //}
+  }
 })
 
 
 router.get("/removecategory",function(req,res){
   var query= url.parse(req.url,true).query;
-  // if(req.cookies.admintoken==undefined){
-  //   res.redirect('/noaccess');
-  // }
-  // else{
+  if(req.cookies.admintoken==undefined){
+    res.redirect('/noaccess');
+  }
+  else{
     MongoClient.connect(dburl,function(err,db){
       var dbo=db.db("mydb");
       dbo.collection("Admins").findOne({token:req.cookies.admintoken},function(err,result){
-        // if(result==null){
-        //   db.close();
-        //   res.redirect('/noaccess');
-        // }
-        // else{
+        if(result==null){
+          db.close();
+          res.redirect('/noaccess');
+        }
+        else{
           dbo.collection("Categories").deleteOne({name:query.category},function(err,deleted){
             fs.unlink('public/catphotos/'+query.category.split(' ').join('-')+".png", function(err) {
               if(err && err.code == 'ENOENT') {
@@ -1740,35 +1740,101 @@ router.get("/removecategory",function(req,res){
               })
           });
           })
-        //}
+        }
       })
     })
-  //}
+  }
 })
 
 
 //------------------------adminpanel---------------------------//
-//======================= signup========================//
+//=======================HC signup========================//
 
 router.get("/HCsignup",function(req,res){
-    res.render("HCsignup.ejs");
-    res.end();
+    if(req.cookies.admintoken==undefined){
+      res.redirect("noaccess");
+    }
+    else{
+      MongoClient.connect(dburl,function(err,db){
+        var dbo=db.db("mydb");
+        dbo.collection("Admins").findOne({token:req.cookies.usertoken},function(err,admin){
+          if(admin==null){
+            res.redirect("noaccess");
+          }
+          else{
+            res.render("HCsignup.ejs");
+            res.end();
+            db.close()
+          }
+        })
+      })
+    }
 })
 
 router.get("/pharmacysignup",function(req,res){
-  res.render("pharmacysignup.ejs");
-  res.end();
+  if(req.cookies.admintoken==undefined){
+    res.redirect("noaccess");
+  }
+  else{
+    MongoClient.connect(dburl,function(err,db){
+      var dbo=db.db("mydb");
+      dbo.collection("Admins").findOne({token:req.cookies.usertoken},function(err,admin){
+        if(admin==null){
+          res.redirect("noaccess");
+        }
+        else{
+          res.render("pharmacysignup.ejs");
+          res.end();
+          db.close()
+        }
+      })
+    })
+  }
 })
 
 router.get("/clinicsignup",function(req,res){
-  categories().then(basiccategories=>{
-    res.render("clinicsignup.ejs",{categories:basiccategories});
-    res.end();
-  })
+  if(req.cookies.admintoken==undefined){
+    res.redirect("noaccess");
+  }
+  else{
+    MongoClient.connect(dburl,function(err,db){
+      var dbo=db.db("mydb");
+      dbo.collection("Admins").findOne({token:req.cookies.usertoken},function(err,admin){
+        if(admin==null){
+          res.redirect("noaccess");
+        }
+        else{
+          categories().then(basiccategories=>{
+            res.render("clinicsignup.ejs",{categories:basiccategories});
+            res.end();
+            db.close()
+          })
+        }
+      })
+    })
+  }
 })
 
 router.get("/labsignup",function(req,res){
-  res.render("labsignup.ejs");
+  if(req.cookies.admintoken==undefined){
+    res.redirect("noaccess");
+  }
+  else{
+    MongoClient.connect(dburl,function(err,db){
+      var dbo=db.db("mydb");
+      dbo.collection("Admins").findOne({token:req.cookies.usertoken},function(err,admin){
+        if(admin==null){
+          res.redirect("noaccess");
+        }
+        else{
+          res.render("labsignup.ejs");
+          res.end();
+          db.close()
+        }
+      })
+    })
+  }
+ 
 })
 //======================= signup========================//
 
