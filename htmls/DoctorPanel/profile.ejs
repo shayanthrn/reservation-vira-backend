@@ -308,7 +308,7 @@
     close[i].onclick = function() {
       var div = this.parentElement;
         var opt=document.createElement("option");
-        console.log(div.data);
+        console.log(div.className);
         opt.value=div.data;
         opt.className="options";
         this.parentElement.remove();
