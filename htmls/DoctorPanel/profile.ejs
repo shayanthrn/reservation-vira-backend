@@ -119,7 +119,7 @@
                           <option value="<%= categories[j].name>"></option>
                           <% } %>
                         </datalist>
-                        <button type="button" onclick="newElement()" id="addcat" class="addBtn btn btn-danger">اضافه</button>
+                        <button type="button" onclick="newElement()" id="addcat" class="addBtn">اضافه</button>
                         <ul id="myUL">
                           <% for(let i=0;i<doctor.categories.length;i++) { %>
                             <li class="checklist" style="list-style: none;"><%=doctor.categories[i]%><input type="checkbox" name="categories" value="<%=doctor.categories[i]%>" style="visibility: hidden;" checked></li>
@@ -310,12 +310,12 @@
     }
   }
   
-  // var options = document.getElementsByClassName("options");
-  //   for(i =0 ; i<options.length;i++){
-  //     if(options[i].value==inputValue){
-  //       options[i].remove();
-  //     }
-  //   }
+  var options = document.getElementsByClassName("options");
+    for(i =0 ; i<options.length;i++){
+      if(options[i].value==inputValue){
+        options[i].remove();
+      }
+    }
   
   // Create a new list item when clicking on the "Add" button
   function newElement() {
@@ -352,12 +352,12 @@
       }
     }
     
-    // var options = document.getElementsByClassName("options");
-    // for(i =0 ; i<options.length;i++){
-    //   if(options[i].value==inputValue){
-    //     options[i].remove();
-    //   }
-    // }
+    var options = document.getElementsByClassName("options");
+    for(i =0 ; i<options.length;i++){
+      if(options[i].value==inputValue){
+        options[i].remove();
+      }
+    }
   }
 
   function checkdatalist(){
