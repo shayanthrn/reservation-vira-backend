@@ -113,11 +113,11 @@
                     <div class="form-group mb-2">
                       <div id="myDIV" class="header">
                         <h4 style="margin:5px">انتخاب تخصص</h4>
-                        <input  list="mylist" id="myInput" placeholder="تخصص">
+                        <input oninput="checkdatalist()" list="mylist" id="myInput" placeholder="تخصص">
                         <datalist id="mylist">
-                          <% for(let j=0 ; j<categories.length;j++) { %>
+                          <!-- <% for(let j=0 ; j<categories.length;j++) { %>
                           <option value="<%= categories[j].name>"></option>
-                          <% } %>
+                          <% } %> -->
                         </datalist>
                         <button type="button" onclick="newElement()" id="addcat" class="addBtn btn btn-danger">اضافه</button>
                         <ul id="myUL">
@@ -310,12 +310,12 @@
     }
   }
   
-  var options = document.getElementsByClassName("options");
-    for(i =0 ; i<options.length;i++){
-      if(options[i].value==inputValue){
-        options[i].remove();
-      }
-    }
+  // var options = document.getElementsByClassName("options");
+  //   for(i =0 ; i<options.length;i++){
+  //     if(options[i].value==inputValue){
+  //       options[i].remove();
+  //     }
+  //   }
   
   // Create a new list item when clicking on the "Add" button
   function newElement() {
@@ -352,12 +352,12 @@
       }
     }
     
-    var options = document.getElementsByClassName("options");
-    for(i =0 ; i<options.length;i++){
-      if(options[i].value==inputValue){
-        options[i].remove();
-      }
-    }
+    // var options = document.getElementsByClassName("options");
+    // for(i =0 ; i<options.length;i++){
+    //   if(options[i].value==inputValue){
+    //     options[i].remove();
+    //   }
+    // }
   }
 
   function checkdatalist(){
