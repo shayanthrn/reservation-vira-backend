@@ -113,13 +113,13 @@
                     <div class="form-group mb-2">
                       <div id="myDIV" class="header">
                         <h4 style="margin:5px">انتخاب تخصص</h4>
-                        <input oninput="checkdatalist()" list="mylist" id="myInput" placeholder="تخصص">
+                        <input  list="mylist" id="myInput" placeholder="تخصص">
                         <datalist id="mylist">
                           <% for(let j=0 ; j<categories.length;j++) { %>
                           <option value="<%= categories[j].name>"></option>
                           <% } %>
                         </datalist>
-                        <button type="button" onclick="newElement()" id="addcat" class="addBtn">اضافه</button>
+                        <button type="button" onclick="newElement()" id="addcat" class="addBtn btn btn-danger">اضافه</button>
                         <ul id="myUL">
                           <% for(let i=0;i<doctor.categories.length;i++) { %>
                             <li class="checklist" style="list-style: none;"><%=doctor.categories[i]%><input type="checkbox" name="categories" value="<%=doctor.categories[i]%>" style="visibility: hidden;" checked></li>
