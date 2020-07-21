@@ -939,102 +939,129 @@ router.post("/changepassHC",function(req,res){
 
 
 router.post("/addDoctor",function(req,res){
+  if(req.cookies.admintoken==undefined){
+    res.redirect("/noaccess");
+  }
+  else{
     MongoClient.connect(dburl,function(err,db){
       var dbo=db.db("mydb");
-      dbo.collection("Doctors").findOne({name:req.body.name},function(err,res1){
-        if(res1!=null){
-          db.close();
-          res.redirect('/doctorsignup')
+      dbo.collection("Admins").findOne({token:req.cookies.admintoken},function(err,admin){
+        if(admin==null){
+          res.redirect("/noaccess");
         }
         else{
-          dbo.collection("Doctors").findOne({username:req.body.username},function(err,res2){
-            if(res2!=null){
+          dbo.collection("Doctors").findOne({name:req.body.name},function(err,res1){
+            if(res1!=null){
               db.close();
-              res.redirect('/doctorsignup')
+              res.redirect('/Adminpanel/addDoctor')
             }
             else{
-              var cats=[];
-              var memtype=[];
-              if(typeof req.body.categories=="string"){
-                cats.push(req.body.categories);
-              }
-              else{
-                req.body.categories.forEach(function(doc){
-                  cats.push(doc);
-                  })
-              }
-              if(typeof req.body.membershiptypes=="string"){
-                memtype.push(req.body.membershiptypes)
-              }
-              else[
-                req.body.membershiptypes.forEach(function(doc2){
-                  memtype.push(doc2);
-                })
-              ]
-              dbo.collection('Doctors').insertOne(new Doctor(req.body.username,req.body.pass,req.body.name,cats,req.body.medicalnumber,req.body.codemeli,req.body.workphone,req.body.phonenumber,req.body.address,req.body.city,"/docphotos/"+req.body.name+".png",req.body.background,req.body.description,memtype,req.body.appknowledge),function(err,res2){
-                if(req.files!=null){
-                mv(req.files.image.tempFilePath,"public/docphotos/"+req.body.name+".png",function(err){
-                  console.log("public/docphotos/"+req.body.name+".png")
-                })
+              dbo.collection("Doctors").findOne({username:req.body.username},function(err,res2){
+                if(res2!=null){
+                  db.close();
+                  res.redirect('/Adminpanel/addDoctor')
                 }
-                db.close();
-                res.redirect('/'); //fixxxxxxxxxxxxxxxxxxxxxxxx
+                else{
+                  var cats=[];
+                  var memtype=[];
+                  if(typeof req.body.categories=="string"){
+                    cats.push(req.body.categories);
+                  }
+                  else{
+                    req.body.categories.forEach(function(doc){
+                      cats.push(doc);
+                      })
+                  }
+                  if(typeof req.body.membershiptypes=="string"){
+                    memtype.push(req.body.membershiptypes)
+                  }
+                  else[
+                    req.body.membershiptypes.forEach(function(doc2){
+                      memtype.push(doc2);
+                    })
+                  ]
+                  dbo.collection('Doctors').insertOne(new Doctor(req.body.username,req.body.pass,req.body.name,cats,req.body.medicalnumber,req.body.codemeli,req.body.workphone,req.body.phonenumber,req.body.address,req.body.city,"/docphotos/"+req.body.name+".png",req.body.background,req.body.description,memtype,req.body.appknowledge),function(err,res2){
+                    if(req.files!=null){
+                    mv(req.files.image.tempFilePath,"public/docphotos/"+req.body.name+".png",function(err){
+                      console.log("public/docphotos/"+req.body.name+".png")
+                    })
+                    }
+                    db.close();
+                    res.redirect('/'); //fixxxxxxxxxxxxxxxxxxxxxxxx
+                  })
+                }
               })
             }
           })
         }
       })
     })
+  }
 })
 
 router.post('/addHC',function(req,res){
-  var query=url.parse(req.url,true).query;
-  bodypost=req.body;
-  bodypost.type=query.type;
-  if(bodypost.type!="pharmacy"){
-    bodypost.isReserveable="true";
+  if(req.cookies.admintoken==undefined){
+    res.redirect("noaccess");
   }
-  bodypost.image="/"+query.type+"photos/"+req.body.name.split(' ').join('-')+".png";
-  if(req.files!=null){
-    mv(req.files.image.tempFilePath,"public"+"/"+query.type+"photos/"+req.body.name.split(' ').join('-')+".png",function(err){
-      console.log("public"+"/"+query.type+"photos/"+req.body.name.split(' ').join('-')+".png")
+  else{
+    MongoClient.connect(dburl,function(err,db){
+      var dbo=db.db("mydb");
+      dbo.collection("Admins").findOne({token:req.cookies.admintoken},function(err,admin){
+        if(admin==null){
+          res.redirect("noaccess");
+        }
+        else{
+          var query=url.parse(req.url,true).query;
+          bodypost=req.body;
+          bodypost.type=query.type;
+          if(bodypost.type!="pharmacy"){
+            bodypost.isReserveable="true";
+          }
+          bodypost.image="/"+query.type+"photos/"+req.body.name.split(' ').join('-')+".png";
+          if(req.files!=null){
+            mv(req.files.image.tempFilePath,"public"+"/"+query.type+"photos/"+req.body.name.split(' ').join('-')+".png",function(err){
+              console.log("public"+"/"+query.type+"photos/"+req.body.name.split(' ').join('-')+".png")
+            })
+          }
+          
+          var options = {
+            url: 'http://reservation.drtajviz.com/api/addhealthcenter?key=pouyarahmati',
+            json: true,
+            body: bodypost,
+          };
+        
+          request.post(options, (err, resp, body) => {
+            if(query.type!="pharmacy"){
+              var cats=[];
+              if(typeof req.body.categories=="string"){
+                cats.push(req.body.categories);
+              }
+              else{
+                cats=req.body.categories;
+              }
+              cats.forEach(function(doc){
+                options = {
+                  url: 'http://reservation.drtajviz.com/api/addCategoryToHC?key=pouyarahmati',
+                  json: true,
+                  body: {
+                    name:req.body.name,
+                    type:query.type,
+                    catname:doc,
+                    catduration:"30",
+                    catcost:"3000"
+                  },
+                };
+                request.post(options,(err, resp2, body2) =>{
+                  console.log(body);
+                })
+              })
+            }
+            res.redirect("/HCsignup");
+          });
+        }
+      })
     })
   }
-  
-  var options = {
-    url: 'http://reservation.drtajviz.com/api/addhealthcenter?key=pouyarahmati',
-    json: true,
-    body: bodypost,
-  };
-
-  request.post(options, (err, resp, body) => {
-    if(query.type!="pharmacy"){
-      var cats=[];
-      if(typeof req.body.categories=="string"){
-        cats.push(req.body.categories);
-      }
-      else{
-        cats=req.body.categories;
-      }
-      cats.forEach(function(doc){
-        options = {
-          url: 'http://reservation.drtajviz.com/api/addCategoryToHC?key=pouyarahmati',
-          json: true,
-          body: {
-            name:req.body.name,
-            type:query.type,
-            catname:doc,
-            catduration:"30",
-            catcost:"3000"
-          },
-        };
-        request.post(options,(err, resp2, body2) =>{
-          console.log(body);
-        })
-      })
-    }
-    res.redirect("/HCsignup");
-  });
 })
 
 
@@ -1722,13 +1749,6 @@ router.get("/removecategory",function(req,res){
 
 //------------------------adminpanel---------------------------//
 //======================= signup========================//
-
-router.get("/DoctorSignup",function(req,res){
-  categories().then(basiccategories=>{
-    res.render("doctorsignup.ejs",{categories:basiccategories});
-    res.end();
-  })
-})
 
 router.get("/HCsignup",function(req,res){
     res.render("HCsignup.ejs");
