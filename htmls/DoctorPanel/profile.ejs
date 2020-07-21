@@ -308,8 +308,7 @@
     close[i].onclick = function() {
       var div = this.parentElement;
         var opt=document.createElement("option");
-        console.log(div.mydata);
-        opt.value=div.data;
+        opt.value=div.dataset.mydata;
         opt.className="options";
         this.parentElement.remove();
         document.getElementById("mylist").appendChild(opt);
@@ -339,7 +338,7 @@
     input.style.visibility="hidden";
     li.className="checklist";
     li.style.listStyle="none";
-    li.data=inputValue;
+    li.dataset.mydata=inputValue;
     li.appendChild(t);
     li.appendChild(input);
     if (inputValue === '') {
@@ -359,7 +358,7 @@
       close[i].onclick = function() {
         var div = this.parentElement;
         var opt=document.createElement("option");
-        opt.value=div.data;
+        opt.value=div.dataset.mydata;
         opt.className="options";
         this.parentElement.remove();
         document.getElementById("mylist").appendChild(opt);
