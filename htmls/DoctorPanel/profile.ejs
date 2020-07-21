@@ -123,7 +123,7 @@
                         <button type="button" onclick="newElement()" id="addcat" class="addBtn btn btn-danger">اضافه</button>
                         <ul id="myUL">
                           <% for(let i=0;i<doctor.categories.length;i++) { %>
-                            <li class="checklist" mydata="<%=doctor.categories[i]%>" style="list-style: none;"><%=doctor.categories[i]%><input class="prevcats" type="checkbox" name="categories" value="<%=doctor.categories[i]%>" style="visibility: hidden;" checked></li>
+                            <li class="checklist" data="<%=doctor.categories[i]%>" style="list-style: none;"><%=doctor.categories[i]%><input class="prevcats" type="checkbox" name="categories" value="<%=doctor.categories[i]%>" style="visibility: hidden;" checked></li>
                           <% } %>
                         </ul>
                       </div>
@@ -308,7 +308,7 @@
     close[i].onclick = function() {
       var div = this.parentElement;
         var opt=document.createElement("option");
-        opt.value=div.mydata;
+        opt.value=div.data;
         opt.className="options";
         this.parentElement.remove();
         document.getElementById("mylist").appendChild(opt);
@@ -338,7 +338,7 @@
     input.style.visibility="hidden";
     li.className="checklist";
     li.style.listStyle="none";
-    li.mydata=inputValue;
+    li.data=inputValue;
     li.appendChild(t);
     li.appendChild(input);
     if (inputValue === '') {
@@ -358,7 +358,7 @@
       close[i].onclick = function() {
         var div = this.parentElement;
         var opt=document.createElement("option");
-        opt.value=div.mydata;
+        opt.value=div.data;
         opt.className="options";
         this.parentElement.remove();
         document.getElementById("mylist").appendChild(opt);
