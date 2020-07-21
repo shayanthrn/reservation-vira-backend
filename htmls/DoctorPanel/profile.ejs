@@ -121,7 +121,7 @@
                         <span onclick="newElement()" class="addBtn">اضافه</span>
                         <ul id="myUL">
                           <% for(let i=0;i<doctor.categories.length;i++) { %>
-                            <li class="checklist"><%=doctor.categories[i]%><input type="checkbox" name="categories" value="<%=doctor.categories[i]%>"></li>
+                            <li class="checklist" style="list-style: none;"><%=doctor.categories[i]%><input type="checkbox" name="categories" value="<%=doctor.categories[i]%>"></li>
                           <% } %>
                         </ul>
                       </div>
@@ -321,6 +321,7 @@
     input.name="categories";
     input.style.visibility="hidden";
     li.className="checklist";
+    li.style.listStyle="none";
     li.appendChild(t);
     li.appendChild(input);
     if (inputValue === '') {
