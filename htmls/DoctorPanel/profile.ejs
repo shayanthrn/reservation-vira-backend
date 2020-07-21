@@ -118,7 +118,7 @@
                         <datalist id="mylist">
                           <option value="1"></option>
                         </datalist>
-                        <span onclick="newElement()" class="addBtn">اضافه</span>
+                        <button type="button" onclick="newElement()" id="addcat" class="addBtn">اضافه</button>
                         <ul id="myUL">
                           <% for(let i=0;i<doctor.categories.length;i++) { %>
                             <li class="checklist" style="list-style: none;"><%=doctor.categories[i]%><input type="checkbox" name="categories" value="<%=doctor.categories[i]%>" style="visibility: hidden;" checked></li>
@@ -347,7 +347,7 @@
 
   function checkdatalist(){
     const currentValue = document.getElementById('myInput').value;
-    document.getElementById("mySubmit").disabled =
+    document.getElementById("addcat").disabled =
     currentValue.length === 0 ||
     document.querySelector('option[value="' + currentValue + '"]') === null;
   }
