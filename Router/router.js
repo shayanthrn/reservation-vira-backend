@@ -1757,7 +1757,7 @@ router.get("/HCsignup",function(req,res){
     else{
       MongoClient.connect(dburl,function(err,db){
         var dbo=db.db("mydb");
-        dbo.collection("Admins").findOne({token:req.cookies.usertoken},function(err,admin){
+        dbo.collection("Admins").findOne({token:req.cookies.admintoken},function(err,admin){
           if(admin==null){
             res.redirect("noaccess");
           }
@@ -1778,7 +1778,7 @@ router.get("/pharmacysignup",function(req,res){
   else{
     MongoClient.connect(dburl,function(err,db){
       var dbo=db.db("mydb");
-      dbo.collection("Admins").findOne({token:req.cookies.usertoken},function(err,admin){
+      dbo.collection("Admins").findOne({token:req.cookies.admintoken},function(err,admin){
         if(admin==null){
           res.redirect("noaccess");
         }
@@ -1799,7 +1799,7 @@ router.get("/clinicsignup",function(req,res){
   else{
     MongoClient.connect(dburl,function(err,db){
       var dbo=db.db("mydb");
-      dbo.collection("Admins").findOne({token:req.cookies.usertoken},function(err,admin){
+      dbo.collection("Admins").findOne({token:req.cookies.admintoken},function(err,admin){
         if(admin==null){
           res.redirect("noaccess");
         }
@@ -1822,7 +1822,7 @@ router.get("/labsignup",function(req,res){
   else{
     MongoClient.connect(dburl,function(err,db){
       var dbo=db.db("mydb");
-      dbo.collection("Admins").findOne({token:req.cookies.usertoken},function(err,admin){
+      dbo.collection("Admins").findOne({token:req.cookies.admintoken},function(err,admin){
         if(admin==null){
           res.redirect("noaccess");
         }
