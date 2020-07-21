@@ -1704,7 +1704,9 @@ router.get("/removecategory",function(req,res){
               } else {
                   console.info(`removed`);
               }
-              res.redirect("adminpanel/categories")
+              dbo.collection("Doctors").updateMany({categories:query.category},{$pull:{categories:query.category}},function(err,done){
+                res.redirect("adminpanel/categories")
+              })
           });
           })
         //}
