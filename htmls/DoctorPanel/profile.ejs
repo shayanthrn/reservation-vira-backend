@@ -114,14 +114,14 @@
                     <div class="form-group mb-2">
                       <div id="myDIV" class="header">
                         <h4 style="margin:5px">انتخاب تخصص</h4>
-                        <input list="mylist" id="myInput" placeholder="Title...">
+                        <input list="mylist" id="myInput" placeholder="تخصص">
                         <datalist id="mylist">
                           <option value="1"></option>
                         </datalist>
                         <span onclick="newElement()" class="addBtn">اضافه</span>
                         <ul id="myUL">
                           <% for(let i=0;i<doctor.categories.length;i++) { %>
-                            <li class="checklist" style="list-style: none;"><%=doctor.categories[i]%><input type="checkbox" name="categories" value="<%=doctor.categories[i]%>"></li>
+                            <li class="checklist" style="list-style: none;"><%=doctor.categories[i]%><input type="checkbox" name="categories" value="<%=doctor.categories[i]%>" style="visibility: hidden;" checked></li>
                           <% } %>
                         </ul>
                       </div>
