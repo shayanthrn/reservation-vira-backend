@@ -1947,6 +1947,24 @@ router.get("/healthcenters/:type",function(req,res){
           db.close();
         })
       }
+      else{
+        dbo.collection("Users").findOne({token:req.cookies.usertoken},function(err,user){
+          if(user==null){
+            categories().then(basiccategories=>{
+              res.render("healthcenters-type.ejs",{Objects:HCs,user:"",categories:basiccategories,type:type});
+              res.end();
+              db.close();
+            })
+          }
+          else{
+            categories().then(basiccategories=>{
+              res.render("healthcenters-type.ejs",{Objects:HCs,user:user,categories:basiccategories,type:type});
+              res.end();
+              db.close();
+            })
+          }
+        })
+      }
     })
   })
 })
