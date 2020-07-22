@@ -158,6 +158,25 @@ router.post("/api/getallHCbytypeandcity",function(req,res){
    }
 })
 
+router.get("/api/getallHCtypes",function(req,res){
+  var query=url.parse(req.url,true).query;
+   if(query.key!="pouyarahmati"){
+     res.json({data:"noaccess"});
+     res.end();
+   }
+   else{
+      MongoClient.connect(dburl,function(err,db){
+        var dbo=db.db("mydb");
+        dbo.collection("HCtypes").find({},async function(err,result){
+          data=await result.toArray()
+          res.json({data:data});
+          db.close();
+          res.end();
+        })
+      })
+   }
+})
+
 
 router.post("/api/addCategoryToHC",function(req,res){
   var query=url.parse(req.url,true).query;
