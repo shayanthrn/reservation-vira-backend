@@ -1894,6 +1894,31 @@ router.get("/",function(req,res){
   })
 })
 
+
+
+router.get("/HealthCenters",function(req,res){
+  req.session.prevurl=req.session.currurl;
+  req.session.currurl=req.url;
+  MongoClient.connect(dburl,function(err,db){
+    var dbo=db.db("mydb");
+    dbo.collection("HCtypes").find({},async function(err,result){
+      var types= await result.toArray();
+      console.log(types);
+      if(req.cookies.usertoken==undefined){
+        categories().then(basiccategories=>{
+          res.render("index.ejs",{Objects:types,type:"HC",category:"test",user:"",categories:basiccategories});
+          res.end();
+          db.close();
+        })
+      }
+    })
+  })
+})
+
+
+
+
+
 router.get("/category/:Category",function(req,res){
   req.session.prevurl=req.session.currurl;
   req.session.currurl=req.url;
