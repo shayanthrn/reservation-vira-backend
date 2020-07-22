@@ -179,7 +179,7 @@
                                         <span>نوبت دهی</span>
                                     </a>
                                 </li>
-                                <% } else {  %>
+                                <% } else if(type="doc") {  %>
                                 <li>
                                     <a href="#">
                                         <span>نوبت دهی</span>
@@ -203,7 +203,10 @@
                                         }
                                     </script>
                                 </div>
-                                <% } %> 
+                                <% } else { %> 
+                                    <li><span>بانک سلامت</span></li>
+                                    <li><span>دسته بندی ها</span></li>
+                                <% } %>
                             </ul>
                         </div>
                         <div class="listing default">
