@@ -1970,6 +1970,43 @@ router.get("/healthcenters/:type",function(req,res){
 })
 
 
+router.get("/healthcenters/:type/:HC",function(req,res){
+  req.session.prevurl=req.session.currurl;
+  req.session.currurl=req.url;
+  var HCname=req.params.HC.split("-").join(' ');
+  var type=req.params.type.split("-").join(' ');
+  MongoClient.connect(dburl,function(err,db){
+    var dbo=db.db("mydb");
+    dbo.collection("HealthCenters").findOne({name:HCname},function(err,HC){
+      if(req.cookies.usertoken==undefined){
+        categories().then(basiccategories=>{
+          res.render("healthcenters-type.ejs",{Objects:HC.categories,user:"",categories:basiccategories,type:type});
+          res.end();
+          db.close();
+        })
+      }
+      else{
+        dbo.collection("Users").findOne({token:req.cookies.usertoken},function(err,user){
+          if(user==null){
+            categories().then(basiccategories=>{
+              res.render("healthcenters-type.ejs",{Objects:HC.categories,user:"",categories:basiccategories,type:type});
+              res.end();
+              db.close();
+            })
+          }
+          else{
+            categories().then(basiccategories=>{
+              res.render("healthcenters-type.ejs",{Objects:HCs,user:user,categories:basiccategories,type:type});
+              res.end();
+              db.close();
+            })
+          }
+        })
+      }
+    })
+  })
+})
+
 
 router.get("/category/:Category",function(req,res){
   req.session.prevurl=req.session.currurl;
