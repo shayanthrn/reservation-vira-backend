@@ -1906,9 +1906,27 @@ router.get("/HealthCenters",function(req,res){
       console.log(types);
       if(req.cookies.usertoken==undefined){
         categories().then(basiccategories=>{
-          res.render("index.ejs",{Objects:types,type:"HC",category:"test",user:"",categories:basiccategories});
+          res.render("healthcenters.ejs",{Objects:types,user:"",categories:basiccategories});
           res.end();
           db.close();
+        })
+      }
+      else{
+        dbo.collection("Users").findOne({token:req.cookies.usertoken},function(err,user){
+          if(user==null){
+            categories().then(basiccategories=>{
+              res.render("healthcenters.ejs",{Objects:types,user:"",categories:basiccategories});
+              res.end();
+              db.close();
+            })
+          }
+          else{
+            categories().then(basiccategories=>{
+              res.render("healthcenters.ejs",{Objects:types,user:user,categories:basiccategories});
+              res.end();
+              db.close();
+            })
+          }
         })
       }
     })

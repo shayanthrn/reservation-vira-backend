@@ -43,7 +43,7 @@
                         <button type="submit"><img src="assets/img/search.png" alt=""></button>
                     </form>
                     <ul>
-                        <li><a href="/signup?from=/"><i class="now-ui-icons users_single-02"></i></a></li>
+                        <li><a href="/signup?from=/healthcenters"><i class="now-ui-icons users_single-02"></i></a></li>
                     </ul>
                 </div>
             </div>
@@ -112,7 +112,7 @@
                             </a>
                             <ul class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink1">
                                 <div class="dropdown-item">
-                                    <a href="/signup?from=/" class="btn btn-info">ورود به دکتر تجویز</a>
+                                    <a href="/signup?from=/healthcenters" class="btn btn-info">ورود به دکتر تجویز</a>
                                 </div>
                             </ul>
                         </div>
@@ -173,37 +173,16 @@
                     <div class="col-12 col-sm-12 col-md-12 col-lg-12 order-2">
                         <div class="breadcrumb-section default">
                             <ul class="breadcrumb-list">
-                                <% if(type=="category") { %>
                                 <li>
                                     <a href="#">
-                                        <span>نوبت دهی</span>
+                                        <span>بانک سلامت</span>
                                     </a>
                                 </li>
-                                <% } else {  %>
                                 <li>
                                     <a href="#">
-                                        <span>نوبت دهی</span>
+                                        <span>دسته بندی ها</span>
                                     </a>
                                 </li>
-                                <li><span><%= category.split('-').join(' ') %></span></li>
-                                <li><span>دکتر ها</span></li>  
-
-
-                                <div>
-                                    <select onchange="javascript:handleSelect(this)">
-                                        <option selected>فیلتر بر اساس شهر</option>
-                                        <option value="all">همه</option>
-                                        <option value="ایلام">ایلام</option>
-                                        <option value="کرمانشاه">کرمانشاه</option>
-                                    </select>
-                                    <script type="text/javascript">
-                                        function handleSelect(elm)
-                                        {
-                                        window.location = window.location.href.split('?')[0] +"?city="+elm.value;
-                                        }
-                                    </script>
-                                </div>
-                                <% } %> 
                             </ul>
                         </div>
                         <div class="listing default">
@@ -213,8 +192,7 @@
                                         <ul class="row listing-items">
                                             <% for(let i =0 ;i < Objects.length ; i++) { %>
                                             <li>
-                                                <% if(category=="") { %>
-                                                <a href="<%= "category"+  category.split(' ').join('-') + "/" + Objects[i].name.split(' ').join('-') +"?city=all" %>">
+                                                <a href="">
                                                     <div style="border-width: 2px;
                                                     font-weight: 400;
                                                     font-size: 0.8571em;
@@ -235,29 +213,6 @@
                                                         </p> 
                                                     </div>
                                                 </a>
-                                                <% } else {  %>
-                                                <a href="<%= "category/"+ category.split(' ').join('-') + "/" + Objects[i].name.split(' ').join('-') %>">
-                                                    <div style="border-width: 2px;
-                                                    font-weight: 400;
-                                                    font-size: 0.8571em;
-                                                    line-height: 1.35em;
-                                                    margin: 5px 1px;
-                                                    border: none;
-                                                    border-radius: 0.1875rem;
-                                                    padding: 11px 22px;
-                                                    cursor: pointer;
-                                                    background-color:#FAFAFA;
-                                                    max-width: 172px;
-                                                    color: #FFFFFF;" style="border-radius: 20px;">
-                                                        <div style="height:auto; width: auto;">
-                                                            <img src="<%= Objects[i].image %>" style="background: transparent; min-height: 128px;min-width: 128px; max-width: 128px; max-height: 128px;" onerror="this.src='assets/img/altimage.png'" alt="not found">
-                                                        </div>
-                                                        <p class="card-text text-slate font-weight-bold text-14 mt-4" style="color: #1e3e72;">
-                                                            <%= Objects[i].name %> 
-                                                        </p>
-                                                    </div>
-                                                </a>
-                                                <% } %>
                                             </li>
                                             <% } %>
                                         </ul>
