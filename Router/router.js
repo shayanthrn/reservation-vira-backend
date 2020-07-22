@@ -1903,7 +1903,6 @@ router.get("/HealthCenters",function(req,res){
     var dbo=db.db("mydb");
     dbo.collection("HCtypes").find({},async function(err,result){
       var types= await result.toArray();
-      console.log(types);
       if(req.cookies.usertoken==undefined){
         categories().then(basiccategories=>{
           res.render("healthcenters.ejs",{Objects:types,user:"",categories:basiccategories});

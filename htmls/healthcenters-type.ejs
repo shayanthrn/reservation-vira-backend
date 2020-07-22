@@ -43,7 +43,7 @@
                         <button type="submit"><img src="assets/img/search.png" alt=""></button>
                     </form>
                     <ul>
-                        <li><a href="<%= "/signup?from=/healthcenters" + type.split(' ').join('-') %>"><i class="now-ui-icons users_single-02"></i></a></li>
+                        <li><a href="<%= "/signup?from=/healthcenters/" + type.split(' ').join('-') %>"><i class="now-ui-icons users_single-02"></i></a></li>
                     </ul>
                 </div>
             </div>
@@ -115,7 +115,7 @@
                             </a>
                             <ul class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink1">
                                 <div class="dropdown-item">
-                                    <a href="<%= "/signup?from=/healthcenters" + type.split(' ').join('-') %>" class="btn btn-info">ورود به دکتر تجویز</a>
+                                    <a href="<%= "/signup?from=/healthcenters/" + type.split(' ').join('-') %>" class="btn btn-info">ورود به دکتر تجویز</a>
                                 </div>
                             </ul>
                         </div>
@@ -189,6 +189,11 @@
                                         <span>دسته بندی ها</span>
                                     </a>
                                 </li>
+                                <li>
+                                    <a href="#">
+                                        <span><%= type %></span>
+                                    </a>
+                                </li>
                             </ul>
                         </div>
                         <div class="listing default">
@@ -198,7 +203,7 @@
                                         <ul class="row listing-items">
                                             <% for(let i =0 ;i < Objects.length ; i++) { %>
                                             <li>
-                                                <a href="<%= "/healthcenters/"+ Objects[i].name.split(' ').join('-') %>">
+                                                <a href="<%= "/healthcenters/"+ type.split(' ').join('-') + "/" + Object[i].name.split(' ').join('-') %>">
                                                     <div style="border-width: 2px;
                                                     font-weight: 400;
                                                     font-size: 0.8571em;
