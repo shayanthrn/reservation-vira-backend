@@ -1943,7 +1943,7 @@ router.get("/healthcenters/:type",function(req,res){
       if(req.cookies.usertoken==undefined){
         categories().then(basiccategories=>{
           res.render("healthcenters-type.ejs",{Objects:HCs,user:"",categories:basiccategories,type:type});
-          //res.end();
+          res.end();
           db.close();
         })
       }
