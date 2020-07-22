@@ -1978,30 +1978,60 @@ router.get("/healthcenters/:type/:HC",function(req,res){
   MongoClient.connect(dburl,function(err,db){
     var dbo=db.db("mydb");
     dbo.collection("HealthCenters").findOne({name:HCname},function(err,HC){
-      if(req.cookies.usertoken==undefined){
-        categories().then(basiccategories=>{
-          res.render("healthcenters-type.ejs",{Objects:HC.categories,user:"",categories:basiccategories,type:type});
-          res.end();
-          db.close();
-        })
+      if(HC.isReserveable!= true){
+        if(req.cookies.usertoken==undefined){
+          categories().then(basiccategories=>{
+            res.render("hc-info.ejs",{user:"",categories:basiccategories,HC:HC});
+            res.end();
+            db.close();
+          })
+        }
+        else{
+          dbo.collection("Users").findOne({token:req.cookies.usertoken},function(err,user){
+            if(user==null){
+              categories().then(basiccategories=>{
+                res.render("hc-info.ejs",{user:user,categories:basiccategories,HC:HC});
+                res.end();
+                db.close();
+              })
+            }
+            else{
+              categories().then(basiccategories=>{
+                res.render("hc-info.ejs",{user:user,categories:basiccategories,HC:HC});
+                res.end();
+                db.close();
+              })
+            }
+          })
+        }
+        
       }
       else{
-        dbo.collection("Users").findOne({token:req.cookies.usertoken},function(err,user){
-          if(user==null){
-            categories().then(basiccategories=>{
-              res.render("healthcenters-type.ejs",{Objects:HC.categories,user:"",categories:basiccategories,type:type});
-              res.end();
-              db.close();
-            })
-          }
-          else{
-            categories().then(basiccategories=>{
-              res.render("healthcenters-type.ejs",{Objects:HCs,user:user,categories:basiccategories,type:type});
-              res.end();
-              db.close();
-            })
-          }
-        })
+        if(req.cookies.usertoken==undefined){
+          categories().then(basiccategories=>{
+            res.render("hc-cats.ejs",{Objects:HC.categories,user:"",categories:basiccategories,type:type});
+            res.end();
+            db.close();
+          })
+        }
+        else{
+          dbo.collection("Users").findOne({token:req.cookies.usertoken},function(err,user){
+            if(user==null){
+              categories().then(basiccategories=>{
+                res.render("hc-cats.ejs",{Objects:HC.categories,user:"",categories:basiccategories,type:type});
+                res.end();
+                db.close();
+              })
+            }
+            else{
+              categories().then(basiccategories=>{
+                res.render("hc-cats.ejs",{Objects:HCs,user:user,categories:basiccategories,type:type});
+                res.end();
+                db.close();
+              })
+            }
+          })
+        }
       }
     })
   })
