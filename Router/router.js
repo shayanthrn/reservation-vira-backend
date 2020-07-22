@@ -2004,12 +2004,11 @@ router.get("/healthcenters/:type/:HC",function(req,res){
             }
           })
         }
-        
       }
       else{
         if(req.cookies.usertoken==undefined){
           categories().then(basiccategories=>{
-            res.render("hc-cats.ejs",{Objects:HC.categories,user:"",categories:basiccategories,type:type});
+            res.render("hc-cats.ejs",{Objects:HC.categories,user:"",categories:basiccategories,type:type,HC:HC});
             res.end();
             db.close();
           })
@@ -2018,14 +2017,14 @@ router.get("/healthcenters/:type/:HC",function(req,res){
           dbo.collection("Users").findOne({token:req.cookies.usertoken},function(err,user){
             if(user==null){
               categories().then(basiccategories=>{
-                res.render("hc-cats.ejs",{Objects:HC.categories,user:"",categories:basiccategories,type:type});
+                res.render("hc-cats.ejs",{Objects:HC.categories,user:"",categories:basiccategories,type:type,HC:HC});
                 res.end();
                 db.close();
               })
             }
             else{
               categories().then(basiccategories=>{
-                res.render("hc-cats.ejs",{Objects:HCs,user:user,categories:basiccategories,type:type});
+                res.render("hc-cats.ejs",{Objects:HCs,user:user,categories:basiccategories,type:type,HC:HC});
                 res.end();
                 db.close();
               })
