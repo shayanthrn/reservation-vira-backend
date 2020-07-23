@@ -83,7 +83,7 @@
                         </div>
                         <section class="page-content default">
                             <div class="checkout-shipment">
-                               <form action="paymenttest?from=/reserve/<%=HC.name%>" method="POST">
+                               <form action="<%= "paymenttest?from=reservation/"+ HC.type + "/"+ HC.name +"/"+ cat.name %>" method="POST">
                                 <ul>
                                     <li><span> نام مرکز :</span><span><%= HC.name %></span></li>
                                     <li><span>  تخصص :</span><span><%= cat.name %></span></li>
