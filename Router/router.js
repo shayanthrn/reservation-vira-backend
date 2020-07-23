@@ -2037,6 +2037,13 @@ router.get("/healthcenters/:type/:HC",function(req,res){
 })
 
 
+router.get("/reservation/info/:type/:HCname/:category",function(req,res){
+  req.session.prevurl=req.session.currurl;
+  req.session.currurl=req.url;
+  HCname=req.params.HCname.split('-').join(' ');
+})
+
+
 router.get("/category/:Category",function(req,res){
   req.session.prevurl=req.session.currurl;
   req.session.currurl=req.url;
