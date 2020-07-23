@@ -2114,6 +2114,10 @@ router.get("/reservation/:type/:HCname/:category",function(req,res){
   })
 })
 
+router.post("/paymenttest",function(req,res){
+  res.write(req.body);
+})
+
 
 router.get("/category/:Category",function(req,res){
   req.session.prevurl=req.session.currurl;
