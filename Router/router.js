@@ -2192,7 +2192,7 @@ router.get("/paymenthandlerHC",function(req,res){
   var query= url.parse(req.url,true).query;
   MongoClient.connect(dburl,function(err,db){
     var dbo=db.db("mydb");
-    dbo.collection("TempReserves").findOne({authority:query.Authority},function(err,reserve){
+    dbo.collection("TempReservesHC").findOne({authority:query.Authority},function(err,reserve){
       if(reserve==null){
         db.close();
         res.redirect("/noaccess");
@@ -2201,7 +2201,7 @@ router.get("/paymenthandlerHC",function(req,res){
         if(query.Status=="NOK"){
           strtime=reserve.time.start.hour+":"+reserve.time.start.min;
           dbo.collection("HealthCenters").findOne({_id:reserve.HC},function(err,HC){
-            dbo.collection("TempReserves").deleteOne({authority:query.Authority},function(err,result){
+            dbo.collection("TempReservesHC").deleteOne({authority:query.Authority},function(err,result){
               res.render("paymentfail.ejs",{doctor:HC,time:strtime});
               db.close();
               res.end();
@@ -2217,7 +2217,7 @@ router.get("/paymenthandlerHC",function(req,res){
             var reservation=reserve;
             reservation.refid=response.RefID;
             dbo.collection("Reservations").insertOne(reservation,function(err,result234){
-              dbo.collection("TempReserves").deleteOne({authority:query.Authority},function(err,aa){
+              dbo.collection("TempReservesHC").deleteOne({authority:query.Authority},function(err,aa){
                 dbo.collection("Doctors").updateOne({_id:reservation.doctor},{$addToSet:{reservations:reservation,unavailabletimes:reservation.time}},function(err,ss){
                   dbo.collection("Users").updateOne({_id:reservation.user},{$addToSet:{reserves:reservation}},function(err,ad){
                     strtime=reservation.time.start.hour+":"+reservation.time.start.min;
@@ -2231,7 +2231,7 @@ router.get("/paymenthandlerHC",function(req,res){
           } else {
               strtime=reserve.time.start.hour+":"+reserve.time.start.min;
               dbo.collection("Doctors").findOne({_id:reserve.doctor},function(err,doctor){
-              dbo.collection("TempReserves").deleteOne({authority:query.Authority},function(err,result){
+              dbo.collection("TempReservesHC").deleteOne({authority:query.Authority},function(err,result){
               res.render("paymentfail.ejs",{doctor:doctor,time:strtime});
               res.end();
             })
