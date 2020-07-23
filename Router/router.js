@@ -2145,7 +2145,7 @@ router.post("/paymenttest",function(req,res){
               }
               else{
                 var catobj=null;
-                result.categories.forEach(function(doc){
+                HC.categories.forEach(function(doc){
                 if(doc.name==req.body.cat){
                   catobj=doc;
                 }
