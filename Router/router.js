@@ -2025,7 +2025,7 @@ router.get("/healthcenters/:type/:HC",function(req,res){
             }
             else{
               categories().then(basiccategories=>{
-                res.render("hc-cats.ejs",{Objects:HCs,user:user,categories:basiccategories,type:type,HC:HC});
+                res.render("hc-cats.ejs",{Objects:HC.categories,user:user,categories:basiccategories,type:type,HC:HC});
                 res.end();
                 db.close();
               })
