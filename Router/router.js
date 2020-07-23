@@ -2040,7 +2040,39 @@ router.get("/healthcenters/:type/:HC",function(req,res){
 router.get("/reservation/info/:type/:HCname/:category",function(req,res){
   req.session.prevurl=req.session.currurl;
   req.session.currurl=req.url;
-  HCname=req.params.HCname.split('-').join(' ');
+  var HCname=req.params.HCname.split('-').join(' ');
+  var type=req.params.type.split('-').join(' ');
+  var category=req.params.category.split('-').join(' ');
+  MongoClient.connect(dburl,function(err,db){
+    var dbo=db.db("mydb");
+    dbo.collection("HealthCenters").findOne({type:type,name:HCname},function(err,HC){
+      if(req.cookies.usertoken==undefined){
+        categories().then(basiccategories=>{
+          res.render("hc-res-info.ejs",{HC:HC,category:category,categories:basiccategories,user:""});
+          res.end();
+          db.close();
+        })
+      }
+      else{
+        dbo.collection("Users").findOne({token:req.cookies.usertoken},function(err,user){
+          if(user==null){
+            categories().then(basiccategories=>{
+              res.render("hc-res-info.ejs",{HC:HC,category:category,categories:basiccategories,user:""});
+              res.end();
+              db.close();
+            })
+          }
+          else{
+            categories().then(basiccategories=>{
+              res.render("hc-res-info.ejs",{HC:HC,category:category,categories:basiccategories,user:user});
+              res.end();
+              db.close();
+            })
+          }
+        })
+      }
+    })
+  })
 })
 
 
