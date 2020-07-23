@@ -2107,7 +2107,7 @@ router.get("/reservation/:type/:HCname/:category",function(req,res){
         days.push(currentday);
         freetimes.push(getDoctimeslots(catobj,new myDate(currentday.toArray()[2],currentday.toArray()[1],currentday.toArray()[0])));
       }
-      res.render("reserve.ejs",{doctor:result,days:createDayboxobj(days),freetimes:freetimes});
+      res.render("reservehc.ejs",{HC:result,doctor:catobj,days:createDayboxobj(days),freetimes:freetimes});
       res.end();
     }
   })
