@@ -2138,10 +2138,9 @@ router.post("/paymenttest",function(req,res){
         }
         else{
           if(checkinterval(1)){
-            dbo.collection("HealthCenters").findOne({name:req.body.Hcname,type:req.body.type},function(err,HC){
+            dbo.collection("HealthCenters").findOne({name:req.body.HCname,type:req.body.type},function(err,HC){
               if(HC==null){
                 db.close();
-                console.log(req.body.Hcname);
                 res.redirect("/noaccess");
               }
               else{
