@@ -2141,6 +2141,7 @@ router.post("/paymenttest",function(req,res){
             dbo.collection("HealthCenters").findOne({name:req.body.Hcname,type:req.body.type},function(err,HC){
               if(HC==null){
                 db.close();
+                console.log("here");
                 res.redirect("/noaccess");
               }
               else{
