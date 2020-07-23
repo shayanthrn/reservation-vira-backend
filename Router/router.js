@@ -2127,62 +2127,64 @@ router.post("/paymenttest",function(req,res){
     res.redirect("/"+query.from);
     res.end();
   }
-  MongoClient.connect(dburl,function(err,db){
-    var dbo=db.db("mydb");
-    dbo.collection("Users").findOne({token:req.cookies.usertoken},function(err,user){
-      if(user==null){
-        res.redirect("/signup"+"?from="+query.from);
-        db.close();
-        res.end();
-      }
-      else{
-        if(checkinterval(1)){
-          dbo.collection("HealthCenters").findOne({name:req.body.Hcname,type:req.body.type},function(err,HC){
-            if(HC==null){
-              db.close();
-              res.redirect("/noaccess");
-            }
-            else{
-              var catobj=null;
-              result.categories.forEach(function(doc){
-              if(doc.name==req.body.cat){
-                catobj=doc;
-              }
-              })
-              if(catobj==null){
-                res.redirect("noaccess")
-              }
-              reservedata=req.body.choice.split(":");
-              date=new myDate(Number(reservedata[4]),Number(reservedata[3]),Number(reservedata[2]));
-              start={hour:Number(reservedata[0]),min:Number(reservedata[1])};
-              temp=(start.hour*60)+start.min+catobj.visitduration;
-              end={hour:Math.floor(temp/60),min:temp%60}
-              unavb={start:start,end:end,date:date,dayofweek:new persianDate([Number(reservedata[2]),Number(reservedata[3]),Number(reservedata[4])]).format("dddd")};
-              zarinpal.PaymentRequest({
-                Amount: req.body.cost , // In Tomans
-                CallbackURL: 'http://reservation.drtajviz.com/paymenthandlerHC',
-                Description: 'Dr tajviz payment',
-                Email: 'shayanthrn@gmail.com',
-                Mobile: '09128993687'
-              }).then(response => {
-                if (response.status === 100) {
-                  reservation = new ReservationHC(user._id,HC._id,req.body.cat,unavb,response.authority,req.body.cost);
-                  dbo.collection("TempReservesHC").insertOne(reservation,function(err,reserve){
-                    res.redirect(response.url)
-                  })
-                }
-              }).catch(err => {
-                res.write("<html><body><p>there is a problem on server please try again later</p><a href='/' >go back to main page</a></body></html>");
-                console.error(err);
-                db.close();
-                res.end();
-              });
-            }
-          })
+  else{
+    MongoClient.connect(dburl,function(err,db){
+      var dbo=db.db("mydb");
+      dbo.collection("Users").findOne({token:req.cookies.usertoken},function(err,user){
+        if(user==null){
+          res.redirect("/signup"+"?from="+query.from);
+          db.close();
+          res.end();
         }
-      }
+        else{
+          if(checkinterval(1)){
+            dbo.collection("HealthCenters").findOne({name:req.body.Hcname,type:req.body.type},function(err,HC){
+              if(HC==null){
+                db.close();
+                res.redirect("/noaccess");
+              }
+              else{
+                var catobj=null;
+                result.categories.forEach(function(doc){
+                if(doc.name==req.body.cat){
+                  catobj=doc;
+                }
+                })
+                if(catobj==null){
+                  res.redirect("noaccess")
+                }
+                reservedata=req.body.choice.split(":");
+                date=new myDate(Number(reservedata[4]),Number(reservedata[3]),Number(reservedata[2]));
+                start={hour:Number(reservedata[0]),min:Number(reservedata[1])};
+                temp=(start.hour*60)+start.min+catobj.visitduration;
+                end={hour:Math.floor(temp/60),min:temp%60}
+                unavb={start:start,end:end,date:date,dayofweek:new persianDate([Number(reservedata[2]),Number(reservedata[3]),Number(reservedata[4])]).format("dddd")};
+                zarinpal.PaymentRequest({
+                  Amount: req.body.cost , // In Tomans
+                  CallbackURL: 'http://reservation.drtajviz.com/paymenthandlerHC',
+                  Description: 'Dr tajviz payment',
+                  Email: 'shayanthrn@gmail.com',
+                  Mobile: '09128993687'
+                }).then(response => {
+                  if (response.status === 100) {
+                    reservation = new ReservationHC(user._id,HC._id,req.body.cat,unavb,response.authority,req.body.cost);
+                    dbo.collection("TempReservesHC").insertOne(reservation,function(err,reserve){
+                      res.redirect(response.url)
+                    })
+                  }
+                }).catch(err => {
+                  res.write("<html><body><p>there is a problem on server please try again later</p><a href='/' >go back to main page</a></body></html>");
+                  console.error(err);
+                  db.close();
+                  res.end();
+                });
+              }
+            })
+          }
+        }
+      })
     })
-  })
+  }
   }
 })
 
@@ -2349,53 +2351,55 @@ router.post("/payment",function(req,res){
     res.redirect("/");
     res.end();
   }
-  MongoClient.connect(dburl,function(err,db){
-    var dbo=db.db("mydb");
-    dbo.collection("Users").findOne({token:req.cookies.usertoken},function(err,user){
-      if(user==null){
-        res.redirect("/signup"+"?from="+query.from);
-        db.close();
-        res.end();
-      }
-      else{
-        if(checkinterval(1)){
-          dbo.collection("Doctors").findOne({name:req.body.doctor},function(err,doctor){
-            if(doctor==null){
-              db.close();
-              res.redirect("/noaccess");
-            }
-            else{
-              reservedata=req.body.choice.split(":");
-              date=new myDate(Number(reservedata[4]),Number(reservedata[3]),Number(reservedata[2]));
-              start={hour:Number(reservedata[0]),min:Number(reservedata[1])};
-              temp=(start.hour*60)+start.min+doctor.visitduration;
-              end={hour:Math.floor(temp/60),min:temp%60}
-              unavb={start:start,end:end,date:date,dayofweek:new persianDate([Number(reservedata[2]),Number(reservedata[3]),Number(reservedata[4])]).format("dddd")};
-              zarinpal.PaymentRequest({
-                Amount: req.body.cost , // In Tomans
-                CallbackURL: 'http://reservation.drtajviz.com/paymenthandler',
-                Description: 'Dr tajviz payment',
-                Email: 'shayanthrn@gmail.com',
-                Mobile: '09128993687'
-              }).then(response => {
-                if (response.status === 100) {
-                  reservation = new Reservation(user._id,doctor._id,unavb,response.authority,req.body.cost);
-                  dbo.collection("TempReserves").insertOne(reservation,function(err,reserve){
-                    res.redirect(response.url)
-                  })
-                }
-              }).catch(err => {
-                res.write("<html><body><p>there is a problem on server please try again later</p><a href='/' >go back to main page</a></body></html>");
-                console.error(err);
-                db.close();
-                res.end();
-              });
-            }
-          })
+  else{
+    MongoClient.connect(dburl,function(err,db){
+      var dbo=db.db("mydb");
+      dbo.collection("Users").findOne({token:req.cookies.usertoken},function(err,user){
+        if(user==null){
+          res.redirect("/signup"+"?from="+query.from);
+          db.close();
+          res.end();
         }
-      }
+        else{
+          if(checkinterval(1)){
+            dbo.collection("Doctors").findOne({name:req.body.doctor},function(err,doctor){
+              if(doctor==null){
+                db.close();
+                res.redirect("/noaccess");
+              }
+              else{
+                reservedata=req.body.choice.split(":");
+                date=new myDate(Number(reservedata[4]),Number(reservedata[3]),Number(reservedata[2]));
+                start={hour:Number(reservedata[0]),min:Number(reservedata[1])};
+                temp=(start.hour*60)+start.min+doctor.visitduration;
+                end={hour:Math.floor(temp/60),min:temp%60}
+                unavb={start:start,end:end,date:date,dayofweek:new persianDate([Number(reservedata[2]),Number(reservedata[3]),Number(reservedata[4])]).format("dddd")};
+                zarinpal.PaymentRequest({
+                  Amount: req.body.cost , // In Tomans
+                  CallbackURL: 'http://reservation.drtajviz.com/paymenthandler',
+                  Description: 'Dr tajviz payment',
+                  Email: 'shayanthrn@gmail.com',
+                  Mobile: '09128993687'
+                }).then(response => {
+                  if (response.status === 100) {
+                    reservation = new Reservation(user._id,doctor._id,unavb,response.authority,req.body.cost);
+                    dbo.collection("TempReserves").insertOne(reservation,function(err,reserve){
+                      res.redirect(response.url)
+                    })
+                  }
+                }).catch(err => {
+                  res.write("<html><body><p>there is a problem on server please try again later</p><a href='/' >go back to main page</a></body></html>");
+                  console.error(err);
+                  db.close();
+                  res.end();
+                });
+              }
+            })
+          }
+        }
+      })
     })
-  })
+  }
   }
 })
 
