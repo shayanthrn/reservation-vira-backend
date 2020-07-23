@@ -2115,7 +2115,7 @@ router.get("/reservation/:type/:HCname/:category",function(req,res){
   })
 })
 
-router.post("/paymenttest",function(req,res){
+router.post("/paymentHC",function(req,res){
   var query= url.parse(req.url,true).query;
   req.session.prevurl=req.session.currurl;
   req.session.currurl=req.url;
@@ -2218,14 +2218,23 @@ router.get("/paymenthandlerHC",function(req,res){
             reservation.refid=response.RefID;
             dbo.collection("Reservations").insertOne(reservation,function(err,result234){
               dbo.collection("TempReservesHC").deleteOne({authority:query.Authority},function(err,aa){
-                dbo.collection("Doctors").updateOne({_id:reservation.doctor},{$addToSet:{reservations:reservation,unavailabletimes:reservation.time}},function(err,ss){
                   dbo.collection("Users").updateOne({_id:reservation.user},{$addToSet:{reserves:reservation}},function(err,ad){
-                    strtime=reservation.time.start.hour+":"+reservation.time.start.min;
-                    res.render("paymentaccept.ejs",{doctor:result,time:strtime,resid:reservation.refid});
-                    //sendSMSforres(reservation);
-                    res.end();
+                    dbo.collection("HealthCenters").findOne({_id:reservation.HC},function(err,HC){
+                      var catobj=null;
+                      HC.categories.forEach(function(doc){
+                      if(doc.name==req.body.cat){
+                        doc.reservations.push(reservation);
+                        doc.unavailabletimes.push(reservation.time);
+                      }
+                      })
+                      dbo.collection("HealthCenters").updateOne({_id:reservation.user},{$set:{categories:HC.categories}},function(err,sdf){
+                        strtime=reservation.time.start.hour+":"+reservation.time.start.min;
+                        res.render("paymentaccept.ejs",{doctor:HC,time:strtime,resid:reservation.refid});
+                        //sendSMSforres(reservation);
+                        res.end();
+                      })
+                    })
                   })
-                })
               })
             })
           } else {
