@@ -2115,7 +2115,7 @@ router.get("/reservation/:type/:HCname/:category",function(req,res){
 })
 
 router.post("/paymenttest",function(req,res){
-  res.write(req.body);
+  console.log(req.body);
 })
 
 
