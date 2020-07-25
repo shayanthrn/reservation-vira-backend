@@ -1,0 +1,1 @@
+document.getElementById("base").setAttribute("href","http://localhost");
