@@ -1361,9 +1361,9 @@ router.get("/HCpanel/patients",function(req,res){
               result2.forEach(function(doc){
                 patients.push(doc);
               },function(){
-                res.render('HCpanel/reserveable/patients.ejs',{patients:patients});
+                res.render('HCPanel/reserveable/patients.ejs',{patients:patients});
                 db.close();
-                //res.end();
+                res.end();
               })
             })
           }
