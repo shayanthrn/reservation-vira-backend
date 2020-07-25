@@ -705,6 +705,8 @@ router.post("/changedocinfo",function(req,res){
         }
         else{
           var cats=[]
+          console.log(req.body.categories);
+          console.log(req.body);
           if(typeof req.body.categories=="string"){
             cats.push(req.body.categories);
           }
