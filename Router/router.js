@@ -64,45 +64,6 @@ function categories(){
 
 //banksalamat
 
-
-router.post("/api/addhealthcenter",function(req,res){
-  var query=url.parse(req.url,true).query;
-   if(query.key!="pouyarahmati"){
-     res.json({data:"noaccess"});
-     res.end();
-   }
-   else{
-      MongoClient.connect(dburl,function(err,db){
-        var dbo=db.db("mydb");
-        dbo.collection("HealthCenters").findOne({name:req.body.name,type:req.body.type},function(err,hc){
-          if(hc!=null){
-            res.json({data:"there is a healthcenter with this name"});
-            res.end();
-          }
-          else{
-            dbo.collection("HealthCenters").findOne({username:req.body.username},function(err,hc2){
-              if(hc2!=null){
-                res.json({data:"there is a healthcenter with this username"});
-                res.end();
-              }
-              else{
-                var newHC=new HealthCenter(req.body.type,req.body.name,req.body.isReserveable=="true",req.body.codemeli,req.body.codeofHC,req.body.city,req.body.phonenumber,req.body.address,req.body.directphonenumber,req.body.background,null,req.body.appknowledge,req.body.username,req.body.password,req.body.image);
-                if(req.body.type=="pharmacy"){
-                  newHC.medicalnumber=req.body.medicalnumber;
-                }
-                dbo.collection("HealthCenters").insertOne(newHC,function(err,result){
-                  res.json({data:result});
-                  db.close();
-                  res.end();
-                  })
-              }
-            })
-          }
-        })
-      })
-   }
-})
-
 router.get("/api/getAlltypesofHC",function(req,res){
   var query=url.parse(req.url,true).query;
    if(query.key!="pouyarahmati"){
@@ -1025,6 +986,7 @@ router.post("/addDoctor",function(req,res){
 })
 
 router.post('/addHC',function(req,res){
+  var query= url.parse(req.url,true).query;
   if(req.cookies.admintoken==undefined){
     res.redirect("noaccess");
   }
@@ -1036,53 +998,59 @@ router.post('/addHC',function(req,res){
           res.redirect("noaccess");
         }
         else{
-          var query=url.parse(req.url,true).query;
-          bodypost=req.body;
-          bodypost.type=query.type;
-          if(bodypost.type!="pharmacy"){
-            bodypost.isReserveable="true";
-          }
-          bodypost.image="/"+query.type+"photos/"+req.body.name.split(' ').join('-')+".png";
-          if(req.files!=null){
-            mv(req.files.image.tempFilePath,"public"+"/"+query.type+"photos/"+req.body.name.split(' ').join('-')+".png",function(err){
-              console.log("public"+"/"+query.type+"photos/"+req.body.name.split(' ').join('-')+".png")
-            })
-          }
-          
-          var options = {
-            url: 'http://reservation.drtajviz.com/api/addhealthcenter?key=pouyarahmati',
-            json: true,
-            body: bodypost,
-          };
-        
-          request.post(options, (err, resp, body) => {
-            if(query.type!="pharmacy"){
-              var cats=[];
-              if(typeof req.body.categories=="string"){
-                cats.push(req.body.categories);
+          MongoClient.connect(dburl,function(err,db){
+            var dbo=db.db("mydb");
+            dbo.collection("HealthCenters").findOne({name:req.body.name},function(err,hc){
+              if(hc!=null){
+                res.json({data:"there is a healthcenter with this name"});
+                res.end();
               }
               else{
-                cats=req.body.categories;
-              }
-              cats.forEach(function(doc){
-                options = {
-                  url: 'http://reservation.drtajviz.com/api/addCategoryToHC?key=pouyarahmati',
-                  json: true,
-                  body: {
-                    name:req.body.name,
-                    type:query.type,
-                    catname:doc,
-                    catduration:"30",
-                    catcost:"3000"
-                  },
-                };
-                request.post(options,(err, resp2, body2) =>{
-                  console.log(body);
+                dbo.collection("HealthCenters").findOne({username:req.body.username},function(err,hc2){
+                  if(hc2!=null){
+                    res.json({data:"there is a healthcenter with this username"});
+                    res.end();
+                  }
+                  else{
+                    dbo.collection("HCtypes").findOne({name:query.type},function(err,type){
+                      var img= "/"+query.type +"photos/"+req.body.name+".png";
+                      var newHC=new HealthCenter(query.type,type.systype,req.body.name,type.systype=="B" || type.systype=="A",req.body.codemeli,req.body.codeofHC,req.body.city,req.body.phonenumber,req.body.address,req.body.directphonenumber,req.body.background,req.body.medicalnumber,req.body.appknowledge,req.body.username,req.body.password,img);
+                      try {
+                        mv(req.files.image.tempFilePath,"public"+img,{mkdirp: true},function(err){
+                          console.log("image added");
+                        });
+                      } catch (error) {
+                        console.log("no image");
+                      }
+                      dbo.collection("HealthCenters").insertOne(newHC,function(err,result){
+                        if(type.systype=="A"){
+                          var cats=[]
+                          if(typeof req.body.categories=="string"){
+                            cats.push(req.body.categories);
+                          }
+                          else{
+                            if(req.body.categories==undefined || req.body.categories==null ){
+                              cats=[];
+                            }
+                            else{
+                              cats=req.body.categories;
+                             }
+                           }
+                          cats.forEach(function(doc){
+                            var newcat = {name:doc,unavailabletimes:[],reservations:[],visitduration:30,visitcost:3000};
+                            dbo.collection("HealthCenters").updateOne({name:req.body.name},{$addToSet:{categories:newcat}},function(err,result){
+                              console.log("cats added");
+                            })
+                          })
+                        }
+                        res.redirect("/HCsignup")
+                      })
+                    })
+                  }
                 })
-              })
-            }
-            res.redirect("/HCsignup");
-          });
+              }
+            })
+          })
         }
       })
     })
@@ -1858,98 +1826,44 @@ router.get("/removecategory",function(req,res){
 })
 
 
-//------------------------adminpanel---------------------------//
-//=======================HC signup========================//
-
 router.get("/HCsignup",function(req,res){
+    var query = url.parse(req.url,true).query;
     if(req.cookies.admintoken==undefined){
       res.redirect("noaccess");
     }
     else{
-      MongoClient.connect(dburl,function(err,db){
-        var dbo=db.db("mydb");
-        dbo.collection("Admins").findOne({token:req.cookies.admintoken},function(err,admin){
-          if(admin==null){
-            res.redirect("noaccess");
-          }
-          else{
-            res.render("HCsignup.ejs");
-            res.end();
-            db.close()
-          }
+      if(query.ejs!=undefined){
+        try {
+          res.render(query.ejs);
+          res.end();
+        } catch (error) {
+          res.redirect("/HCsignup")
+        }
+      }
+      else{
+        MongoClient.connect(dburl,function(err,db){
+          var dbo=db.db("mydb");
+          dbo.collection("Admins").findOne({token:req.cookies.admintoken},function(err,admin){
+            if(admin==null){
+              res.redirect("noaccess");
+            }
+            else{
+              dbo.collection("HCtypes").find({},async function(err,result){
+                types=await result.toArray();
+                res.render("HCsignup.ejs",{types:types});
+                res.end();
+                db.close();
+              })
+            }
+          })
         })
-      })
+      }
     }
 })
 
-router.get("/pharmacysignup",function(req,res){
-  if(req.cookies.admintoken==undefined){
-    res.redirect("noaccess");
-  }
-  else{
-    MongoClient.connect(dburl,function(err,db){
-      var dbo=db.db("mydb");
-      dbo.collection("Admins").findOne({token:req.cookies.admintoken},function(err,admin){
-        if(admin==null){
-          res.redirect("noaccess");
-        }
-        else{
-          res.render("pharmacysignup.ejs");
-          res.end();
-          db.close()
-        }
-      })
-    })
-  }
-})
-
-router.get("/clinicsignup",function(req,res){
-  if(req.cookies.admintoken==undefined){
-    res.redirect("noaccess");
-  }
-  else{
-    MongoClient.connect(dburl,function(err,db){
-      var dbo=db.db("mydb");
-      dbo.collection("Admins").findOne({token:req.cookies.admintoken},function(err,admin){
-        if(admin==null){
-          res.redirect("noaccess");
-        }
-        else{
-          categories().then(basiccategories=>{
-            res.render("clinicsignup.ejs",{categories:basiccategories});
-            res.end();
-            db.close()
-          })
-        }
-      })
-    })
-  }
-})
-
-router.get("/labsignup",function(req,res){
-  if(req.cookies.admintoken==undefined){
-    res.redirect("noaccess");
-  }
-  else{
-    MongoClient.connect(dburl,function(err,db){
-      var dbo=db.db("mydb");
-      dbo.collection("Admins").findOne({token:req.cookies.admintoken},function(err,admin){
-        if(admin==null){
-          res.redirect("noaccess");
-        }
-        else{
-          res.render("labsignup.ejs");
-          res.end();
-          db.close()
-        }
-      })
-    })
-  }
- 
-})
-//======================= signup========================//
 
 
+//------------------------adminpanel---------------------------//
 
 router.get("/",function(req,res){
   req.session.prevurl=req.session.currurl;

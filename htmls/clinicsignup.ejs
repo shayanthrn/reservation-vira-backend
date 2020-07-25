@@ -45,7 +45,7 @@
             <h1 class="h2">عضویت کلینیک و بیمارستان</h1>
           </div>
 
-          <form class="" action="addHC?type=کلینیک&systype=A" enctype="multipart/form-data" method="POST">
+          <form class="" action="addHC?type=کلینیک" enctype="multipart/form-data" method="POST">
             <div class="row">
               <div class="col-sm-12 col-md-10">
                 <div class="row">
@@ -74,10 +74,15 @@
                     </div>
                     <div class="col-md-6 col-lg-6">
                       <div class="form-group mb-2 checkbox-groupp required">
-                        <% for(let i=0;i<categories.length;i++) { %>
-                        <input type="checkbox" id="<%= i %>" name="categories" value="<%=categories[i].name %>">
-                        <label for="<%= i %>"> <%=categories[i].name%></label><br>
-                        <% } %>
+                        <div id="myDIV" class="header">
+                          <h4 style="margin:5px">انتخاب تخصص</h4>
+                          <input oninput="checkdatalist()" list="mylist" id="myInput" placeholder="تخصص">
+                          <datalist id="mylist">
+                          </datalist>
+                          <button type="button" onclick="newElement()" id="addcat" class="addBtn btn btn-danger">اضافه</button>
+                          <ul id="myUL">
+                          </ul>
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -88,7 +93,7 @@
                   <div class="col-md-6 col-lg-6">
                     <div class="form-group mb-2">
                       <input type="text" class="form-control form-control-sm" name="codeofHC" id="codeofHC" placeholder="شماره ثبت" value="" required>
-                      <input type="text"  name="medicalnumber" id="medicalnumber" value=null style="visibility: hidden;">
+                      <input type="text"  name="medicalnumber" id="medicalnumber" value="" style="visibility: hidden;">
                     </div>
                   </div>
                 </div>
@@ -195,22 +200,10 @@
             <div class="row">
               <div class="col">
                 <div class="float-right">
-                  <button type="submit" onclick="return myfunction()" class="btn btn-success edit-button" style="margin: 24px;">
+                  <button type="submit" class="btn btn-success edit-button" style="margin: 24px;">
                     <i class="fa fa-plus"></i>
                     ثبت اطلاعات برای بررسی
                   </button>
-                  <script>
-                    function myfunction(){
-                      
-                      if($('div.checkbox-groupp.required :checkbox:checked').length == 0){
-                        alert("لطفا دسته بندی  را مشخص کنید")
-                        return false
-                      }
-                      else{
-                        return true
-                      }
-                     }
-                  </script>
                 </div>
               </div>
             </div>
@@ -222,5 +215,45 @@
   </div>
 
 </body>
+
+
+<script>
+  function newElement() {
+    var li = document.createElement("li");
+    var input = document.createElement("input");
+    var inputValue = document.getElementById("myInput").value;
+    var t = document.createTextNode(inputValue);
+    input.value=inputValue;
+    input.type="checkbox";
+    input.checked=true;
+    input.name="categories";
+    input.style.visibility="hidden";
+    li.className="checklist";
+    li.style.listStyle="none";
+    li.appendChild(t);
+    li.appendChild(input);
+    if (inputValue === '') {
+      alert("تخصص وارد شده معتبر نیست");
+    } else {
+      document.getElementById("myUL").appendChild(li);
+    }
+    document.getElementById("myInput").value = "";
+  
+    var span = document.createElement("SPAN");
+    var txt = document.createTextNode("\u00D7");
+    span.className = "close";
+    span.appendChild(txt);
+    li.appendChild(span);
+  
+    var close = document.getElementsByClassName("close");
+    for (i = 0; i < close.length; i++) {
+      close[i].onclick = function() {
+        var div = this.parentElement;
+        this.parentElement.remove();
+      }
+    }
+  }
+
+  </script>
 
 </html>
