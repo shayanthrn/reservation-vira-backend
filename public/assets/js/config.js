@@ -1,1 +1,1 @@
-document.getElementById("base").setAttribute("href","http://localhost");
+document.getElementById("base").setAttribute("href","http://reservation.drtajviz.com");
