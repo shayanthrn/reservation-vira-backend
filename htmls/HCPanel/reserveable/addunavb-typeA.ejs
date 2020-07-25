@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html dir="rtl" class="fa-events-icons-ready" lang="en"><head>
+  <meta charset="utf-8">
+  <base href="http://reservation.drtajviz.com/" >
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="">
+  <meta name="author" content="">
+  <title>تعیین زمانبندی - دکتر تجویز</title>
+  <link rel="icon" href="favicon.ico">
+
+
+  <title></title>
+
+  <link rel="stylesheet" href="https://cdn.rtlcss.com/bootstrap/v4.1.3/css/bootstrap.min.css" integrity="sha384-Jt6Tol1A2P9JBesGeCxNrxkmRFSjWCBW1Af7CSQSKsfMVQCqnUVWhZzG0puJMCK6" crossorigin="anonymous">
+  <link href="assets/panelassests/dashboard.rtl.css" rel="stylesheet">
+  <script src="https://use.fontawesome.com/6d68f18b97.js"></script><link href="https://use.fontawesome.com/6d68f18b97.css" media="all" rel="stylesheet">
+
+  <link rel="stylesheet" href="https://unpkg.com/persian-datepicker@latest/dist/css/persian-datepicker.min.css">
+</head>
+
+<body>
+
+  <nav class="navbar fixed-top navbar-expand-lg nav-dark">
+    <a class="navbar-brand mr-2" href="#">داشبورد برند</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarTogglerDemo" aria-controls="navbarTogglerDemo" aria-expanded="false" aria-label="Toggle navigation">
+      <i class="fa fa-bars menu-icon"></i>
+    </button>
+  </nav>
+
+
+  <div class="container-fluid">
+    <div class="row">
+      
+      <nav class="col-lg-3 col-xl-2 d-lg-block sidebar collapse" id="navbarTogglerDemo">
+        <div class="sidebar-sticky">
+          <ul class="nav flex-column"> 
+            <li class="nav-item">
+              <a class="nav-link" href="/doctorpanel/dashboard">
+                <i class="fa fa-tachometer"></i>
+                داشبورد
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/doctorpanel/profile">
+                <i class="fa fa-user-md"></i>
+                پروفایل
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/doctorpanel/patients">
+                <i class="fa fa-users"></i>
+                بیماران
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link active" href="/doctorpanel/visittimes">
+                <i class="fa fa-calendar"></i>
+                تعیین زمانبندی
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/doctorpanel/systemicinfo">
+                <i class="fa fa-cog"></i>
+                اطلاعات سیستم
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/exit">
+                <i class="fa fa-sign-out"></i>
+                خروج
+              </a>
+            </li>
+          </ul>
+
+          </div>
+      </nav>
+
+      <main role="main" class=" ml-sm-auto col-lg-9 col-xl-10 px-4" id="addClosedTime">
+        <div class="container-fluid">
+
+          <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+            <h1 class="h2">اضافه کردن ساعت تعطیل</h1>
+          </div>
+          
+          <form class="" action="addunavbeveryday" method="GET">
+            <div class="row">
+              <div class="col-xl-4 col-lg-6">
+                <div class="timePickerForm" action="addunavbeveryday" method="GET">
+                  <div class="row">
+                    <div class="col">
+                      <div class="form-group">
+                        <label for="fromTime">
+                          از
+                        </label>
+                        <input type="text" class="form-control fromTimePicker" name="fromTime" id="fromTime" required/>
+                      </div>
+                    </div>
+                    <div class="col">
+                      <div class="form-group">
+                        <label for="toTime">
+                          تا
+                        </label>
+                        <input type="text" class="form-control toTimePicker" name="toTime" id="toTime" required/>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <button type="submit" class="btn btn-success submit-button float-right">
+                  <i class="fa fa-check"></i>
+                  اضافه کردن
+                </button>
+              </div>
+            </div>
+          </form>
+
+      </main>
+
+      <main role="main" class=" ml-sm-auto col-lg-9 col-xl-10 px-4" id="addClosedTimeInAWeekday">
+        <div class="container-fluid">
+
+          <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+            <h1 class="h2">اضافه کردن ساعت تعطیل در یک روز خاص از هفته</h1>
+          </div>
+          
+          <form class="" action="addunavbdayofweek" method="GET">
+            <div class="row">
+              <div class="col-xl-2 col-lg-6">
+                <div class="form-group">
+                  <label for="weekDayPicker">روز هفته</label>
+                  <select class="form-control" name="dayofweek" id="weekDayPicker" required>
+                    <option disabled>--- انتخاب روز هفته ---</option>
+                    <option value="شنبه">شنبه</option>
+                    <option value="یکشنبه">یک شنبه</option>
+                    <option value="دوشنبه">دوشنبه</option>
+                    <option value="سه شنبه">سه شنبه</option>
+                    <option value="چهار شنبه">چهارشنبه</option>
+                    <option value="پنج‌شنبه">پنجشنبه</option>
+                    <option value="جمعه">جمعه</option>
+                  </select>
+                </div>
+              </div>
+              <div class="col-xl-4 col-lg-6">
+                <div class="timePickerForm" action="index.html" method="GET">
+                  <div class="row">
+                    <div class="col">
+                      <div class="form-group">
+                        <label for="fromTime">
+                          از
+                        </label>
+                        <input type="text" class="form-control fromTimePicker" name="fromTime" id="fromTime" required/>
+                      </div>
+                    </div>
+                    <div class="col">
+                      <div class="form-group">
+                        <label for="toTime">
+                          تا
+                        </label>
+                        <input type="text" class="form-control toTimePicker" name="toTime" id="toTime" required/>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <button type="submit" class="btn btn-success submit-button float-right">
+                  <i class="fa fa-check"></i>
+                  اضافه کردن
+                </button>
+              </div>
+            </div>
+          </form>
+
+      </main>
+
+      
+      <main role="main" class=" ml-sm-auto col-lg-9 col-xl-10 px-4" id="addClosedTimeInAWeekday">
+        <div class="container-fluid">
+
+          <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+            <h1 class="h2">اضافه کردن ساعت تعطیل در یک تاریخ خاص</h1>
+          </div>
+          
+          <form class="" action="addunavb" method="GET">
+            <div class="row">
+              <div class="col-xl-2 col-lg-6">
+                <div class="form-group">
+                  <label for="datePicker">
+                    تاریخ
+                  </label>
+                  <input type="text" class="form-control datePicker" id="datePicker" required/>
+                  <input type="text" class="form-control datePicker" name="datePicker" id="datePickerTimeStamp" required hidden/>
+                </div>
+              </div>
+              <div class="col-xl-4 col-lg-6">
+                <div class="timePickerForm" action="addunavb" method="GET">
+                  <div class="row">
+                    <div class="col">
+                      <div class="form-group">
+                        <label for="fromTime">
+                          از
+                        </label>
+                        <input type="text" class="form-control fromTimePicker" name="fromTime" id="fromTime" required/>
+                      </div>
+                    </div>
+                    <div class="col">
+                      <div class="form-group">
+                        <label for="toTime">
+                          تا
+                        </label>
+                        <input type="text" class="form-control toTimePicker" name="toTime" id="toTime" required/>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <button type="submit" class="btn btn-success submit-button float-right">
+                  <i class="fa fa-check"></i>
+                  اضافه کردن
+                </button>
+              </div>
+            </div>
+          </form>
+
+      </main>
+
+
+    </div>
+  </div>
+
+
+  <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+  <script>window.jQuery || document.write('<script src="assets/panelassests/jquery-slim.min.js"><\/script>')</script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+  <script src="https://cdn.rtlcss.com/bootstrap/v4.1.3/js/bootstrap.min.js" integrity="sha384-C/pvytx0t5v9BEbkMlBAGSPnI1TQU1IrTJ6DJbC8GBHqdMnChcb6U4xg4uRkIQCV" crossorigin="anonymous"></script>
+
+  <script src="https://unpkg.com/persian-date@latest/dist/persian-date.min.js"></script>
+  <script src="https://unpkg.com/persian-datepicker@latest/dist/js/persian-datepicker.min.js"></script>
+
+  <script type="text/javascript">
+    let datePickerOptions = {
+      autoClose: true,
+      initialValue: false,
+      format: 'dddd YYYY/MM/DD',
+      altField: "#datePickerTimeStamp"
+    }
+
+    let timePickerOptions = {
+      format: 'HH:mm',
+      initialValue: false,
+      onlyTimePicker: true,
+      calendar:{
+        persian: {
+          locale: 'en'
+        }
+      },
+      timePicker: {
+        enabled: true,
+        step: 1,
+        second: { enabled: false },
+        meridian: { enabled: false }
+      },
+    }
+
+    let datePicker, toTimePicker, fromTimePicker;
+
+    // TODO: [BACK-END] fill this data with dynamic closed days 
+    let closedDaysInWeek = [6, 7];
+    let closedDays = [1590305400000, 1590391800000]
+    
+    function disableClosedDays(unix) {
+
+      let isDayExistsInClosedDaysInWeek = closedDaysInWeek
+        .filter(day => new persianDate(unix).day() === day)
+        .length === 0
+      
+      let isDayExistsIsClosed = closedDays
+        .filter(day => unix === day)
+        .length === 0
+
+      return isDayExistsIsClosed && isDayExistsInClosedDaysInWeek
+    }
+
+    function updateDate(unix) {
+      let selectedDate = new persianDate(unix)
+      let day = selectedDate.format("dddd")
+      let date = selectedDate.format(datePickerOptions.format)
+      $("#selectedDay").text(day)
+      $("#selectedDate").text(date)
+    }
+
+    
+    $(document).ready(function() {
+      datePicker = $("#datePicker").persianDatepicker({
+        ...datePickerOptions,
+        checkDate: disableClosedDays,
+        onSelect: updateDate
+      });
+  
+      toTimePicker = $(".fromTimePicker").persianDatepicker({
+        ...timePickerOptions,
+      });
+  
+      fromTimePicker = $(".toTimePicker").persianDatepicker({
+        ...timePickerOptions,
+      });
+  
+      $('input:radio[name="state"]').change(function() {
+        $(".timePickerForm").toggleClass("edit", $(this).val() === '3');
+      });
+      
+      updateDate()
+    });
+
+  </script>
+
+</body>
+</html>

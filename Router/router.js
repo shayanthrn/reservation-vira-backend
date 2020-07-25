@@ -1352,11 +1352,18 @@ router.get("/HCpanel/patients",function(req,res){
             res.redirect('noaccess');
           }
           else{
-            HC.categories.forEach(function(doc){
-              for(var i=0;i<doc.reservations.length;i++){
-                patientsid.push(doc.reservations[i].user);
+            if(HC.systype=="A"){
+              HC.categories.forEach(function(doc){
+                for(var i=0;i<doc.reservations.length;i++){
+                  patientsid.push(doc.reservations[i].user);
+                }
+              })
+            }
+            else{
+              for(var i=0;i<HC.reservations.length;i++){
+                patientsid.push(HC.reservations[i].user);
               }
-            })
+            }
             dbo.collection("Users").find({_id: { $in : patientsid }},function(err,result2){
               result2.forEach(function(doc){
                 patients.push(doc);
@@ -1376,7 +1383,30 @@ router.get("/HCpanel/patients",function(req,res){
 
 
 router.get("/HCpanel/visittimes",function(req,res){
-
+  if(req.cookies.HCtoken==undefined){
+    res.redirect('/noaccess');
+  }
+  else{
+    MongoClient.connect(dburl,function(err,db){
+      var dbo=db.db("mydb");
+      dbo.collection('HealthCenters').findOne({token:req.cookies.HCtoken},function(err,result){
+        if(result==null){
+          db.close();
+          res.redirect('noaccess');
+        }
+        else{
+          if(result.systype=="A"){
+            res.render('HCPanel/reserveable/addunavb-typeA.ejs');
+          }
+          else{
+            res.render('HCPanel/reserveable/addunavb-typeB.ejs');
+          }
+          db.close();
+          res.end();
+        }
+      })
+    })
+  }
 })
 
 router.get("/HCpanel/addexp",function(req,res){

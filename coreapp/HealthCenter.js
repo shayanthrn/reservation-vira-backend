@@ -1,5 +1,5 @@
 class HealthCenter{
-    constructor(type,name,isReserveable,codemeli,codeofHC,city,phonenumber,address,directphonenumber,background,medicalnumber,appknowledge,username,password,image){
+    constructor(type,systype,name,isReserveable,codemeli,codeofHC,city,phonenumber,address,directphonenumber,background,medicalnumber,appknowledge,username,password,image){
         this.type=type;
         this.name=name;
         this.codeofHC=codeofHC;
@@ -10,8 +10,16 @@ class HealthCenter{
         this.directphonenumber=directphonenumber;
         this.background=background;
         this.address=address;
-        if(isReserveable==true){
+        if(systype=="A"){
             this.categories=[];
+        }
+        else{
+            if(systype=="B"){
+                this.unavailabletimes=[];
+                this.reservations=[]
+                this.visitduration=30;
+                this.visitcost=3000;
+            }
         }
         this.appknowledge=appknowledge;
         this.username=username;
