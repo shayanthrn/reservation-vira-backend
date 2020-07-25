@@ -1363,7 +1363,7 @@ router.get("/HCpanel/patients",function(req,res){
               },function(){
                 res.render('HCpanel/reserveable/patients.ejs',{patients:patients});
                 db.close();
-                res.end();
+                //res.end();
               })
             })
           }
