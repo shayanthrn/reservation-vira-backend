@@ -1331,6 +1331,62 @@ router.get('/HCpanel/systemicinfo',function(req,res){
   }
 })
 
+//---------just reservables  
+
+router.get("/HCpanel/patients",function(req,res){
+  var patientsid=[];
+  var patients=[];
+  if(req.cookies.HCtoken==undefined){
+    res.redirect('/noaccess');
+  }
+  else{
+    MongoClient.connect(dburl,function(err,db){
+      var dbo=db.db("mydb");
+      dbo.collection('HealthCenters').findOne({token:req.cookies.HCtoken},function(err,HC){
+        if(HC==null){
+          db.close();
+          res.redirect('noaccess');
+        }
+        else{
+          if(HC.isReserveable!=true){
+            res.redirect('noaccess');
+          }
+          else{
+            HC.categories.forEach(function(doc){
+              for(var i=0;i<doc.reservations.length;i++){
+                patientsid.push(doc.reservations[i].user);
+              }
+            })
+            dbo.collection("Users").find({_id: { $in : patientsid }},function(err,result2){
+              result2.forEach(function(doc){
+                patients.push(doc);
+              },function(){
+                res.render('HCpanel/reserveable/patients.ejs',{patients:patients});
+                db.close();
+                res.end();
+              })
+            })
+          }
+        }
+      })
+    })
+  }
+})
+
+
+
+router.get("/HCpanel/visittimes",function(req,res){
+
+})
+
+router.get("/HCpanel/addexp",function(req,res){
+
+})
+
+router.get("/HCpanel/reserves",function(req,res){
+
+})
+
 
 //-----------------------HCpanel------------------------------//
 
