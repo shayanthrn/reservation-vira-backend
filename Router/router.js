@@ -709,7 +709,12 @@ router.post("/changedocinfo",function(req,res){
             cats.push(req.body.categories);
           }
           else{
-            cats=req.body.categories;
+            if(req.body.categories==undefined || req.body.categories==null ){
+              cats=[];
+            }
+            else{
+              cats=req.body.categories;
+            }
           }
           dbo.collection('Doctors').updateOne({token:req.cookies.doctortoken},{$set:{categories:cats,city:req.body.city,workphone:req.body.workphone,medicalnumber:req.body.medicalnumber,codemeli:req.body.codemeli,background:req.body.experience,address:req.body.address,phonenumber:req.body.phone,visitduration:Number(req.body.duration),description:req.body.description}},function(err,res2){
             if(req.files!=null){
