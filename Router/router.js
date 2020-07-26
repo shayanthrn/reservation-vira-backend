@@ -341,18 +341,6 @@ router.get("/api/verification",function(req,res){
   }
 })
 
-// ///
-
-// var query=url.parse(req.url,true).query;
-//   if(query.key!="pouyarahmati"){
-//     res.write("noaccess");
-//     res.end();
-//   }
-//   else{
-    
-//   }
-// ///
-
 router.get("/api/login",function(req,res){
   var query=url.parse(req.url,true).query;
   if(query.key!="pouyarahmati"){
@@ -712,7 +700,7 @@ router.get("/addunavbeveryday",function(req,res){
           else{
             if((fromtime.hour*60)+fromtime.min>(totime.hour*60)+totime.min){
               dbo.collection('Doctors').updateOne({token:req.cookies.doctortoken},{$addToSet:{unavailabletimes:{date:"*",dayofweek:"*",start:fromtime,end:{hour:23,min:59}}}});
-              dbo.collection('Doctors').updateOne({token:req.cookies.doctortoken},{$addToSet:{unavailabletimes:{date:"*",dayofweek:"*",start:{hour:0,min:0},end:totime}}});
+              dbo.collection('Doctors').updateOne({token:req.cookies.doctortoken},{$addToSet:{unavailabletimes:{date:"*",dayofweek:"*",start:{hour:0,min:1},end:totime}}});
               db.close();
               res.redirect('/doctorpanel/visittimes');
             }
@@ -728,6 +716,65 @@ router.get("/addunavbeveryday",function(req,res){
     })
   }
 })
+
+router.get("/addunavbeverydayHC",function(req,res){
+  var query = url.parse(req.url,true).query;
+  if(req.cookies.HCtoken==undefined){
+    
+    res.redirect('/noaccess');
+  }
+  else{
+    MongoClient.connect(dburl,function(err,db){
+      var dbo=db.db("mydb");
+      dbo.collection('HealthCenters').findOne({token:req.cookies.HCtoken},function(err,HC){
+        if(HC==null){
+          db.close();
+          res.redirect('noaccess');
+        }
+        else{
+          fromtime = {hour:Number(query.fromTime.split(":")[0]),min:Number(query.fromTime.split(":")[1])};
+          totime= {hour:Number(query.toTime.split(":")[0]),min:Number(query.toTime.split(":")[1])};
+          if(Number.isNaN(fromtime.hour)||Number.isNaN(fromtime.min)||Number.isNaN(totime.hour)||Number.isNaN(totime.min)){
+            res.write("invalid");
+            db.close();
+            res.end();
+          }
+          else{
+            if(HC.systype=="A"){
+              if((fromtime.hour*60)+fromtime.min>(totime.hour*60)+totime.min){
+                HC.categories.forEach(function(doc){
+                  if(doc.name==query.category){
+                     doc.unavailabletimes.push({date:"*",dayofweek:"*",start:fromtime,end:{hour:23,min:59}});
+                     doc.unavailabletimes.push({date:"*",dayofweek:"*",start:{hour:0,min:0},end:totime});
+                  }
+                })
+              }
+              else{
+                HC.categories.forEach(function(doc){
+                  if(doc.name==query.category){
+                     doc.unavailabletimes.push({date:"*",dayofweek:"*",start:fromtime,end:totime});
+                     
+                  }
+                })
+              }
+              dbo.collection("HealthCenters").updateOne({token:req.cookies.HCtoken},{$set:{categories:HC.categories}},function(err,result2){
+                console.log(result2);
+                console.log(HC.categories);
+                res.redirect('/HCpanel/visittimes');
+              });
+            }
+            else{
+
+            }
+          }
+        }
+      })
+    })
+  }
+})
+
+
+
 
 router.get("/addunavbdayofweek",function(req,res){
   var query = url.parse(req.url,true).query;
@@ -1197,14 +1244,25 @@ router.get('/HCpanel/dashboard',function(req,res){
               currentday=currentday.add('d',1);
               visittimes.push({date1:{year:currentday.toArray()[0],month:currentday.format("MMMM"),day:currentday.toArray()[2]},date:{year:currentday.toArray()[0],month:currentday.toArray()[1],day:currentday.toArray()[2]},times:[],dayofweek:currentday.format("dddd")});
             }
-            for(let k=0;k<HC.categories.length;k++){
-              HC.categories[k].reservations.forEach(function(doc){
+            if(HC.systype=="B"){
+              HC.reservations.forEach(function(doc){
                 for(i=0;i<6;i++){
                   if(lodash.isEqual(visittimes[i].date,doc.time.date)){
                     visittimes[i].times.push(doc);
                   }
                 }
               })
+            }
+            else{
+              for(let k=0;k<HC.categories.length;k++){
+                HC.categories[k].reservations.forEach(function(doc){
+                  for(i=0;i<6;i++){
+                    if(lodash.isEqual(visittimes[i].date,doc.time.date)){
+                      visittimes[i].times.push(doc);
+                    }
+                  }
+                })
+              }
             }
             res.render("HCPanel/reserveable/dashboard.ejs",{visittimes:visittimes});
             res.end();
@@ -1337,7 +1395,7 @@ router.get("/HCpanel/visittimes",function(req,res){
         }
         else{
           if(result.systype=="A"){
-            res.render('HCPanel/reserveable/addunavb-typeA.ejs');
+            res.render('HCPanel/reserveable/addunavb-typeA.ejs',{categories:result.categories});
           }
           else{
             res.render('HCPanel/reserveable/addunavb-typeB.ejs');

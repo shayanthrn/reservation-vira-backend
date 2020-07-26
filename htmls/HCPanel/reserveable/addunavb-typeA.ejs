@@ -90,10 +90,10 @@
             <h1 class="h2">اضافه کردن ساعت تعطیل</h1>
           </div>
           
-          <form class="" action="addunavbeverydayHC" method="GET">
+          <form class="" autocomplete="off" action="addunavbeverydayHC?type=A" method="GET">
             <div class="row">
               <div class="col-xl-4 col-lg-6">
-                <div class="timePickerForm" action="addunavbeverydayHC" method="GET">
+                <div class="timePickerForm" action="addunavbeverydayHC?type=A" method="GET">
                   <div class="row">
                     <div class="col">
                       <div class="form-group">
@@ -109,6 +109,18 @@
                           تا
                         </label>
                         <input type="text" class="form-control toTimePicker" name="toTime" id="toTime" required/>
+                      </div>
+                    </div>
+                    <div class="col">
+                      <div class="form-group">
+                        <label for="selectcategory">
+                          انتخاب دسته بندی
+                        </label>
+                        <select class="form-control" name="category" id="selectcategory">
+                          <% for ( let i = 0 ; i < categories.length ; i++ ) {  %>
+                            <option value="<%= categories[i].name %>"><%= categories[i].name %></option>
+                            <% } %> 
+                        </select>
                       </div>
                     </div>
                   </div>
@@ -130,7 +142,7 @@
             <h1 class="h2">اضافه کردن ساعت تعطیل در یک روز خاص از هفته</h1>
           </div>
           
-          <form class="" action="addunavbdayofweekHC" method="GET">
+          <form class="" autocomplete="off" action="addunavbdayofweekHC?type=A" method="GET">
             <div class="row">
               <div class="col-xl-2 col-lg-6">
                 <div class="form-group">
@@ -148,7 +160,7 @@
                 </div>
               </div>
               <div class="col-xl-4 col-lg-6">
-                <div class="timePickerForm" action="addunavbdayofweekHC" method="GET">
+                <div class="timePickerForm" action="addunavbdayofweekHC?type=A" method="GET">
                   <div class="row">
                     <div class="col">
                       <div class="form-group">
@@ -164,6 +176,18 @@
                           تا
                         </label>
                         <input type="text" class="form-control toTimePicker" name="toTime" id="toTime" required/>
+                      </div>
+                    </div>
+                    <div class="col">
+                      <div class="form-group">
+                        <label for="selectcategory">
+                          انتخاب دسته بندی
+                        </label>
+                        <select class="form-control" name="category" id="selectcategory">
+                          <% for ( let i = 0 ; i < categories.length ; i++ ) {  %>
+                            <option><%= categories[i].name %></option>
+                            <% } %> 
+                        </select>
                       </div>
                     </div>
                   </div>
@@ -186,7 +210,7 @@
             <h1 class="h2">اضافه کردن ساعت تعطیل در یک تاریخ خاص</h1>
           </div>
           
-          <form class="" action="addunavbHC" method="GET">
+          <form class="" autocomplete="off" action="addunavbHC?type=A" method="GET">
             <div class="row">
               <div class="col-xl-2 col-lg-6">
                 <div class="form-group">
@@ -198,7 +222,7 @@
                 </div>
               </div>
               <div class="col-xl-4 col-lg-6">
-                <div class="timePickerForm" action="addunavbHC" method="GET">
+                <div class="timePickerForm" action="addunavbHC?type=A" method="GET">
                   <div class="row">
                     <div class="col">
                       <div class="form-group">
@@ -214,6 +238,18 @@
                           تا
                         </label>
                         <input type="text" class="form-control toTimePicker" name="toTime" id="toTime" required/>
+                      </div>
+                    </div>
+                    <div class="col">
+                      <div class="form-group">
+                        <label for="selectcategory">
+                          انتخاب دسته بندی
+                        </label>
+                        <select class="form-control" name="category" id="selectcategory">
+                          <% for ( let i = 0 ; i < categories.length ; i++ ) {  %>
+                          <option><%= categories[i].name %></option>
+                          <% } %> 
+                        </select>
                       </div>
                     </div>
                   </div>
