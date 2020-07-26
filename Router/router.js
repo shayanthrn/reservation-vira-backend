@@ -73,8 +73,9 @@ router.get("/api/getAlltypesofHC",function(req,res){
    else{
       MongoClient.connect(dburl,function(err,db){
         var dbo=db.db("mydb");
-        dbo.collection("HealthCenters").distinct("type",function(err,result){
-          res.json({data:result});
+        dbo.collection("HCtypes").find({},async function(err,result){
+          data=await result.toArray()
+          res.json({data:data});
           db.close();
           res.end();
         })
@@ -120,44 +121,6 @@ router.post("/api/getallHCbytypeandcity",function(req,res){
    }
 })
 
-router.get("/api/getallHCtypes",function(req,res){
-  var query=url.parse(req.url,true).query;
-   if(query.key!="pouyarahmati"){
-     res.json({data:"noaccess"});
-     res.end();
-   }
-   else{
-      MongoClient.connect(dburl,function(err,db){
-        var dbo=db.db("mydb");
-        dbo.collection("HCtypes").find({},async function(err,result){
-          data=await result.toArray()
-          res.json({data:data});
-          db.close();
-          res.end();
-        })
-      })
-   }
-})
-
-
-router.post("/api/addCategoryToHC",function(req,res){
-  var query=url.parse(req.url,true).query;
-   if(query.key!="pouyarahmati"){
-     res.json({data:"noaccess"});
-     res.end();
-   }
-   else{
-      MongoClient.connect(dburl,function(err,db){
-        var dbo=db.db("mydb");
-        var newcat = {name:req.body.catname,unavailabletimes:[],reservations:[],visitduration:Number(req.body.catduration),visitcost:Number(req.body.catcost)}
-        dbo.collection("HealthCenters").updateOne({name:req.body.name,type:req.body.type,isReserveable:true},{$addToSet:{categories:newcat}},function(err,result){
-          res.json({data:result});
-          db.close();
-          res.end();
-        })
-      })
-   }
-})
 
 router.get("/api/getTimeslotsHC",function(req,res){
   var query=url.parse(req.url,true).query;
@@ -170,17 +133,22 @@ router.get("/api/getTimeslotsHC",function(req,res){
       var dbo=db.db("mydb");
       days=[];
       freetimes=[]
-      dbo.collection("HealthCenters").findOne({name:query.name,type:query.type},function(err,result){
+      dbo.collection("HealthCenters").findOne({name:query.name},function(err,result){
       if(result==null){
         res.json({data:'not found'});
         res.end();
       }
       var catobj=null;
-      result.categories.forEach(function(doc){
-        if(doc.name==query.category){
-          catobj=doc;
-        }
-      })
+      if(result.systype=="B"){
+        catobj=result;
+      }
+      else{
+        result.categories.forEach(function(doc){
+          if(doc.name==query.category){
+            catobj=doc;
+          }
+        })
+      }
       if(catobj==null){
         res.json({data:'invalid category'});
         res.end();
