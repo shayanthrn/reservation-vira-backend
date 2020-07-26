@@ -988,14 +988,14 @@ router.post("/addDoctor",function(req,res){
 router.post('/addHC',function(req,res){
   var query= url.parse(req.url,true).query;
   if(req.cookies.admintoken==undefined){
-    res.redirect("noaccess");
+    res.redirect("/noaccess");
   }
   else{
     MongoClient.connect(dburl,function(err,db){
       var dbo=db.db("mydb");
       dbo.collection("Admins").findOne({token:req.cookies.admintoken},function(err,admin){
         if(admin==null){
-          res.redirect("noaccess");
+          res.redirect("/noaccess");
         }
         else{
           MongoClient.connect(dburl,function(err,db){
@@ -1829,7 +1829,7 @@ router.get("/removecategory",function(req,res){
 router.get("/HCsignup",function(req,res){
     var query = url.parse(req.url,true).query;
     if(req.cookies.admintoken==undefined){
-      res.redirect("noaccess");
+      res.redirect("/noaccess");
     }
     else{
       if(query.ejs!=undefined){
@@ -1845,7 +1845,7 @@ router.get("/HCsignup",function(req,res){
           var dbo=db.db("mydb");
           dbo.collection("Admins").findOne({token:req.cookies.admintoken},function(err,admin){
             if(admin==null){
-              res.redirect("noaccess");
+              res.redirect("/noaccess");
             }
             else{
               dbo.collection("HCtypes").find({},async function(err,result){
@@ -1984,7 +1984,7 @@ router.get("/healthcenters/:type/:HC",function(req,res){
   MongoClient.connect(dburl,function(err,db){
     var dbo=db.db("mydb");
     dbo.collection("HealthCenters").findOne({name:HCname},function(err,HC){
-      if(HC.isReserveable!= true){
+      if(HC.systype=="C"){
         if(req.cookies.usertoken==undefined){
           categories().then(basiccategories=>{
             res.render("hc-info.ejs",{user:"",categories:basiccategories,HC:HC});
@@ -2011,10 +2011,10 @@ router.get("/healthcenters/:type/:HC",function(req,res){
           })
         }
       }
-      else{
+      else if(HC.systype=="B"){
         if(req.cookies.usertoken==undefined){
           categories().then(basiccategories=>{
-            res.render("hc-cats.ejs",{Objects:HC.categories,user:"",categories:basiccategories,type:type,HC:HC});
+            res.render("hc-res-info.ejs",{user:"",categories:basiccategories,HC:HC,category:"آزمایش"});
             res.end();
             db.close();
           })
@@ -2023,14 +2023,41 @@ router.get("/healthcenters/:type/:HC",function(req,res){
           dbo.collection("Users").findOne({token:req.cookies.usertoken},function(err,user){
             if(user==null){
               categories().then(basiccategories=>{
-                res.render("hc-cats.ejs",{Objects:HC.categories,user:"",categories:basiccategories,type:type,HC:HC});
+                res.render("hc-res-info.ejs",{user:user,categories:basiccategories,HC:HC,category:"آزمایش"});
                 res.end();
                 db.close();
               })
             }
             else{
               categories().then(basiccategories=>{
-                res.render("hc-cats.ejs",{Objects:HC.categories,user:user,categories:basiccategories,type:type,HC:HC});
+                res.render("hc-res-info.ejs",{user:user,categories:basiccategories,HC:HC,category:"آزمایش"});
+                res.end();
+                db.close();
+              })
+            }
+          })
+        }
+      }
+      else if(HC.systype=="A"){
+        if(req.cookies.usertoken==undefined){
+          categories().then(basiccategories=>{
+            res.render("hc-cats.ejs",{Objects:HC.categories,user:"",categories:basiccategories,HC:HC});
+            res.end();
+            db.close();
+          })
+        }
+        else{
+          dbo.collection("Users").findOne({token:req.cookies.usertoken},function(err,user){
+            if(user==null){
+              categories().then(basiccategories=>{
+                res.render("hc-cats.ejs",{Objects:HC.categories,user:"",categories:basiccategories,HC:HC});
+                res.end();
+                db.close();
+              })
+            }
+            else{
+              categories().then(basiccategories=>{
+                res.render("hc-cats.ejs",{Objects:HC.categories,user:user,categories:basiccategories,HC:HC});
                 res.end();
                 db.close();
               })
@@ -2092,17 +2119,18 @@ router.get("/reservation/:type/:HCname/:category",function(req,res){
     days=[];
     freetimes=[]
     dbo.collection("HealthCenters").findOne({name:HCname,type:type},function(err,result){
-    if(result==null){
-      res.redirect("noaccess")
+    if(result==null || result.categories==undefined){
+      res.redirect("/noaccess")
     }
-    var catobj=null;
+    else{
+      var catobj=null;
     result.categories.forEach(function(doc){
       if(doc.name==category){
         catobj=doc;
       }
     })
     if(catobj==null){
-      res.redirect("noaccess")
+      res.redirect("/noaccess")
     }
     else{
       currentday=new persianDate();
@@ -2114,6 +2142,34 @@ router.get("/reservation/:type/:HCname/:category",function(req,res){
         freetimes.push(getDoctimeslots(catobj,new myDate(currentday.toArray()[2],currentday.toArray()[1],currentday.toArray()[0])));
       }
       res.render("reservehc.ejs",{HC:result,cat:catobj,days:createDayboxobj(days),freetimes:freetimes});
+      res.end();
+    }
+    }
+  })
+  })
+})
+
+router.get("/reservation/:type/:HCname",function(req,res){
+  var HCname=req.params.HCname.split('-').join(' ');
+  var type=req.params.type.split('-').join(' ');
+  MongoClient.connect(dburl,function(err,db){
+    var dbo=db.db("mydb");
+    days=[];
+    freetimes=[]
+    dbo.collection("HealthCenters").findOne({name:HCname,type:type},function(err,HC){
+    if(HC==null || HC.systype!="B"){
+      res.redirect("/noaccess")
+    }
+    else{
+      currentday=new persianDate();
+      days.push(currentday);
+      freetimes.push(getDoctimeslots(HC,new myDate(currentday.toArray()[2],currentday.toArray()[1],currentday.toArray()[0])));
+      for(let i=0;i<14;i++){
+        currentday=currentday.add("d",1);
+        days.push(currentday);
+        freetimes.push(getDoctimeslots(HC,new myDate(currentday.toArray()[2],currentday.toArray()[1],currentday.toArray()[0])));
+      }
+      res.render("reservehc.ejs",{HC:HC,cat:HC,days:createDayboxobj(days),freetimes:freetimes});
       res.end();
     }
   })
@@ -2150,13 +2206,18 @@ router.post("/paymentHC",function(req,res){
               }
               else{
                 var catobj=null;
-                HC.categories.forEach(function(doc){
-                if(doc.name==req.body.cat){
-                  catobj=doc;
+                if(HC.categories==undefined){
+                  catobj=HC;
                 }
-                })
-                if(catobj==null){
-                  res.redirect("noaccess")
+                else{
+                  HC.categories.forEach(function(doc){
+                    if(doc.name==req.body.cat){
+                      catobj=doc;
+                    }
+                    })
+                    if(catobj==null){
+                      res.redirect("/noaccess")
+                    }
                 }
                 reservedata=req.body.choice.split(":");
                 date=new myDate(Number(reservedata[4]),Number(reservedata[3]),Number(reservedata[2]));
@@ -2201,6 +2262,7 @@ router.get("/paymenthandlerHC",function(req,res){
       if(reserve==null){
         db.close();
         res.redirect("/noaccess");
+        
       }
       else{
         if(query.Status=="NOK"){
@@ -2225,19 +2287,29 @@ router.get("/paymenthandlerHC",function(req,res){
               dbo.collection("TempReservesHC").deleteOne({authority:query.Authority},function(err,aa){
                   dbo.collection("Users").updateOne({_id:reservation.user},{$addToSet:{reserves:reservation}},function(err,ad){
                     dbo.collection("HealthCenters").findOne({_id:reservation.HC},function(err,HC){
-                      var catobj=null;
-                      HC.categories.forEach(function(doc){
-                      if(doc.name==req.body.cat){
-                        doc.reservations.push(reservation);
-                        doc.unavailabletimes.push(reservation.time);
+                      if(HC.systype=="B"){
+                        dbo.collection("HealthCenters").updateOne({_id:reservation.HC},{$addToSet:{reservations:reservation,unavailabletimes:reservation.time}},function(err,sas){
+                          strtime=reservation.time.start.hour+":"+reservation.time.start.min;
+                          res.render("paymentaccept.ejs",{doctor:HC,time:strtime,resid:reservation.refid});
+                          //sendSMSforres(reservation);
+                          res.end();
+                        })
                       }
-                      })
-                      dbo.collection("HealthCenters").updateOne({_id:reservation.user},{$set:{categories:HC.categories}},function(err,sdf){
-                        strtime=reservation.time.start.hour+":"+reservation.time.start.min;
-                        res.render("paymentaccept.ejs",{doctor:HC,time:strtime,resid:reservation.refid});
-                        //sendSMSforres(reservation);
-                        res.end();
-                      })
+                      else{
+                        var catobj=null;
+                        HC.categories.forEach(function(doc){
+                        if(doc.name==req.body.cat){
+                          doc.reservations.push(reservation);
+                          doc.unavailabletimes.push(reservation.time);
+                        }
+                        })
+                        dbo.collection("HealthCenters").updateOne({_id:reservation.HC},{$set:{categories:HC.categories}},function(err,sdf){
+                          strtime=reservation.time.start.hour+":"+reservation.time.start.min;
+                          res.render("paymentaccept.ejs",{doctor:HC,time:strtime,resid:reservation.refid});
+                          //sendSMSforres(reservation);
+                          res.end();
+                        })
+                      }
                     })
                   })
               })
@@ -2334,6 +2406,7 @@ router.get("/reserve/:Doctor",function(req,res){
         db.close();
         res.redirect('/');
       }
+      else{
       currentday=new persianDate();
       days.push(currentday);
       freetimes.push(getDoctimeslots(result,new myDate(currentday.toArray()[2],currentday.toArray()[1],currentday.toArray()[0])));
@@ -2347,6 +2420,7 @@ router.get("/reserve/:Doctor",function(req,res){
         db.close();
         res.end();
       })
+      }
     })
   })
 })
@@ -2384,6 +2458,7 @@ router.post("/payment",function(req,res){
               else{
                 reservedata=req.body.choice.split(":");
                 date=new myDate(Number(reservedata[4]),Number(reservedata[3]),Number(reservedata[2]));
+                console.log(date);
                 start={hour:Number(reservedata[0]),min:Number(reservedata[1])};
                 temp=(start.hour*60)+start.min+doctor.visitduration;
                 end={hour:Math.floor(temp/60),min:temp%60}

@@ -27,6 +27,7 @@ class HealthCenter{
         this.image=image;
         this.token="";
         this.medicalnumber=medicalnumber;
+        this.systype=systype;
     }
 }
 

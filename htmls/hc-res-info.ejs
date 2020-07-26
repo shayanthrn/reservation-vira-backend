@@ -216,9 +216,15 @@
                                                                 <span data-v-4606823b="" class="experience text-gray-200 mr-3"><%= HC.background %> سال</span>
                                                             </li>
                                                             <li class="py-1 text-gray-200 font-weight-medium">
+                                                                <% if ( HC.systype == "B") {  %>
+                                                                <a href="<%= "/reservation/" + HC.type + "/" + HC.name %>" class="btn btn-info">
+                                                                    نوبت گیری
+                                                                </a>
+                                                                <% } else { %>
                                                                 <a href="<%= "/reservation/" + HC.type + "/" + HC.name + "/" + category%>" class="btn btn-info">
                                                                     نوبت گیری
                                                                 </a>
+                                                                <% } %>
                                                             </li>
                                                         </ul> 
                                                     </div>
