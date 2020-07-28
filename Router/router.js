@@ -172,7 +172,82 @@ router.get("/api/getTimeslotsHC",function(req,res){
 
 
 router.post("/api/paymentHC",function(req,res){
-
+  if(req.body.usertoken==undefined){
+    console.log(req.body);
+    res.json({data:"user token not found"})
+    res.end();
+  }
+  else{
+  if(req.body.choice==undefined){
+    res.json({data:"choice is not defined"})
+    res.end();
+  }
+  else{
+    
+  MongoClient.connect(dburl,function(err,db){
+    var dbo=db.db("mydb");
+    dbo.collection("Users").findOne({token:req.body.usertoken},function(err,user){
+      if(user==null){
+        res.json({data:"user not found"});
+        db.close();
+        res.end();
+      }
+      else{
+        if(checkinterval(1)){
+          dbo.collection("HealthCenters").findOne({name:req.body.HCname},function(err,HC){
+            if(HC==null){
+              db.close();
+              res.json({data:"HC not found"});
+              res.end();
+            }
+            else{
+              var catobj=null;
+              if(HC.categories==undefined){
+                catobj=HC;
+              }
+              else{
+                HC.categories.forEach(function(doc){
+                  if(doc.name==req.body.cat){
+                    catobj=doc;
+                  }
+                  })
+                  if(catobj==null){
+                    res.redirect("/noaccess")
+                  }
+              }
+              reservedata=req.body.choice.split(":");
+              date=new myDate(Number(reservedata[4]),Number(reservedata[3]),Number(reservedata[2]));
+              start={hour:Number(reservedata[0]),min:Number(reservedata[1])};
+              temp=(start.hour*60)+start.min+catobj.visitduration;
+              end={hour:Math.floor(temp/60),min:temp%60}
+              unavb={start:start,end:end,date:date,dayofweek:new persianDate([Number(reservedata[2]),Number(reservedata[3]),Number(reservedata[4])]).format("dddd")};
+              zarinpal.PaymentRequest({
+                Amount: req.body.cost , // In Tomans
+                CallbackURL: 'http://reservation.drtajviz.com/api/paymenthandlerHC',
+                Description: 'Dr tajviz payment',
+                Email: 'shayanthrn@gmail.com',
+                Mobile: '09128993687'
+              }).then(response => {
+                if (response.status === 100) {
+                  reservation = new ReservationHC(user._id,HC._id,req.body.cat,unavb,response.authority,req.body.cost);
+                  dbo.collection("TempReservesHC").insertOne(reservation,function(err,reserve){
+                    res.json({data:response.url})
+                  })
+                }
+              }).catch(err => {
+                res.write("<html><body><p>there is a problem on server please try again later</p><a href='/' >go back to main page</a></body></html>");
+                console.error(err);
+                db.close();
+                res.end();
+              });
+            }
+          })
+        }
+      }
+    })
+  })
+  }
+  }
 })
 
 
@@ -554,7 +629,8 @@ router.post("/api/payment",function(req,res){
     res.json({data:"choice is not defined"})
     res.end();
   }
- 
+  else{
+    
   MongoClient.connect(dburl,function(err,db){
     var dbo=db.db("mydb");
     dbo.collection("Users").findOne({token:req.body.usertoken},function(err,user){
@@ -603,6 +679,7 @@ router.post("/api/payment",function(req,res){
       }
     })
   })
+  }
   }
 })
 
