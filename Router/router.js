@@ -1622,7 +1622,7 @@ router.post("/addexp",function(req,res){
             }
             else{
               var now=new Date();
-              path="/data/Experiments/"+now.getTime()+".zip";
+              path="data/Experiments/"+now.getTime()+".zip";
               dbo.collection("Experiments").insertOne({userid:user._id,hcid:HC._id,dateuploaded:now,description:req.body.description,path:path},function(err,result){
                 mv(req.files.file.tempFilePath,path,{mkdirp:true},function(err){
                   res.redirect("/HCpanel/addexp");
