@@ -764,7 +764,16 @@ router.get("/addunavbeverydayHC",function(req,res){
               });
             }
             else{
-                //type B         ///complete this
+              if((fromtime.hour*60)+fromtime.min>(totime.hour*60)+totime.min){
+                HC.unavailabletimes.push({date:"*",dayofweek:"*",start:fromtime,end:{hour:23,min:59}});
+                HC.unavailabletimes.push({date:"*",dayofweek:"*",start:{hour:0,min:0},end:totime});
+              }
+              else{
+                HC.unavailabletimes.push({date:"*",dayofweek:"*",start:fromtime,end:totime});
+              }
+              dbo.collection("HealthCenters").updateOne({token:req.cookies.HCtoken},{$set:{unavailabletimes:HC.unavailabletimes}},function(err,result2){
+                res.redirect('/HCpanel/visittimes');
+              });
             }
           }
         }
@@ -845,7 +854,7 @@ router.get("/addunavbdayofweekHC",function(req,res){
                 HC.categories.forEach(function(doc){
                   if(doc.name==query.category){
                      doc.unavailabletimes.push({date:"*",dayofweek:query.dayofweek,start:fromtime,end:{hour:23,min:59}});
-                     doc.unavailabletimes.push({date:"*",dayofweek:query.dayofweek,start:{hour:0,min:0},end:totime});
+                     doc.unavailabletimes.push({date:"*",dayofweek:query.dayofweek,start:{hour:0,min:1},end:totime});
                   }
                 })
               }
@@ -862,7 +871,16 @@ router.get("/addunavbdayofweekHC",function(req,res){
               });
             }
             else{
-                //type B         ///complete this
+              if((fromtime.hour*60)+fromtime.min>(totime.hour*60)+totime.min){
+                HC.unavailabletimes.push({date:"*",dayofweek:query.dayofweek,start:fromtime,end:{hour:23,min:59}});
+                HC.unavailabletimes.push({date:"*",dayofweek:query.dayofweek,start:{hour:0,min:1},end:totime});
+              }
+              else{
+                HC.unavailabletimes.push({date:"*",dayofweek:query.dayofweek,start:fromtime,end:totime});
+              }
+              dbo.collection("HealthCenters").updateOne({token:req.cookies.HCtoken},{$set:{unavailabletimes:HC.unavailabletimes}},function(err,result2){
+                res.redirect('/HCpanel/visittimes');
+              });
             }
           }
         }
@@ -899,7 +917,7 @@ router.get("/addunavb",function(req,res){
             date=new myDate(querydate.toArray()[2],querydate.toArray()[1],querydate.toArray()[0]);
             if((fromtime.hour*60)+fromtime.min>(totime.hour*60)+totime.min){
               dbo.collection('Doctors').updateOne({token:req.cookies.doctortoken},{$addToSet:{unavailabletimes:{date:date,dayofweek:querydate.format("dddd"),start:fromtime,end:{hour:23,min:59}}}})
-              dbo.collection('Doctors').updateOne({token:req.cookies.doctortoken},{$addToSet:{unavailabletimes:{date:date,dayofweek:querydate.format("dddd"),start:{hour:0,min:0},end:totime}}})
+              dbo.collection('Doctors').updateOne({token:req.cookies.doctortoken},{$addToSet:{unavailabletimes:{date:date,dayofweek:querydate.format("dddd"),start:{hour:0,min:1},end:totime}}})
               db.close();
               res.redirect('/doctorpanel/visittimes');
             }
@@ -915,6 +933,73 @@ router.get("/addunavb",function(req,res){
     })
   }
 })
+
+
+router.get("/addunavbHC",function(req,res){
+  var query = url.parse(req.url,true).query;
+  if(req.cookies.HCtoken==undefined){
+    res.redirect('/noaccess');
+  }
+  else{
+    MongoClient.connect(dburl,function(err,db){
+      var dbo=db.db("mydb");
+      dbo.collection('HealthCenters').findOne({token:req.cookies.HCtoken},function(err,HC){
+        if(HC==null){
+          db.close();
+          res.redirect('noaccess');
+        }
+        else{
+          fromtime = {hour:Number(query.fromTime.split(":")[0]),min:Number(query.fromTime.split(":")[1])};
+          totime= {hour:Number(query.toTime.split(":")[0]),min:Number(query.toTime.split(":")[1])};
+          if(Number.isNaN(fromtime.hour)||Number.isNaN(fromtime.min)||Number.isNaN(totime.hour)||Number.isNaN(totime.min)){
+            
+            res.write("invalid");
+            db.close();
+            res.end();
+          }
+          else{
+            querydate=new persianDate(Number(query.datePicker));
+            date=new myDate(querydate.toArray()[2],querydate.toArray()[1],querydate.toArray()[0]);
+            if(HC.systype=="A"){
+              if((fromtime.hour*60)+fromtime.min>(totime.hour*60)+totime.min){
+                HC.categories.forEach(function(doc){
+                  if(doc.name==query.category){
+                     doc.unavailabletimes.push({date:date,dayofweek:querydate.format("dddd"),start:fromtime,end:{hour:23,min:59}});
+                     doc.unavailabletimes.push({date:date,dayofweek:querydate.format("dddd"),start:{hour:0,min:1},end:totime});
+                  }
+                })
+              }
+              else{
+                HC.categories.forEach(function(doc){
+                  if(doc.name==query.category){
+                     doc.unavailabletimes.push({date:date,dayofweek:querydate.format("dddd"),start:fromtime,end:totime});
+                     
+                  }
+                })
+              }
+              dbo.collection("HealthCenters").updateOne({token:req.cookies.HCtoken},{$set:{categories:HC.categories}},function(err,result2){
+                res.redirect('/HCpanel/visittimes');
+              });
+            }
+            else{
+              if((fromtime.hour*60)+fromtime.min>(totime.hour*60)+totime.min){
+                HC.unavailabletimes.push({date:date,dayofweek:querydate.format("dddd"),start:fromtime,end:{hour:23,min:59}});
+                HC.unavailabletimes.push({date:date,dayofweek:querydate.format("dddd"),start:{hour:0,min:1},end:totime});
+              }
+              else{
+                HC.unavailabletimes.push({date:date,dayofweek:querydate.format("dddd"),start:fromtime,end:totime});
+              }
+              dbo.collection("HealthCenters").updateOne({token:req.cookies.HCtoken},{$set:{unavailabletimes:HC.unavailabletimes}},function(err,result2){
+                res.redirect('/HCpanel/visittimes');
+              });
+            }
+          }
+        }
+      })
+    })
+  }
+})
+
 
 
 router.post("/changepass",function(req,res){
