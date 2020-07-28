@@ -764,7 +764,7 @@ router.get("/addunavbeverydayHC",function(req,res){
               });
             }
             else{
-
+                //type B         ///complete this
             }
           }
         }
@@ -800,7 +800,7 @@ router.get("/addunavbdayofweek",function(req,res){
           else{
             if((fromtime.hour*60)+fromtime.min>(totime.hour*60)+totime.min){
               dbo.collection('Doctors').updateOne({token:req.cookies.doctortoken},{$addToSet:{unavailabletimes:{date:"*",dayofweek:query.dayofweek,start:fromtime,end:{hour:23,min:59}}}});
-              dbo.collection('Doctors').updateOne({token:req.cookies.doctortoken},{$addToSet:{unavailabletimes:{date:"*",dayofweek:query.dayofweek,start:{hour:0,min:0},end:totime}}});
+              dbo.collection('Doctors').updateOne({token:req.cookies.doctortoken},{$addToSet:{unavailabletimes:{date:"*",dayofweek:query.dayofweek,start:{hour:0,min:1},end:totime}}});
               db.close();
               res.redirect('/doctorpanel/visittimes');
             }
@@ -809,6 +809,60 @@ router.get("/addunavbdayofweek",function(req,res){
               db.close();
               res.redirect('/doctorpanel/visittimes');
             })
+            }
+          }
+        }
+      })
+    })
+  }
+})
+
+
+router.get("/addunavbdayofweekHC",function(req,res){
+  var query = url.parse(req.url,true).query;
+  if(req.cookies.HCtoken==undefined){
+    res.redirect('/noaccess');
+  }
+  else{
+    MongoClient.connect(dburl,function(err,db){
+      var dbo=db.db("mydb");
+      dbo.collection('HealthCenters').findOne({token:req.cookies.HCtoken},function(err,HC){
+        if(HC==null){
+          db.close();
+          res.redirect('noaccess');
+        }
+        else{
+          fromtime = {hour:Number(query.fromTime.split(":")[0]),min:Number(query.fromTime.split(":")[1])};
+          totime= {hour:Number(query.toTime.split(":")[0]),min:Number(query.toTime.split(":")[1])};
+          if(Number.isNaN(fromtime.hour)||Number.isNaN(fromtime.min)||Number.isNaN(totime.hour)||Number.isNaN(totime.min)){
+            db.close();
+            res.write("invalid");
+            res.end();
+          }
+          else{
+            if(HC.systype=="A"){
+              if((fromtime.hour*60)+fromtime.min>(totime.hour*60)+totime.min){
+                HC.categories.forEach(function(doc){
+                  if(doc.name==query.category){
+                     doc.unavailabletimes.push({date:"*",dayofweek:query.dayofweek,start:fromtime,end:{hour:23,min:59}});
+                     doc.unavailabletimes.push({date:"*",dayofweek:query.dayofweek,start:{hour:0,min:0},end:totime});
+                  }
+                })
+              }
+              else{
+                HC.categories.forEach(function(doc){
+                  if(doc.name==query.category){
+                     doc.unavailabletimes.push({date:"*",dayofweek:query.dayofweek,start:fromtime,end:totime});
+                     
+                  }
+                })
+              }
+              dbo.collection("HealthCenters").updateOne({token:req.cookies.HCtoken},{$set:{categories:HC.categories}},function(err,result2){
+                res.redirect('/HCpanel/visittimes');
+              });
+            }
+            else{
+                //type B         ///complete this
             }
           }
         }
@@ -1083,6 +1137,7 @@ router.post("/changeDocinfo1111",function(req,res){
   console.log(req.body);
 })
 
+
 //-----------------------test route--------------------------//
 
 //-----------------------functions--------------------------//
@@ -1118,7 +1173,10 @@ function getDoctimeslots(doctor,date){
         if(unavbstart<slotend && unavbstart>slotstart){
           return true;
         }
-        if(unavbend<slotend && unavbend>slotstart){
+        if(unavbstart<slotend && unavbstart>=slotstart){
+          return true;
+        }
+        if(unavbend<=slotend && unavbend>slotstart){
           return true;
         }
         if(unavbstart<slotstart&&unavbend>slotend){
@@ -2295,7 +2353,7 @@ router.get("/paymenthandlerHC",function(req,res){
           strtime=reserve.time.start.hour+":"+reserve.time.start.min;
           dbo.collection("HealthCenters").findOne({_id:reserve.HC},function(err,HC){
             dbo.collection("TempReservesHC").deleteOne({authority:query.Authority},function(err,result){
-              res.render("paymentfail.ejs",{doctor:HC,time:strtime});
+              res.render("paymentfail.ejs",{doctor:HC,time:strtime,href:0});
               db.close();
               res.end();
             })
@@ -2344,7 +2402,7 @@ router.get("/paymenthandlerHC",function(req,res){
               strtime=reserve.time.start.hour+":"+reserve.time.start.min;
               dbo.collection("Doctors").findOne({_id:reserve.doctor},function(err,doctor){
               dbo.collection("TempReservesHC").deleteOne({authority:query.Authority},function(err,result){
-              res.render("paymentfail.ejs",{doctor:doctor,time:strtime});
+              res.render("paymentfail.ejs",{doctor:doctor,time:strtime,href:0});
               res.end();
             })
           })
@@ -2533,7 +2591,7 @@ router.get("/paymenthandler",function(req,res){
           strtime=reserve.time.start.hour+":"+reserve.time.start.min;
           dbo.collection("Doctors").findOne({_id:reserve.doctor},function(err,doctor){
             dbo.collection("TempReserves").deleteOne({authority:query.Authority},function(err,result){
-              res.render("paymentfail.ejs",{doctor:doctor,time:strtime});
+              res.render("paymentfail.ejs",{doctor:doctor,time:strtime,href:0});
               db.close();
               res.end();
             })
@@ -2563,7 +2621,7 @@ router.get("/paymenthandler",function(req,res){
               strtime=reserve.time.start.hour+":"+reserve.time.start.min;
               dbo.collection("Doctors").findOne({_id:reserve.doctor},function(err,doctor){
               dbo.collection("TempReserves").deleteOne({authority:query.Authority},function(err,result){
-              res.render("paymentfail.ejs",{doctor:doctor,time:strtime});
+              res.render("paymentfail.ejs",{doctor:doctor,time:strtime,href:0});
               res.end();
             })
           })
