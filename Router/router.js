@@ -1218,8 +1218,11 @@ router.get("/test",function(req,res){
     res.render("test.ejs");
     res.end();
 })
-router.post("/changeDocinfo1111",function(req,res){
+router.post("/test",function(req,res){
+  console.log(req.files);
   console.log(req.body);
+  res.json({data:req.body,data2:req.files});
+  res.end();
 })
 
 
