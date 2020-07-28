@@ -1552,7 +1552,94 @@ router.get("/HCpanel/visittimes",function(req,res){
 })
 
 router.get("/HCpanel/addexp",function(req,res){
+  var patientsid=[];
+  var phonenumbers=[];
+  if(req.cookies.HCtoken==undefined){
+    res.redirect('/noaccess');
+  }
+  else{
+    MongoClient.connect(dburl,function(err,db){
+      var dbo=db.db("mydb");
+      dbo.collection('HealthCenters').findOne({token:req.cookies.HCtoken},function(err,HC){
+        if(HC==null){
+          db.close();
+          res.redirect('noaccess');
+        }
+        else{
+          if(HC.systype=="C"){
+            db.close();
+            res.redirect('noaccess');
+          }
+          else{
+            if(HC.systype=="A"){
+              HC.categories.forEach(function(doc){
+                for(var i=0;i<doc.reservations.length;i++){
+                  patientsid.push(doc.reservations[i].user);
+                }
+              })
+            }
+            else{
+              for(var i=0;i<HC.reservations.length;i++){
+                patientsid.push(HC.reservations[i].user);
+              }
+            }
+            dbo.collection("Users").find({_id: { $in : patientsid }},function(err,result2){
+              result2.forEach(function(doc){
+                phonenumbers.push(doc.phonenumber);
+              },function(){
+                res.render('HCPanel/reserveable/addexp.ejs',{phonenumbers:phonenumbers});
+                db.close();
+                res.end();
+              })
+            })
+            
+          } 
+        }
+      })
+    })
+  }
+})
 
+
+router.post("/addexp",function(req,res){
+  if(req.cookies.HCtoken==undefined){
+    res.redirect('/noaccess');
+  }
+  else{
+    MongoClient.connect(dburl,function(err,db){
+      var dbo=db.db("mydb");
+      dbo.collection('HealthCenters').findOne({token:req.cookies.HCtoken},function(err,HC){
+        if(HC==null){
+          db.close();
+          res.redirect('noaccess');
+        }
+        else{
+          if(req.files!=null){
+            dbo.collection("Users").findOne({phonenumber:req.body.phonenumber},function(err,user){
+            if(user==null){
+              res.json({data:"user not found"});
+              res.end();
+            }
+            else{
+              var now=new Date();
+              path="/data/Experiments/"+now.getTime()+".zip";
+              dbo.collection("Experiments").insertOne({userid:user._id,hcid:HC._id,dateuploaded:now,description:req.body.description,path:path},function(err,result){
+                mv(req.files.file.tempFilePath,path,{mkdirp:true},function(err){
+                  res.redirect("/HCpanel/addexp");
+                  db.close();
+                })
+              })
+            }
+           })
+          }
+          else{
+            res.json({data:"no file uploaded"});
+            res.end();
+          }
+        }
+      })
+    })
+  }
 })
 
 router.get("/HCpanel/reserves",function(req,res){
