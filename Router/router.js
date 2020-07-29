@@ -197,7 +197,6 @@ router.post("/api/paymentHC",function(req,res){
           dbo.collection("HealthCenters").findOne({name:req.body.HCname},function(err,HC){
             if(HC==null){
               db.close();
-              console.log(req.body);
               res.json({data:"HC not found"});
               res.end();
             }
@@ -224,7 +223,7 @@ router.post("/api/paymentHC",function(req,res){
               unavb={start:start,end:end,date:date,dayofweek:new persianDate([Number(reservedata[2]),Number(reservedata[3]),Number(reservedata[4])]).format("dddd")};
               zarinpal.PaymentRequest({
                 Amount: req.body.cost , // In Tomans
-                CallbackURL: 'http://reservation.drtajviz.com/api/paymenthandlerHC',
+                CallbackURL: 'http://reservation.drtajviz.com/paymenthandlerHC',
                 Description: 'Dr tajviz payment',
                 Email: 'shayanthrn@gmail.com',
                 Mobile: '09128993687'
@@ -249,11 +248,6 @@ router.post("/api/paymentHC",function(req,res){
   })
   }
   }
-})
-
-
-router.get("/api/paymenthandlerHC",function(req,res){
-  
 })
 
 
