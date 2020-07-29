@@ -197,6 +197,8 @@ router.post("/api/paymentHC",function(req,res){
           dbo.collection("HealthCenters").findOne({name:req.body.HCname},function(err,HC){
             if(HC==null){
               db.close();
+              console.log(req.body.HCname);
+              console.log(HC);
               res.json({data:"HC not found"});
               res.end();
             }
