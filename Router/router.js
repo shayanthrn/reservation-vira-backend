@@ -10,6 +10,7 @@ var mv = require('mv');
 const TokenGenerator = require('uuid-token-generator');
 const tokgen = new TokenGenerator();
 var Doctor = require('../coreapp/Doctor.js');
+var Chat = require('../coreapp/Chat.js');
 var User = require('../coreapp/User.js');
 var Reservation = require('../coreapp/Reservation.js');
 var ReservationHC = require('../coreapp/ReservationHC.js');
@@ -32,6 +33,7 @@ const { debugPort } = require('process');
 const { Buffer } = require('buffer');
 const { query } = require('express');
 const fileUpload = require('express-fileupload');
+const Ticket = require('../coreapp/Ticket.js');
 const zarinpal = ZarinpalCheckout.create('3392f819-3761-4add-babb-4d1d70021603', false);
 
 
@@ -354,12 +356,95 @@ router.get("/api/getAllExperimentsOfHC",function(req,res){
 })
 
 
-router.get("/api/sendTicket",function(req,res){
-
+router.post("/api/sendTicket",function(req,res){
+  var query=url.parse(req.url,true).query;
+  if(query.key!="pouyarahmati"){
+    res.json({data:"noaccess"});
+    res.end();
+  }
+  else{
+    MongoClient.connect(dburl,function(err,db){
+      var dbo=db.db("mydb");
+      dbo.collection("Chats").findOne({doctor:query.dname,userphone:query.uphone},function(err,chat){
+        if(chat!=null){
+          var now=new Date();
+          var newticket;
+          if(req.files==null){
+            newticket=new Ticket(req.body.subject,req.body.text,null,now);
+          }
+          else{
+            var arr=req.files.file.name.split('.');
+            var fileformat=arr[arr.length-1];
+            var file={format:fileformat,path:"data/ticketfiles/"+arr[0]+now.getTime()+"."+fileformat};
+            newticket = new Ticket(req.body.subject,req.body.text,file,now);
+            mv(req.files.file.tempFilePath,file.path,{mkdirp:true},function(err){
+              chat.tickets.push(newticket);
+              dbo.collection("Chats").updateOne({doctor:query.dname,userphone:query.uphone},{$set:{tickets:chat.tickets}},function(err,asd){
+                res.json({data:"succesfull"});
+                res.end();
+              })
+            })
+          }
+        }
+        else{
+          var newchat = new Chat(query.dname,query.uphone);
+          var now=new Date();
+          var newticket;
+          if(req.files==null){
+            newticket=new Ticket(req.body.subject,req.body.text,null,now);
+          }
+          else{
+            var arr=req.files.file.name.split('.');
+            var fileformat=arr[arr.length-1];
+            var file={format:fileformat,path:"data/ticketfiles/"+arr[0]+now.getTime()+"."+fileformat};
+            newticket = new Ticket(req.body.subject,req.body.text,file,now);
+            mv(req.files.file.tempFilePath,file.path,{mkdirp:true},function(err){
+              newchat.tickets.push(newticket);
+              dbo.collection("Chats").insertOne(newchat,function(err,as){
+                res.json({data:"succesfull"});
+                res.end();
+              })
+            })
+          } 
+        }
+      })
+    })
+  }
 })
 
 router.get('/api/getAlltickets',function(req,res){
+  var query=url.parse(req.url,true).query;
+  if(query.key!="pouyarahmati"){
+    res.json({data:"noaccess"});
+    res.end();
+  }
+  else{
+    MongoClient.connect(dburl,function(err,db){
+      var dbo=db.db("mydb");
+      dbo.collection("Chats").findOne({doctor:query.dname,userphone:query.uphone},function(err,chat){
+        if(chat==null){
+          res.json({data:"not found"});
+          res.end();
+        }
+        else{
+          res.json({data:chat});
+          res.end();
+        }
+      })
+    })
+  }
+})
 
+router.get("/api/downloadfile",function(req,res){
+  var query=url.parse(req.url,true).query;
+  if(query.key!="pouyarahmati"){
+    res.json({data:"noaccess"});
+    res.end();
+  }
+  else{
+    res.download(req.body.path);
+    res.end();
+  }
 })
 
 
@@ -556,7 +641,7 @@ router.get("/api/getDoctorsBycategory-city",function(req,res){
 router.get("/api/getCurUser",function(req,res){
   var query=url.parse(req.url,true).query;
   if(query.key!="pouyarahmati"){
-    res.write("noaccess");
+    res.json({data:"no access"});
     res.end();
   }
   else{
@@ -564,7 +649,7 @@ router.get("/api/getCurUser",function(req,res){
       var dbo=db.db("mydb");
       dbo.collection("Users").findOne({token:query.token},function(err,user){
         if(user==null){
-          res.write("not found");
+          res.json({data:"not found"});
           db.close();
           res.end();
         }
@@ -582,7 +667,7 @@ router.get("/api/getCurUser",function(req,res){
 router.get("/api/getTimeSlots",function(req,res){
   var query=url.parse(req.url,true).query;
   if(query.key!="pouyarahmati"){
-    res.write("noaccess");
+    res.json({data:"no access"});
     res.end();
   }
   else{
@@ -592,7 +677,7 @@ router.get("/api/getTimeSlots",function(req,res){
       freetimes=[]
       dbo.collection("Doctors").findOne({name:query.doctor},function(err,result){
       if(result==null){
-        res.write('not found');
+        res.json({data:"not found"});
         db.close();
         res.end();
       }
@@ -1199,7 +1284,7 @@ router.post("/addDoctor",function(req,res){
                     })
                     }
                     db.close();
-                    res.redirect('/'); //fixxxxxxxxxxxxxxxxxxxxxxxx
+                    res.redirect('/Adminpanel/addDoctor');
                   })
                 }
               })
@@ -1290,6 +1375,39 @@ router.get("/test",function(req,res){
     res.render("test.ejs");
     res.end();
 })
+
+router.get("/test2",function(req,res){
+  reservation={
+    "user": {
+        "$oid": "5ef3291e7fc6456d3a1aaa16"
+    },
+    "doctor": {
+        "$oid": "5f14097c4c368d1c02ef530c"
+    },
+    refid:"1231",
+    "time": {
+        "start": {
+            "hour": 3,
+            "min": 0
+        },
+        "end": {
+            "hour": 4,
+            "min": 0
+        },
+        "date": {
+            "year": 1399,
+            "month": 5,
+            "day": 10
+        },
+        "dayofweek": "جمعه"
+    },
+    "authority": "A00000000000000000000000000210093852",
+    "cost": "3000"
+  }
+  sendSMSforres(reservation);
+  res.end();
+})
+
 router.post("/test",function(req,res){
   console.log(req.files);
   console.log(req.body);
@@ -1414,20 +1532,33 @@ function sendSMSforres(reservation){
           token2: doctor.name,
           token3: date,
           template : "reserveACK",
-          receptor: doctor.phonenumber+","+user.phonenumber
+          receptor:user.phonenumber
         },
         function(response, status) {
           console.log(response);
           console.log(status);
           if(status==200){
-            console.log("hehe");
+            apikave.VerifyLookup({
+              token: reservation.refid,
+              token2: user.firstname+" "+user.lastname,
+              token3: date,
+              template : "reserveACKdoc",
+              receptor: doctor.phonenumber
+            },function(respones,status){
+                if(status==200){
+                  console.log("ok");
+                  db.close();
+                }
+                else{
+                  db.close();
+                  console.log("nok");
+                }
+            })
             db.close();
-            res.end();
           }
           else{
-            res.write("<html><body><p>there is a problem on server please try again later</p></body></html>");
             db.close();
-            res.end();
+            console.log("nok");
           }
         });
       })
@@ -1869,6 +2000,10 @@ router.get('/doctorpanel/systemicinfo',function(req,res){
 
 //------------------------adminpanel---------------------------//
 
+
+
+
+
 router.get("/AdminPanel/users/:userid",function(req,res){
   userid=req.params.userid;
   userid=ObjectID(userid);
@@ -2137,10 +2272,8 @@ router.get("/removecategory",function(req,res){
           dbo.collection("Categories").deleteOne({name:query.category},function(err,deleted){
             fs.unlink('public/catphotos/'+query.category.split(' ').join('-')+".png", function(err) {
               if(err && err.code == 'ENOENT') {
-                  // file doens't exist
                   console.info("File doesn't exist, won't remove it.");
               } else if (err) {
-                  // other errors, e.g. maybe we don't have enough permission
                   console.error("Error occurred while trying to remove file");
               } else {
                   console.info(`removed`);
@@ -2585,6 +2718,8 @@ router.post("/paymentHC",function(req,res){
   }
 })
 
+
+
 router.get("/paymenthandlerHC",function(req,res){
   var query= url.parse(req.url,true).query;
   MongoClient.connect(dburl,function(err,db){
@@ -2715,10 +2850,21 @@ router.get("/category/:Category/:Doctor",function(req,res){
     if (err) throw err;
     var dbo=db.db("mydb");
     dbo.collection("Doctors").findOne({name:req.params.Doctor.split('-').join(' ')},function(err,result){
-      categories().then(basiccategories=>{
-        res.render("doctorpage.ejs",{doctor:result,categories:basiccategories,user:""});      //fix this
-        db.close();
-        res.end();
+      dbo.collection("Users").findOne({token:req.cookies.usertoken},function(err,user){
+        if(user==null){
+          categories().then(basiccategories=>{
+            res.render("doctorpage.ejs",{doctor:result,categories:basiccategories,user:""});
+            db.close();
+            res.end();
+          })
+        }
+        else{
+          categories().then(basiccategories=>{
+            res.render("doctorpage.ejs",{doctor:result,categories:basiccategories,user:user});
+            db.close();
+            res.end();
+          })
+        }
       })
     })
   })
@@ -3154,7 +3300,7 @@ router.get('/exit',function(req,res){
 })
 
 
-router.get('*',function(req,res){        // 404 page should be displayed here// should be at the end
+router.get('*',function(req,res){
   req.session.prevurl=req.session.currurl;
   req.session.currurl=req.url;
   categories().then(basiccategories=>{

@@ -60,7 +60,7 @@
                         <ul>
                             <% for(let i=0 ; i < categories.length;i++) { %>
                             <li>
-                                <a href="<%= "/category/"+categories[i].name.split(' ').join('-') %>"><%= categories[i].name %> </a>
+                                <a href="<%= "/category/"+categories[i].name.split(' ').join('-')+"?city=all" %>"><%= categories[i].name %> </a>
                             </li>
                             <% } %>
                         </ul>
@@ -147,7 +147,7 @@
                                 <% for(let i=0;i<categories.length;i++) { %>
                                 <li class="list-item list-item-has-children">
                                     <a class="main-list-item nav-link"
-                                        href="<%= "/category/"+categories[i].name.split(' ').join('-') %>"><%= categories[i].name %> </a>
+                                        href="<%= "/category/"+categories[i].name.split(' ').join('-')+"?city=all" %>"><%= categories[i].name %> </a>
                                 </li>
                                 <% } %>
                                 <img src="assets/img/logo.png"  style="max-height: 140px;" alt="">

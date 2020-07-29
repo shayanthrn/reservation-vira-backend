@@ -20,6 +20,7 @@ class Doctor{
         this.token="";
         this.appknowledge=appknowledge;
         this.reservations=[];
+        this.telereservation=[];
     }
 }
 

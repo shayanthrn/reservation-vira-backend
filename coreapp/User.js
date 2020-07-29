@@ -11,6 +11,7 @@ class User{
         }
         this.token="";
         this.reserves=[];
+        this.telereservations=[];
     }
 }
 
