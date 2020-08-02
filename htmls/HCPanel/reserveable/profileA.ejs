@@ -108,6 +108,23 @@
                 </div>
                 <div class="row">
                     <div class="col-md-4 col-lg-2">
+                      <h5>تخصص</h5>
+                    </div>
+                    <div class="col-md-6 col-lg-6">
+                      <p><% for(let i=0;i<HC.categories.length;i++){  %>
+                        <% if(i==HC.categories.length-1){ %>
+                            <%= HC.categories[i].name %>
+                        <% } else { %>
+                        <%= HC.categories[i].name+"," %>
+                        <% } %>
+                        <% } %></p>
+                      <div class="form-group mb-2">
+                        
+                      </div>
+                    </div>
+                  </div>
+                <div class="row">
+                    <div class="col-md-4 col-lg-2">
                       <h5> شماره ثبت</h5>
                     </div>
                     <div class="col-md-6 col-lg-6">
