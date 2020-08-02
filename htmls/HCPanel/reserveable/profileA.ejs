@@ -240,6 +240,20 @@
     </div>
   </div>
   <script>
+
+var close = document.getElementsByClassName("close");
+  var i;
+  for (i = 0; i < close.length; i++) {
+    close[i].onclick = function() {
+      var div = this.parentElement;
+        var opt=document.createElement("option");
+        opt.value=div.dataset.mydata;
+        opt.className="options";
+        this.parentElement.remove();
+        document.getElementById("mylist").appendChild(opt);
+    }
+  }
+
     function newElement() {
       var li = document.createElement("li");
       var input = document.createElement("input");
