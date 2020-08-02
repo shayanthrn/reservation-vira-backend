@@ -1641,9 +1641,16 @@ router.get('/HCpanel/profile',function(req,res){
             db.close();
           }
           else{
-            res.render("HCPanel/reserveable/profile.ejs",{HC:HC});
-            res.end();
-            db.close();
+            if(HC.systype=="B"){
+              res.render("HCPanel/reserveable/profileB.ejs",{HC:HC});
+              res.end();
+              db.close();
+            }
+            else{
+              res.render("HCPanel/reserveable/profileA.ejs",{HC:HC});
+              res.end();
+              db.close();
+            }
           }
         }
       })
