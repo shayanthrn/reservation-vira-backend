@@ -239,7 +239,44 @@
 
     </div>
   </div>
+  <script>
+    function newElement() {
+      var li = document.createElement("li");
+      var input = document.createElement("input");
+      var inputValue = document.getElementById("myInput").value;
+      var t = document.createTextNode(inputValue);
+      input.value=inputValue;
+      input.type="checkbox";
+      input.checked=true;
+      input.name="categories";
+      input.style.visibility="hidden";
+      li.className="checklist";
+      li.style.listStyle="none";
+      li.appendChild(t);
+      li.appendChild(input);
+      if (inputValue === '') {
+        alert("تخصص وارد شده معتبر نیست");
+      } else {
+        document.getElementById("myUL").appendChild(li);
+      }
+      document.getElementById("myInput").value = "";
+    
+      var span = document.createElement("SPAN");
+      var txt = document.createTextNode("\u00D7");
+      span.className = "close";
+      span.appendChild(txt);
+      li.appendChild(span);
+    
+      var close = document.getElementsByClassName("close");
+      for (i = 0; i < close.length; i++) {
+        close[i].onclick = function() {
+          var div = this.parentElement;
+          this.parentElement.remove();
+        }
+      }
+    }
   
+    </script>
 
 
   <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
