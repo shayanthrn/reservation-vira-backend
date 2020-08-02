@@ -125,7 +125,7 @@
                             <button type="button" onclick="newElement()" id="addcat" class="addBtn btn btn-danger">اضافه</button>
                             <ul id="myUL">
                               <% for(let i=0;i<HC.categories.length;i++) { %>
-                                <li class="checklist" style="list-style: none;"><%=HC.categories[i].name%><input class="prevcats" type="checkbox" name="categories" value="<%=HC.categories[i].name%>" style="visibility: hidden;" checked></li>
+                                <li class="checklist" style="list-style: none;"><%=HC.categories[i].name%><span class="close">×</span><input class="prevcats" type="checkbox" name="categories" value="<%=HC.categories[i].name%>" style="visibility: hidden;" checked></li>
                               <% } %>
                             </ul>
                           </div>
@@ -246,11 +246,7 @@ var close = document.getElementsByClassName("close");
   for (i = 0; i < close.length; i++) {
     close[i].onclick = function() {
       var div = this.parentElement;
-        var opt=document.createElement("option");
-        opt.value=div.dataset.mydata;
-        opt.className="options";
         this.parentElement.remove();
-        document.getElementById("mylist").appendChild(opt);
     }
   }
 
