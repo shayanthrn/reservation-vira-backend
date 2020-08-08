@@ -89,6 +89,16 @@
               <div class="col-xl-4 col-lg-6">
                 <div class="timePickerForm" action="addunavbeveryday" method="GET">
                   <div class="row">
+                    <div class="col-xl-2 col-lg-6">
+                        <div class="form-group">
+                          <label for="type">انتخاب دسته بندی </label>
+                          <select class="form-control" name="type" id="type" required>
+                            <option value="doctor">دکتر</option>
+                            <option value="آزمایشگاه">آزمایشگاه</option>
+                            <option value="کلینیک">کلینیک</option>
+                          </select>
+                        </div>
+                    </div>
                     <div class="col">
                       <div class="form-group">
                         <label for="fromTime">
@@ -143,16 +153,11 @@
               </div>
               <div class="col-xl-2 col-lg-6">
                 <div class="form-group">
-                  <label for="weekDayPicker">روز asdf</label>
-                  <select class="form-control" name="dayofweek" id="weekDayPicker" required>
-                    <option disabled>--- انتخاب روز هفته ---</option>
-                    <option value="شنبه">شنasdfبه</option>
-                    <option value="یکشنبه">یک asdfشنبه</option>
-                    <option value="دوشنبه">دوشنبه</option>
-                    <option value="سه شنبه">سه شنبه</option>
-                    <option value="چهار شنبه">چهارشنبه</option>
-                    <option value="پنج‌شنبه">پنجشنبه</option>
-                    <option value="جمعه">جمعه</option>
+                  <label for="type">انتخاب دسته بندی </label>
+                  <select class="form-control" name="type" id="type" required>
+                    <option value="doctor">دکتر</option>
+                    <option value="آزمایشگاه">آزمایشگاه</option>
+                    <option value="کلینیک">کلینیک</option>
                   </select>
                 </div>
               </div>
@@ -204,6 +209,16 @@
                   </label>
                   <input type="text" class="form-control datePicker" id="datePicker" required/>
                   <input type="text" class="form-control datePicker" name="datePicker" id="datePickerTimeStamp" required hidden/>
+                </div>
+              </div>
+              <div class="col-xl-2 col-lg-6">
+                <div class="form-group">
+                  <label for="type">انتخاب دسته بندی </label>
+                  <select class="form-control" name="type" id="type" required>
+                    <option value="doctor">دکتر</option>
+                    <option value="آزمایشگاه">آزمایشگاه</option>
+                    <option value="کلینیک">کلینیک</option>
+                  </select>
                 </div>
               </div>
               <div class="col-xl-4 col-lg-6">
