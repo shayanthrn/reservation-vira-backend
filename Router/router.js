@@ -2151,6 +2151,29 @@ router.get("/Adminpanel/addcategory",function(req,res){
   }
 })
 
+
+router.get("/Adminpanel/visittimes",function(req,res){
+  if(req.cookies.admintoken==undefined){
+    res.redirect('/noaccess');
+  }
+  else{
+    MongoClient.connect(dburl,function(err,db){
+      var dbo=db.db("mydb");
+      dbo.collection("Admins").findOne({token:req.cookies.admintoken},function(err,result){
+        if(result==null){
+          db.close();
+          res.redirect('/noaccess');
+        }
+        else{
+          res.render("AdminPanel/visittimes.ejs",{categories:basiccategories});
+          db.close();
+          res.end();
+        }
+      })
+    })
+  }
+})
+
 router.post("/addCategory",function(req,res){
   if(req.cookies.admintoken==undefined){
     res.redirect('/noaccess');
