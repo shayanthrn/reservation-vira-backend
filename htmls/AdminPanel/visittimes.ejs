@@ -90,6 +90,16 @@
                 <div class="timePickerForm" action="addunavbeveryday" method="GET">
                   <div class="row">
                     <div class="col">
+                        <div class="form-group">
+                          <label for="type">انتخاب دسته بندی </label>
+                          <select class="form-control" name="type" id="type" required>
+                            <option value="doctor">دکتر</option>
+                            <option value="آزمایشگاه">آزمایشگاه</option>
+                            <option value="کلینیک">کلینیک</option>
+                          </select>
+                        </div>
+                    </div>
+                    <div class="col">
                       <div class="form-group">
                         <label for="fromTime">
                           از
@@ -106,16 +116,6 @@
                       </div>
                     </div>
                   </div>
-                  <div class="col-xl-2 col-lg-6">
-                    <div class="form-group">
-                      <label for="type">انتخاب دسته بندی </label>
-                      <select class="form-control" name="type" id="type" required>
-                        <option value="doctor">دکتر</option>
-                        <option value="آزمایشگاه">آزمایشگاه</option>
-                        <option value="کلینیک">کلینیک</option>
-                      </select>
-                    </div>
-                </div>
                 </div>
                 <button type="submit" class="btn btn-success submit-button float-right">
                   <i class="fa fa-check"></i>
