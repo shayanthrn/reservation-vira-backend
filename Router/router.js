@@ -34,6 +34,7 @@ const { Buffer } = require('buffer');
 const { query } = require('express');
 const fileUpload = require('express-fileupload');
 const Ticket = require('../coreapp/Ticket.js');
+const e = require('express');
 const zarinpal = ZarinpalCheckout.create('3392f819-3761-4add-babb-4d1d70021603', false);
 
 
@@ -866,6 +867,71 @@ router.get("/addunavbeveryday",function(req,res){
               db.close();
               res.redirect('/doctorpanel/visittimes');
             })
+            }
+          }
+        }
+      })
+    })
+  }
+})
+
+
+
+router.get("/addunavbeverydayadmin",function(req,res){
+  var query = url.parse(req.url,true).query;
+  if(req.cookies.admintoken==undefined){
+    res.redirect('/noaccess');
+  }
+  else{
+    MongoClient.connect(dburl,function(err,db){
+      var dbo=db.db("mydb");
+      dbo.collection('Admins').findOne({token:req.cookies.admintoken},function(err,result){
+        if(result==null){
+          db.close();
+          res.redirect('noaccess');
+        }
+        else{
+          fromtime = {hour:Number(query.fromTime.split(":")[0]),min:Number(query.fromTime.split(":")[1])};
+          totime= {hour:Number(query.toTime.split(":")[0]),min:Number(query.toTime.split(":")[1])};
+          if(Number.isNaN(fromtime.hour)||Number.isNaN(fromtime.min)||Number.isNaN(totime.hour)||Number.isNaN(totime.min)){
+            res.write("invalid");
+            db.close();
+            res.end();
+          }
+          else{
+            if((fromtime.hour*60)+fromtime.min>(totime.hour*60)+totime.min){
+              if(query.type=="doctor"){
+                dbo.collection('Doctors').updateMany({},{$addToSet:{unavailabletimes:{date:"*",dayofweek:"*",start:fromtime,end:{hour:23,min:59}}}});
+                dbo.collection('Doctors').updateMany({},{$addToSet:{unavailabletimes:{date:"*",dayofweek:"*",start:{hour:0,min:1},end:totime}}});
+                db.close();
+                res.redirect('/adminpanel/visittimes');
+              }
+              else if(query.type=="آزمایشگاه"){
+                dbo.collection('HealthCenters').updateMany({type:"آزمایشگاه"},{$addToSet:{unavailabletimes:{date:"*",dayofweek:"*",start:fromtime,end:{hour:23,min:59}}}});
+                dbo.collection('HealthCenters').updateMany({type:"آزمایشگاه"},{$addToSet:{unavailabletimes:{date:"*",dayofweek:"*",start:{hour:0,min:1},end:totime}}});
+                db.close();
+                res.redirect('/adminpanel/visittimes');
+              }
+              else if(query.type=="کلینیک"){
+                //--
+              }
+            }
+            else{
+              if(query.type=="doctor"){
+                dbo.collection('Doctors').updateMany({},{$addToSet:{unavailabletimes:{date:"*",dayofweek:"*",start:fromtime,end:totime}}},function(result2){
+                  db.close();
+                  res.redirect('/adminpanel/visittimes');
+                })
+              }
+              else if(query.type=="آزمایشگاه"){
+                dbo.collection('HealthCenters').updateMany({type:"آزمایشگاه"},{$addToSet:{unavailabletimes:{date:"*",dayofweek:"*",start:fromtime,end:totime}}},function(result2){
+                  db.close();
+                  res.redirect('/adminpanel/visittimes');
+                })
+              }
+              else if(query.type=="کلینیک"){
+                //--
+              }
             }
           }
         }
