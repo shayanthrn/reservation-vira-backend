@@ -1056,6 +1056,76 @@ router.get("/addunavbdayofweek",function(req,res){
 })
 
 
+router.get("/addunavbdayofweekadmin",function(req,res){
+  var query = url.parse(req.url,true).query;
+  if(req.cookies.admintoken==undefined){
+    res.redirect('/noaccess');
+  }
+  else{
+    MongoClient.connect(dburl,function(err,db){
+      var dbo=db.db("mydb");
+      dbo.collection('Admins').findOne({token:req.cookies.admintoken},function(err,result){
+        if(result==null){
+          db.close();
+          res.redirect('noaccess');
+        }
+        else{
+          fromtime = {hour:Number(query.fromTime.split(":")[0]),min:Number(query.fromTime.split(":")[1])};
+          totime= {hour:Number(query.toTime.split(":")[0]),min:Number(query.toTime.split(":")[1])};
+          if(Number.isNaN(fromtime.hour)||Number.isNaN(fromtime.min)||Number.isNaN(totime.hour)||Number.isNaN(totime.min)){
+            db.close();
+            res.write("invalid");
+            res.end();
+          }
+          else{
+            if((fromtime.hour*60)+fromtime.min>(totime.hour*60)+totime.min){
+              if(query.type=="doctor"){
+                dbo.collection('Doctors').updateMany({},{$addToSet:{unavailabletimes:{date:"*",dayofweek:query.dayofweek,start:fromtime,end:{hour:23,min:59}}}});
+                dbo.collection('Doctors').updateMany({},{$addToSet:{unavailabletimes:{date:"*",dayofweek:query.dayofweek,start:{hour:0,min:1},end:totime}}});
+                db.close();
+                res.redirect('/adminpanel/visittimes');
+              }
+              else if(query.type=="آزمایشگاه"){
+                dbo.collection('HealthCenters').updateMany({type:"آزمایشگاه"},{$addToSet:{unavailabletimes:{date:"*",dayofweek:query.dayofweek,start:fromtime,end:{hour:23,min:59}}}});
+                dbo.collection('HealthCenters').updateMany({type:"آزمایشگاه"},{$addToSet:{unavailabletimes:{date:"*",dayofweek:query.dayofweek,start:{hour:0,min:1},end:totime}}});
+                db.close();
+                res.redirect('/adminpanel/visittimes');
+              }
+              else if(query.type=="کلینیک"){
+                dbo.collection("HealthCenters").updateMany({type:"کلینیک"},{$addToSet:{'categories.$[].unavailabletimes':{date:"*",dayofweek:query.dayofweek,start:fromtime,end:{hour:23,min:59}}}})
+                dbo.collection("HealthCenters").updateMany({type:"کلینیک"},{$addToSet:{'categories.$[].unavailabletimes':{date:"*",dayofweek:query.dayofweek,start:{hour:0,min:1},end:totime}}})
+                db.close();
+                res.redirect('/adminpanel/visittimes');
+              }
+            }
+            else{
+              if(query.type=="doctor"){
+                dbo.collection('Doctors').updateMany({},{$addToSet:{unavailabletimes:{date:"*",dayofweek:query.dayofweek,start:fromtime,end:totime}}},function(result2){
+                  db.close();
+                  res.redirect('/adminpanel/visittimes');
+                })
+              }
+              else if(query.type=="آزمایشگاه"){
+                dbo.collection('HealthCenters').updateMany({type:"آزمایشگاه"},{$addToSet:{unavailabletimes:{date:"*",dayofweek:query.dayofweek,start:fromtime,end:totime}}},function(result2){
+                  db.close();
+                  res.redirect('/adminpanel/visittimes');
+                })
+              }
+              else if(query.type=="کلینیک"){
+                dbo.collection("HealthCenters").updateMany({type:"کلینیک"},{$addToSet:{'categories.$[].unavailabletimes':{date:"*",dayofweek:query.dayofweek,start:fromtime,end:totime}}},function(result2){
+                  db.close();
+                  res.redirect('/adminpanel/visittimes');
+                })
+              }
+            }
+          }
+        }
+      })
+    })
+  }
+})
+
+
 router.get("/addunavbdayofweekHC",function(req,res){
   var query = url.parse(req.url,true).query;
   if(req.cookies.HCtoken==undefined){
