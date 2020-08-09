@@ -35,6 +35,7 @@ const { query } = require('express');
 const fileUpload = require('express-fileupload');
 const Ticket = require('../coreapp/Ticket.js');
 const e = require('express');
+const { setTimeout } = require('timers');
 const zarinpal = ZarinpalCheckout.create('3392f819-3761-4add-babb-4d1d70021603', false);
 
 
@@ -372,6 +373,11 @@ router.post("/api/sendTicket",function(req,res){
           var newticket;
           if(req.files==null){
             newticket=new Ticket(req.body.subject,req.body.text,null,now);
+            chat.tickets.push(newticket);
+            dbo.collection("Chats").updateOne({doctor:query.dname,userphone:query.uphone},{$set:{tickets:chat.tickets}},function(err,asd){
+              res.json({data:"succesfull"});
+              res.end();
+            })
           }
           else{
             var arr=req.files.file.name.split('.');
@@ -393,6 +399,11 @@ router.post("/api/sendTicket",function(req,res){
           var newticket;
           if(req.files==null){
             newticket=new Ticket(req.body.subject,req.body.text,null,now);
+            newchat.tickets.push(newticket);
+              dbo.collection("Chats").insertOne(newchat,function(err,as){
+                res.json({data:"succesfull"});
+                res.end();
+              })
           }
           else{
             var arr=req.files.file.name.split('.');
@@ -1233,6 +1244,79 @@ router.get("/addunavb",function(req,res){
   }
 })
 
+router.get("/addunavbadmin",function(req,res){
+  var query = url.parse(req.url,true).query;
+  if(req.cookies.admintoken==undefined){
+    res.redirect('/noaccess');
+  }
+  else{
+    MongoClient.connect(dburl,function(err,db){
+      var dbo=db.db("mydb");
+      dbo.collection('Admins').findOne({token:req.cookies.admintoken},function(err,result){
+        if(result==null){
+          db.close();
+          res.redirect('noaccess');
+        }
+        else{
+          fromtime = {hour:Number(query.fromTime.split(":")[0]),min:Number(query.fromTime.split(":")[1])};
+          totime= {hour:Number(query.toTime.split(":")[0]),min:Number(query.toTime.split(":")[1])};
+          if(Number.isNaN(fromtime.hour)||Number.isNaN(fromtime.min)||Number.isNaN(totime.hour)||Number.isNaN(totime.min)){
+            
+            res.write("invalid");
+            db.close();
+            res.end();
+          }
+          else{
+            querydate=new persianDate(Number(query.datePicker));
+            date=new myDate(querydate.toArray()[2],querydate.toArray()[1],querydate.toArray()[0]);
+            if((fromtime.hour*60)+fromtime.min>(totime.hour*60)+totime.min){
+
+              if(query.type=="doctor"){
+                dbo.collection('Doctors').updateMany({},{$addToSet:{unavailabletimes:{date:date,dayofweek:querydate.format("dddd"),start:fromtime,end:{hour:23,min:59}}}});
+                dbo.collection('Doctors').updateMany({},{$addToSet:{unavailabletimes:{date:date,dayofweek:querydate.format("dddd"),start:{hour:0,min:1},end:totime}}});
+                db.close();
+                res.redirect('/adminpanel/visittimes');
+              }
+              else if(query.type=="آزمایشگاه"){
+                dbo.collection('HealthCenters').updateMany({type:"آزمایشگاه"},{$addToSet:{unavailabletimes:{date:date,dayofweek:querydate.format("dddd"),start:fromtime,end:{hour:23,min:59}}}});
+                dbo.collection('HealthCenters').updateMany({type:"آزمایشگاه"},{$addToSet:{unavailabletimes:{date:date,dayofweek:query.dayofweek,start:{hour:0,min:1},end:totime}}});
+                db.close();
+                res.redirect('/adminpanel/visittimes');
+              }
+              else if(query.type=="کلینیک"){
+                dbo.collection("HealthCenters").updateMany({type:"کلینیک"},{$addToSet:{'categories.$[].unavailabletimes':{date:date,dayofweek:querydate.format("dddd"),start:fromtime,end:{hour:23,min:59}}}})
+                dbo.collection("HealthCenters").updateMany({type:"کلینیک"},{$addToSet:{'categories.$[].unavailabletimes':{date:date,dayofweek:query.dayofweek,start:{hour:0,min:1},end:totime}}})
+                db.close();
+                res.redirect('/adminpanel/visittimes');
+              }
+            }
+            else{
+              if(query.type=="doctor"){
+                dbo.collection('Doctors').updateMany({},{$addToSet:{unavailabletimes:{date:date,dayofweek:query.dayofweek,start:fromtime,end:totime}}},function(result2){
+                  db.close();
+                  res.redirect('/adminpanel/visittimes');
+                })
+              }
+              else if(query.type=="آزمایشگاه"){
+                dbo.collection('HealthCenters').updateMany({type:"آزمایشگاه"},{$addToSet:{unavailabletimes:{date:date,dayofweek:query.dayofweek,start:fromtime,end:totime}}},function(result2){
+                  db.close();
+                  res.redirect('/adminpanel/visittimes');
+                })
+              }
+              else if(query.type=="کلینیک"){
+                dbo.collection("HealthCenters").updateMany({type:"کلینیک"},{$addToSet:{'categories.$[].unavailabletimes':{date:date,dayofweek:query.dayofweek,start:fromtime,end:totime}}},function(result2){
+                  db.close();
+                  res.redirect('/adminpanel/visittimes');
+                })
+              }
+            }
+          }
+        }
+      })
+    })
+  }
+})
+
 
 router.get("/addunavbHC",function(req,res){
   var query = url.parse(req.url,true).query;
@@ -1513,8 +1597,8 @@ router.post('/addHC',function(req,res){
 
 //-----------------------test route--------------------------//
 
-router.get("/test",function(req,res){
-    res.render("test.ejs");
+router.post("/test",function(req,res){
+    console.log(req.body)
     res.end();
 })
 
@@ -2011,7 +2095,7 @@ router.get('/doctorpanel/dashboard',function(req,res){
     res.redirect('/noaccess');
   }
   else{
-    MongoClient.connect(dburl,function(err,db){
+    MongoClient.connect(dburl,async function(err,db){
       var dbo=db.db("mydb");
       dbo.collection('Doctors').findOne({token:req.cookies.doctortoken},function(err,result){
         if(result==null){
@@ -2033,9 +2117,90 @@ router.get('/doctorpanel/dashboard',function(req,res){
               }
             }
           })
-          res.render('DoctorPanel/dashboard.ejs',{visittimes:visittimes});
+          var patientsid=[]
+          result.reservations.forEach(function(doc){
+            patientsid.push(doc.user.toString())
+          })
+          var patients=new Set(patientsid)
+          patients=Array.from(patients)
+          res.render('DoctorPanel/dashboard.ejs',{visittimes:visittimes,patientscount:patients.length,rescount:result.reservations.length});
           db.close();
           res.end();
+        }
+      })
+    })
+  }
+})
+
+router.get("/doctorpanel/removevisittimes",function(req,res){
+  if(req.cookies.doctortoken==undefined){
+    res.redirect('/noaccess');
+  }
+  else{
+    MongoClient.connect(dburl,function(err,db){
+      var dbo=db.db("mydb");
+      dbo.collection('Doctors').findOne({token:req.cookies.doctortoken},function(err,result){
+        if(result==null){
+          db.close();
+          res.redirect('noaccess');
+        }
+        else{
+          var days=[];
+          var freetimes=[];
+          currentday=new persianDate();
+          days.push(currentday);
+          freetimes.push(getDoctimeslots(result,new myDate(currentday.toArray()[2],currentday.toArray()[1],currentday.toArray()[0])));
+          for(let i=0;i<14;i++){
+            currentday=currentday.add("d",1);
+            days.push(currentday);
+            freetimes.push(getDoctimeslots(result,new myDate(currentday.toArray()[2],currentday.toArray()[1],currentday.toArray()[0])));
+          }
+          res.render("Doctorpanel/removevisittimes.ejs",{doctor:result,days:createDayboxobj(days),freetimes:freetimes});
+          db.close();
+          res.end();
+        }
+      })
+    })
+  }
+})
+
+router.post("/removevisittimes",function(req,res){
+  if(req.cookies.doctortoken==undefined){
+    res.redirect('/noaccess');
+  }
+  else{
+    MongoClient.connect(dburl,function(err,db){
+      var dbo=db.db("mydb");
+      dbo.collection('Doctors').findOne({token:req.cookies.doctortoken},function(err,result){
+        if(result==null){
+          db.close();
+          res.redirect('noaccess');
+        }
+        else{
+          if(req.body.choice==undefined){
+            res.redirect("/doctorpanel/removevisittimes");
+          }
+          else{
+            choices=[]
+            if(typeof req.body.choice=="string"){
+              choices.push(req.body.choice);
+            }
+            else{
+              choices=req.body.choice;
+            }
+            choices.forEach(function(doc){
+                reservedata=doc.split(":");
+                date=new myDate(Number(reservedata[4]),Number(reservedata[3]),Number(reservedata[2]));
+                start={hour:Number(reservedata[0]),min:Number(reservedata[1])};
+                temp=(start.hour*60)+start.min+result.visitduration;
+                end={hour:Math.floor(temp/60),min:temp%60}
+                unavb={start:start,end:end,date:date,dayofweek:new persianDate([Number(reservedata[2]),Number(reservedata[3]),Number(reservedata[4])]).format("dddd")};
+                dbo.collection("Doctors").updateOne({token:req.cookies.doctortoken},{$addToSet:{unavailabletimes:unavb}});
+            })
+            setTimeout(function(){
+              res.redirect("/doctorpanel/removevisittimes")
+            },100)
+          }
         }
       })
     })
@@ -2136,6 +2301,28 @@ router.get('/doctorpanel/systemicinfo',function(req,res){
         }
         else{
           res.render('DoctorPanel/settings.ejs');
+          db.close();
+          res.end();
+        }
+      })
+    })
+  }
+})
+
+router.get("/doctorpanel/tickets",function(req,res){
+  if(req.cookies.doctortoken==undefined){
+    res.redirect('/noaccess');
+  }
+  else{
+    MongoClient.connect(dburl,function(err,db){
+      var dbo=db.db("mydb");
+      dbo.collection('Doctors').findOne({token:req.cookies.doctortoken},function(err,result){
+        if(result==null){
+          db.close();
+          res.redirect('noaccess');
+        }
+        else{
+          res.render('DoctorPanel/tickets.ejs');
           db.close();
           res.end();
         }
@@ -2307,9 +2494,66 @@ router.get("/Adminpanel/visittimes",function(req,res){
           res.redirect('/noaccess');
         }
         else{
-          res.render("AdminPanel/visittimes.ejs",{categories:basiccategories});
+          res.render("AdminPanel/visittimes.ejs");
           db.close();
           res.end();
+        }
+      })
+    })
+  }
+})
+
+router.get("/adminpanel/costmanage",function(req,res){
+  if(req.cookies.admintoken==undefined){
+    res.redirect('/noaccess');
+  }
+  else{
+    MongoClient.connect(dburl,function(err,db){
+      var dbo=db.db("mydb");
+      dbo.collection("Admins").findOne({token:req.cookies.admintoken},function(err,result){
+        if(result==null){
+          db.close();
+          res.redirect('/noaccess');
+        }
+        else{
+          res.render("AdminPanel/costmanage.ejs");
+          db.close();
+          res.end();
+        }
+      })
+    })
+  }
+})
+
+router.get("/changecostadmin",function(req,res){
+  var query=url.parse(req.url,true).query;
+  if(req.cookies.admintoken==undefined){
+    res.redirect("/noaccess");
+  }
+  else{
+    MongoClient.connect(dburl,function(err,db){
+      var dbo=db.db("mydb");
+      dbo.collection("Admins").findOne({token:req.cookies.admintoken},function(err,admin){
+        if(admin==null){
+          db.close();
+          res.redirect("noaccess");
+        }
+        else{
+          if(query.type=="doctor"){
+            dbo.collection("Doctors").updateMany({},{$set:{visitcost:Number(query.cost)}})
+            db.close();
+            res.redirect("/adminpanel/costmanage");
+          }
+          else if(query.type=="آزمایشگاه"){
+            dbo.collection("HealthCenters").updateMany({type:"آزمایشگاه"},{$set:{visitcost:Number(query.cost)}})
+            db.close();
+            res.redirect("/adminpanel/costmanage");
+          }
+          else if(query.type=="کلینیک"){
+            dbo.collection("HealthCenters").updateMany({type:"کلینیک"},{$set:{'categories.$[].visitcost':Number(query.cost)}});
+            db.close();
+            res.redirect("/adminpanel/costmanage");
+          }
         }
       })
     })
