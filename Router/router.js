@@ -913,7 +913,10 @@ router.get("/addunavbeverydayadmin",function(req,res){
                 res.redirect('/adminpanel/visittimes');
               }
               else if(query.type=="کلینیک"){
-                //--
+                dbo.collection("HealthCenters").updateMany({type:"کلینیک"},{$addToSet:{'categories.$[].unavailabletimes':{date:"*",dayofweek:"*",start:fromtime,end:{hour:23,min:59}}}})
+                dbo.collection("HealthCenters").updateMany({type:"کلینیک"},{$addToSet:{'categories.$[].unavailabletimes':{date:"*",dayofweek:"*",start:{hour:0,min:1},end:totime}}})
+                db.close();
+                res.redirect('/adminpanel/visittimes');
               }
             }
             else{
@@ -930,7 +933,10 @@ router.get("/addunavbeverydayadmin",function(req,res){
                 })
               }
               else if(query.type=="کلینیک"){
-                //--
+                dbo.collection("HealthCenters").updateMany({type:"کلینیک"},{$addToSet:{'categories.$[].unavailabletimes':{date:"*",dayofweek:"*",start:fromtime,end:totime}}},function(result2){
+                  db.close();
+                  res.redirect('/adminpanel/visittimes');
+                })
               }
             }
           }
