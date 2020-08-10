@@ -40,6 +40,14 @@
                 داشبورد
               </a>
             </li>
+            <% if(doctor.membershiptypes.includes("teleconsultant")) { %>
+              <li class="nav-item">
+                <a class="nav-link" href="/DoctorPanel/tickets">
+                  <i class="fa fa-phone"></i>
+                  رزرو تلفنی
+                </a>
+              </li>
+              <% } %>
             <li class="nav-item">
               <a class="nav-link " href="/DoctorPanel/profile">
                 <i class="fa fa-user-md"></i>
@@ -52,8 +60,16 @@
                 بیماران
               </a>
             </li>
+            <% if(doctor.membershiptypes.includes("chatconsultant")) { %>
             <li class="nav-item">
-                <a class="nav-link active" href="/DoctorPanel/removevisittimes">
+              <a class="nav-link active" href="/DoctorPanel/tickets">
+                <i class="fa fa-commenting"></i>
+                گفتگو متنی
+              </a>
+            </li>
+            <% } %>
+            <li class="nav-item">
+                <a class="nav-link" href="/DoctorPanel/removevisittimes">
                   <i class="fa fa-calendar"></i>
                   حذف زمانبندی
                 </a>

@@ -67,6 +67,14 @@
                 داشبورد
               </a>
             </li>
+            <% if(doctor.membershiptypes.includes("teleconsultant")) { %>
+              <li class="nav-item">
+                <a class="nav-link" href="/DoctorPanel/tickets">
+                  <i class="fa fa-phone"></i>
+                  رزرو تلفنی
+                </a>
+              </li>
+              <% } %>
             <li class="nav-item">
               <a class="nav-link " href="/DoctorPanel/profile">
                 <i class="fa fa-user-md"></i>
@@ -79,8 +87,16 @@
                 بیماران
               </a>
             </li>
+            <% if(doctor.membershiptypes.includes("chatconsultant")) { %>
             <li class="nav-item">
-                <a class="nav-link active" href="/DoctorPanel/removevisittimes">
+              <a class="nav-link active" href="/DoctorPanel/tickets">
+                <i class="fa fa-commenting"></i>
+                گفتگو متنی
+              </a>
+            </li>
+            <% } %>
+            <li class="nav-item">
+                <a class="nav-link" href="/DoctorPanel/removevisittimes">
                   <i class="fa fa-calendar"></i>
                   حذف زمانبندی
                 </a>
@@ -116,7 +132,7 @@
                 </div>
                 <div class="cart-page-title">
                   <a  href="#" data-toggle="modal" data-target="#exampleModalLong" class="btn btn-danger">ریست کردن تمامی ساعت ها</a>
-                  <a href="/12341" data-toggle="modal" data-target="#modal2" class="btn btn-danger">تنظیم ساعت شب</a>
+                  <a href="#" data-toggle="modal" data-target="#modal2" class="btn btn-danger">تنظیم ساعت شب</a>
                   <!-- modal -->
                   <div class="modal fade" id="exampleModalLong" tabindex="-1" role="dialog" aria-labelledby="exampleModalLongTitle" aria-hidden="true">
                     <div class="modal-dialog" role="document">

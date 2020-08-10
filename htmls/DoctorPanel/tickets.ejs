@@ -39,6 +39,14 @@
                 داشبورد
               </a>
             </li>
+            <% if(doctor.membershiptypes.includes("teleconsultant")) { %>
+              <li class="nav-item">
+                <a class="nav-link" href="/DoctorPanel/tickets">
+                  <i class="fa fa-phone"></i>
+                  رزرو تلفنی
+                </a>
+              </li>
+              <% } %>
             <li class="nav-item">
               <a class="nav-link " href="/DoctorPanel/profile">
                 <i class="fa fa-user-md"></i>
@@ -51,8 +59,16 @@
                 بیماران
               </a>
             </li>
+            <% if(doctor.membershiptypes.includes("chatconsultant")) { %>
             <li class="nav-item">
-                <a class="nav-link active" href="/DoctorPanel/removevisittimes">
+              <a class="nav-link active" href="/DoctorPanel/tickets">
+                <i class="fa fa-commenting"></i>
+                گفتگو متنی
+              </a>
+            </li>
+            <% } %>
+            <li class="nav-item">
+                <a class="nav-link" href="/DoctorPanel/removevisittimes">
                   <i class="fa fa-calendar"></i>
                   حذف زمانبندی
                 </a>
@@ -86,19 +102,46 @@
             <h1 class="h2">گفتگو ها</h1>
           </div>
           <div class='row'>
-            <% for(let i = 0; i<26;i++) { %>
-            <div class="col-sm-12 col-md-6 col-lg-4 mb-3">
+            <% for(let i = 0; i<chats.length;i++) { %>
+            <div class="col-sm-12 col-md-6 col-lg-4 mb-3" >
               <div class="card shadow">
                 <div class="card-header bg-site-primary text-white p-2">
-                  <%= i+1 %>
+                  <%= chats[i].user.firstname + " "+ chats[i].user.lastname %>
                 </div>
                 <div class="card-body">
                 <div>
-                    <a href="test23">فرستنده: اصغر</a>
+                    <a href="test23">شماره تماس: <%=chats[i].userphone%></a>
                 </div>
+                <div>
+                  <a href="test23"> تاریخ آخرین پیام: <%=chats[i].datecreated%></a>
+              </div>
                 <br/>
                 <div>
-                    <a href="test23" class="btn btn-info">ورود</a>
+                    <a href="<%= "/DoctorPanel/tickets/" + chats[i]._id %>" class="btn btn-info">ورود</a>
+                    <% if(chats[i].finished==false) { %>
+                    <a  href="#" data-toggle="modal" data-target="#exampleModalLong"   class="btn btn-danger">خاتمه</a>
+                    <!-- modal -->
+                  <div class="modal fade" id="exampleModalLong" tabindex="-1" role="dialog" aria-labelledby="exampleModalLongTitle" aria-hidden="true">
+                    <div class="modal-dialog" role="document">
+                      <div class="modal-content">
+                        <div class="modal-header">
+                          <h5 class="modal-title" id="exampleModalLongTitle" style="position: relative; right: 30px;">اخطار</h5>
+                          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                          </button>
+                        </div>
+                        <div class="modal-body">
+                          با تایید این گزینه دیگر امکان ارسال پیام از طرفین مسدود می شود. آیا از انجام این کار مطمئن هستید؟
+                        </div>
+                        <div class="modal-footer">
+                          <button type="button" class="btn btn-secondary" data-dismiss="modal">بستن</button>
+                          <a href="<%= "/finishchat/" + chats[i]._id %>" class="btn btn-danger">تایید</a>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <!-- modal -->
+                  <% } %>
                 </div>
                 </div>
               </div>

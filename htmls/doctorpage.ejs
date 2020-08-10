@@ -225,6 +225,16 @@
                                                                 <a href="reserve/<%= doctor.name.split(' ').join('-') %>" class="btn btn-info">
                                                                     نوبت گیری
                                                                 </a>
+                                                                <% if(doctor.membershiptypes.includes("teleconsultant")){ %>
+                                                                <a href="telereserve/<%= doctor.name.split(' ').join('-') %>" class="btn btn-info" style="background-color: #25d366;">
+                                                                    نوبت گیری تلفنی
+                                                                </a>
+                                                                <% } %>
+                                                                <% if(doctor.membershiptypes.includes("teleconsultant")){ %>
+                                                                <a href="ticket/<%= doctor.name.split(' ').join('-') %>" class="btn btn-info" style="background-color: #128c7e;">
+                                                                    گفتگوی متنی
+                                                                </a>
+                                                                <% } %>
                                                             </li>
                                                         </ul> 
                                                     </div>

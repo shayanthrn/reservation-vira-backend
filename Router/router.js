@@ -383,7 +383,7 @@ router.post("/api/sendTicket",function(req,res){
             var arr=req.files.file.name.split('.');
             var fileformat=arr[arr.length-1];
             var file={format:fileformat,path:"data/ticketfiles/"+arr[0]+now.getTime()+"."+fileformat};
-            newticket = new Ticket(req.body.subject,req.body.text,file,now);
+            newticket = new Ticket(req.body.subject,req.body.text,file,now,req.body.sender);
             mv(req.files.file.tempFilePath,file.path,{mkdirp:true},function(err){
               chat.tickets.push(newticket);
               dbo.collection("Chats").updateOne({doctor:query.dname,userphone:query.uphone},{$set:{tickets:chat.tickets}},function(err,asd){
@@ -2123,7 +2123,7 @@ router.get('/doctorpanel/dashboard',function(req,res){
           })
           var patients=new Set(patientsid)
           patients=Array.from(patients)
-          res.render('DoctorPanel/dashboard.ejs',{visittimes:visittimes,patientscount:patients.length,rescount:result.reservations.length});
+          res.render('DoctorPanel/dashboard.ejs',{visittimes:visittimes,patientscount:patients.length,rescount:result.reservations.length,doctor:result});
           db.close();
           res.end();
         }
@@ -2254,7 +2254,7 @@ router.get('/doctorpanel/patients',function(req,res){
             result2.forEach(function(doc){
               patients.push(doc);
             },function(){
-              res.render('DoctorPanel/patients.ejs',{patients:patients});
+              res.render('DoctorPanel/patients.ejs',{patients:patients,doctor:result});
               db.close();
               res.end();
             })
@@ -2278,7 +2278,7 @@ router.get('/doctorpanel/visittimes',function(req,res){
           res.redirect('noaccess');
         }
         else{
-          res.render('DoctorPanel/addunavb.ejs');
+          res.render('DoctorPanel/addunavb.ejs',{doctor:result});
           db.close();
           res.end();
         }
@@ -2300,7 +2300,7 @@ router.get('/doctorpanel/systemicinfo',function(req,res){
           res.redirect('noaccess');
         }
         else{
-          res.render('DoctorPanel/settings.ejs');
+          res.render('DoctorPanel/settings.ejs',{doctor:result});
           db.close();
           res.end();
         }
@@ -2316,27 +2316,264 @@ router.get("/doctorpanel/tickets",function(req,res){
   else{
     MongoClient.connect(dburl,function(err,db){
       var dbo=db.db("mydb");
-      dbo.collection('Doctors').findOne({token:req.cookies.doctortoken},function(err,result){
-        if(result==null){
+      dbo.collection('Doctors').findOne({token:req.cookies.doctortoken},async function(err,result){
+        if(result==null || !result.membershiptypes.includes("chatconsultant")){
           db.close();
           res.redirect('noaccess');
         }
         else{
-          res.render('DoctorPanel/tickets.ejs');
-          db.close();
-          res.end();
+          chats=await dbo.collection("Chats").find({doctor:result.name}).toArray()
+          var foreach = new Promise((resolve, reject) => {
+            chats.forEach(async function(doc,index,array){
+              user=await dbo.collection("Users").findOne({phonenumber:doc.userphone})
+              doc.user=user;
+              doc.datecreated=new persianDate(doc.tickets[doc.tickets.length-1].datecreated).format("l")
+              if (index === array.length -1) resolve();
+            });
+          });
+          foreach.then(a=>{
+            res.render('DoctorPanel/tickets.ejs',{doctor:result,chats:chats});
+            db.close();
+            res.end();
+          })
         }
       })
     })
   }
 })
 
+
+router.get("/doctorpanel/tickets/:tid",function(req,res){
+  if(req.cookies.doctortoken==undefined){
+    res.redirect('/noaccess');
+  }
+  else{
+    MongoClient.connect(dburl,function(err,db){
+      var dbo=db.db("mydb");
+      dbo.collection('Doctors').findOne({token:req.cookies.doctortoken},async function(err,result){
+        if(result==null || !result.membershiptypes.includes("chatconsultant")){
+          db.close();
+          res.redirect('noaccess');
+        }
+        else{
+          var tid=ObjectID(req.params.tid);
+          dbo.collection("Chats").findOne({_id:tid,doctor:result.name},function(err,chat){
+            res.render("DoctorPanel/chatpage.ejs",{doctor:result,chat:chat});
+            db.close();
+            res.end();
+          })
+        }
+      })
+    })
+  }
+})
+
+
+router.get("/finishchat/:chatid",function(req,res){
+  if(req.cookies.doctortoken==undefined){
+    res.redirect('/noaccess');
+  }
+  else{
+    MongoClient.connect(dburl,function(err,db){
+      var dbo=db.db("mydb");
+      dbo.collection('Doctors').findOne({token:req.cookies.doctortoken},function(err,result){
+        if(result==null){
+          db.close();
+          res.redirect('noaccess');
+        }
+        else{
+          oid=new ObjectID(req.params.chatid)
+          dbo.collection("Chats").updateOne({doctor:result.name,_id:oid},{$set:{finished:true}},function(err,as){
+            res.redirect("/DoctorPanel/tickets");
+            db.close();
+          })
+        }
+      })
+    })
+  }
+})
+
+router.get("/resetunavb",function(req,res){
+  if(req.cookies.doctortoken==undefined){
+    res.redirect('/noaccess');
+  }
+  else{
+    MongoClient.connect(dburl,function(err,db){
+      var dbo=db.db("mydb");
+      dbo.collection('Doctors').findOne({token:req.cookies.doctortoken},function(err,result){
+        if(result==null){
+          db.close();
+          res.redirect('noaccess');
+        }
+        else{
+          newunavb=[]
+          result.reservations.forEach(function(doc){
+            newunavb.push(doc.time);
+          })
+          dbo.collection("Doctors").updateOne({token:req.cookies.doctortoken},{$set:{unavailabletimes:newunavb}},function(err,asf){
+            db.close();
+            res.redirect("/doctorpanel/removevisittimes");
+          })
+        }
+      })
+    })
+  }
+})
+
+router.get("/nightmode",function(req,res){
+  if(req.cookies.doctortoken==undefined){
+    res.redirect('/noaccess');
+  }
+  else{
+    MongoClient.connect(dburl,function(err,db){
+      var dbo=db.db("mydb");
+      dbo.collection('Doctors').findOne({token:req.cookies.doctortoken},function(err,result){
+        if(result==null){
+          db.close();
+          res.redirect('noaccess');
+        }
+        else{
+          var flag=0;
+          var flag1=0;
+          newunavb={date:"*",dayofweek:"*",start:{hour:20,min:0},end:{hour:23,min:59}}
+          newunavb2={date:"*",dayofweek:"*",start:{hour:0,min:1},end:{hour:8,min:0}}
+          try {
+            result.unavailabletimes.forEach(function(doc){
+              if(lodash.isEqual(doc,newunavb)){
+                flag=1;
+              }
+              if(lodash.isEqual(doc,newunavb2)){
+                flag1=1;
+              }
+              if(flag1==1&&flag==1){
+                throw BreakException;
+              }
+            })
+          } catch (error) {
+            console.log("found it") 
+          }
+          if(flag==1&&flag1==1){
+            db.close()
+            res.redirect("/doctorpanel/removevisittimes");
+          }
+          else{
+            dbo.collection("Doctors").updateOne({token:req.cookies.doctortoken},{$addToSet:{unavailabletimes:newunavb}},function(err,asf){
+              dbo.collection("Doctors").updateOne({token:req.cookies.doctortoken},{$addToSet:{unavailabletimes:newunavb2}},function(err,asdfa){
+                db.close();
+                res.redirect("/doctorpanel/removevisittimes");
+              })
+            })
+          }
+        }
+      })
+    })
+  }
+})
+
+
+router.get("/doctorpanel/telereserve",function(req,res){
+  if(req.cookies.doctortoken==undefined){
+    res.redirect('/noaccess');
+  }
+  else{
+    MongoClient.connect(dburl,function(err,db){
+      var dbo=db.db("mydb");
+      dbo.collection('Doctors').findOne({token:req.cookies.doctortoken},function(err,result){
+        if(result==null || !result.membershiptypes.includes("teleconsultant")){
+          db.close();
+          res.redirect('noaccess');
+        }
+        else{
+          //pass visit times
+          res.render("DoctorPanel/telereserve.ejs",{doctor:result});
+          db.close()
+          res.end()
+        }
+      })
+    })
+  }
+})
+
+router.get("/doctorpanel/telereserve/settime",function(req,res){
+  if(req.cookies.doctortoken==undefined){
+    res.redirect('/noaccess');
+  }
+  else{
+    MongoClient.connect(dburl,function(err,db){
+      var dbo=db.db("mydb");
+      dbo.collection('Doctors').findOne({token:req.cookies.doctortoken},function(err,result){
+        if(result==null || !result.membershiptypes.includes("teleconsultant")){
+          db.close();
+          res.redirect('noaccess');
+        }
+        else{
+          res.render("DoctorPanel/TRsettime.ejs",{doctor:result,teletimes:result.teletimes});
+          db.close()
+          res.end()
+        }
+      })
+    })
+  }
+})
+
+router.post("/trsettime",function(req,res){
+  if(req.cookies.doctortoken==undefined){
+    res.redirect('/noaccess');
+  }
+  else{
+    MongoClient.connect(dburl,function(err,db){
+      var dbo=db.db("mydb");
+      dbo.collection('Doctors').findOne({token:req.cookies.doctortoken},function(err,result){
+        if(result==null || !result.membershiptypes.includes("teleconsultant")){
+          db.close();
+          res.redirect('noaccess');
+        }
+        else{
+          if(req.body.choice==undefined){
+            dbo.collection("Doctors").updateOne({token:req.cookies.doctortoken},{$set:{teletimes:[]}},function(err,asdf){
+              res.redirect("/doctorpanel/telereserve/settime");
+              db.close();
+            })
+          }
+          else{
+            var times=[]
+            if(typeof req.body.choice=="string"){
+              times.push(req.body.choice);
+            }
+            else{
+              times=req.body.choice;
+            }
+            dbo.collection("Doctors").updateOne({token:req.cookies.doctortoken},{$set:{teletimes:times}},function(err,asdf){
+              res.redirect("/doctorpanel/telereserve/settime");
+              db.close();
+            })
+          }
+        }
+      })
+    })
+  }
+})
+
+
 //------------------------Doctorpanel---------------------------//
 
 
 //------------------------adminpanel---------------------------//
 
+router.get("/AdminPanel/dashboard",function(req,res){
+  res.render("notimp.ejs");
+  res.end()
+})
 
+router.get("/AdminPanel/doctors",function(req,res){
+  res.render("notimp.ejs");
+  res.end()
+})
+
+router.get("/AdminPanel/patients",function(req,res){
+  res.render("notimp.ejs");
+  res.end()
+})
 
 
 
