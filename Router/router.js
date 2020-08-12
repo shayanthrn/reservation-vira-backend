@@ -2324,14 +2324,18 @@ router.get("/doctorpanel/tickets",function(req,res){
         }
         else{
           chats=await dbo.collection("Chats").find({doctor:result.name}).toArray()
-          console.log(chats)
           var foreach = new Promise((resolve, reject) => {
-            chats.forEach(async function(doc,index,array){
-              user=await dbo.collection("Users").findOne({phonenumber:doc.userphone})
-              doc.user=user;
-              doc.datecreated=new persianDate(doc.tickets[doc.tickets.length-1].datecreated).format("l")
-              if (index === array.length -1) resolve();
-            });
+            if(chats==[]){
+              resolve();
+            }
+            else{
+              chats.forEach(async function(doc,index,array){
+                user=await dbo.collection("Users").findOne({phonenumber:doc.userphone})
+                doc.user=user;
+                doc.datecreated=new persianDate(doc.tickets[doc.tickets.length-1].datecreated).format("l")
+                if (index === array.length -1) resolve();
+              });
+            }
           });
           foreach.then(a=>{
             res.render('DoctorPanel/tickets.ejs',{doctor:result,chats:chats});
