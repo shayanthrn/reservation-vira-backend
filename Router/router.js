@@ -2325,7 +2325,7 @@ router.get("/doctorpanel/tickets",function(req,res){
         else{
           chats=await dbo.collection("Chats").find({doctor:result.name}).toArray()
           var foreach = new Promise((resolve, reject) => {
-            if(chats==[]){
+            if(chats.length==0){
               resolve();
             }
             else{
