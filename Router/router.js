@@ -3414,6 +3414,28 @@ router.get("/reservation/:type/:HCname",function(req,res){
 })
 
 
+router.get("/ticket/:doctor",function(req,res){
+  MongoClient.connect(dburl,function(err,db){
+    var dbo=db.db("mydb");
+    dbo.collection("Doctors").findOne({name:req.params.doctor},function(err,doctor){
+      if(doctor==null){
+        console.log(req.url)
+        res.end();
+      }
+      else{
+        res.render("ticket.ejs",{doctor:doctor});
+        res.end();
+        db.close();
+      }
+    })
+  })
+})
+
+router.post("/ticketpayment",function(req,res){
+  console.log(req.body);
+})
+
+
 router.post("/telepayment",function(req,res){
   var query= url.parse(req.url,true).query;
   if(req.cookies.usertoken==undefined){

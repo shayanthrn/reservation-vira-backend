@@ -84,45 +84,36 @@
                         </div>
                         <section class="page-content default">
                             <div class="checkout-shipment">
-                               <form action="payment?from=/reserve/<%=doctor.name%>" method="POST">
                                 <ul>
                                     <li><span> نام دکتر :</span><span><%= doctor.name %></span></li>
-                                    <li><span>  تخصص :</span><span><%= doctor.category %></span></li>
+                                    <li><span>  تخصص :</span>
+                                    <% for(i=0;i<doctor.categories.length;i++) { %>
+                                    <span><%= doctor.categories[i] +" " %></span>
+                                    <% } %>
+                                    </li>
                                 </ul>
                                     <div class="row">
                                       <div class="col-12">
-                                        <div class="reservation-carousel">
-                                          <% for(let i=0;i<days.length;i++) { %>
-                                              <% if(freetimes[i].length==0) { %>
-                                                <div class="carousel-cell m-2 disabled" data-key="<%= days[i].index %>">
-                                                <% } else { %>
-                                            <div class="carousel-cell m-2" data-key="<%= days[i].index %>">
-                                                <% } %>
-                                            <div class="card px-4">
-                                              <div class="card-body text-center">
-                                                <p class="mb-0" style="width: max-content;"><%= days[i].dayofweek%></p>
-                                                <p class="mb-0"><%= days[i].day %></p>
-                                                <p class="mb-0"><%= days[i].month%></p>
-                                              </div>
+                                        <form action="ticketpayment" method="POST" enctype="multipart/form-data" >
+                                            <div  class="col-sm-12 col-md-6 mb-3" style="float: right; clear: both;">
+                                                <div class="card shadow">
+                                                    <div class="card-header bg-site-primary text-white p-2" style="background-color:#25d366;">
+                                                       ارسال پیام
+                                                    </div>
+                                                    <div class="card-body">
+                                                    <div>
+                                                        <label for="subject">موضوع :</label>
+                                                        <input name="subject" id="subject" type="text" style="min-width: 30%; max-width: 30%;">
+                                                        <textarea id="text" name="text" style="min-height: 100px;min-width: 85%;"></textarea>
+                                                    </div>
+                                                    <br/>
+                                                    <div>
+                                                        <input type="file" name="file" id="file" class="btn btn-info" style="min-width: 67%; max-width: 67%;">
+                                                    </div>
+                                                    </div>
+                                                </div>
                                             </div>
-                                          </div>
-                                          <% } %>
-                                        </div>
-                              
-                                        <div id="reserveTimesContainer">
-                                        <% for(let j=0;j<days.length;j++) { %>
-                                          <div class="reserveTimes" data-key="<%= days[j].index %>">
-                                            <div data-toggle="buttons">
-                                            <% for(let k=0;k<freetimes[j].length;k++) { %>
-                                                    <label class="reserve-time btn btn-outline-secondary float-right ml-2">
-                                                      <input class="d-none" type="radio" name="choice" id="<%= days[j].index %>" value="<%=freetimes[j][k].start.hour + ":" + freetimes[j][k].start.min + ":" + days[j].year +":"+days[j].monthnum + ":" + days[j].day %>"> <%= freetimes[j][k].start.hour + ":" + freetimes[j][k].start.min + "-" + freetimes[j][k].end.hour + ":" + freetimes[j][k].end.min %>
-                                                    </label>
-                                            <% } %>
-                                            </div>
-                                          </div>
-                                        <% } %>
-                                        </div>
-                                      </div>
+                                       </div>
                                     </div>
                             </div>
                         </section>
@@ -132,7 +123,7 @@
                             <div class="checkout-summary">
                                 <div class="checkout-summary-main">
                                     <ul class="checkout-summary-summary">
-                                        <li><span>مبلغ کل</span><span><%= doctor.visitcost %> تومان</span></li>
+                                        <li><span>مبلغ کل</span><span><%= doctor.televisitcost %> تومان</span></li>
                                     </ul>
                                     <div class="checkout-summary-devider">
                                         <div></div>
@@ -140,12 +131,12 @@
                                     <div class="checkout-summary-content">
                                         <div class="checkout-summary-price-title">مبلغ قابل پرداخت:</div>
                                         <div class="checkout-summary-price-value">
-                                            <span class="checkout-summary-price-value-amount"><%= doctor.visitcost %></span>تومان
+                                            <span class="checkout-summary-price-value-amount"><%= doctor.televisitcost %></span>تومان
                                         </div>
                                         <a href="#" class="selenium-next-step-shipping">
                                             <div class="parent-btn">
-                                                <a class="dk-btn dk-btn-info"  data-toggle="modal" data-target="#exampleModalLong" style="color:#ffff;">
-                                                    پرداخت
+                                                <a class="dk-btn btn-info"  data-toggle="modal" data-target="#exampleModalLong" style="color:#ffff; background-color: #4bb5ff;">
+                                                    پرداخت و ارسال
                                                     <i class="now-ui-icons shopping_basket"></i>
                                                 </a>
                                             </div>
@@ -181,7 +172,7 @@
                                             <!-- modal -->
                                         </a>
                                         <input type="text" name="doctor" id="doctor" value="<%= doctor.name %>" style="visibility: hidden;">
-                                        <input type="text" name="cost" value="<%= doctor.visitcost %>" style="visibility: hidden;">
+                                        <input type="text" name="cost" value="<%= doctor.televisitcost %>" style="visibility: hidden;">
                                         </form>
                                     </div>
                                 </div>
