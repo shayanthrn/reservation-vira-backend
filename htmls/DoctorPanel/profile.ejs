@@ -42,14 +42,14 @@
             </li>
             <% if(doctor.membershiptypes.includes("teleconsultant")) { %>
               <li class="nav-item">
-                <a class="nav-link" href="/DoctorPanel/tickets">
+                <a class="nav-link" href="/DoctorPanel/telereserve">
                   <i class="fa fa-phone"></i>
                   رزرو تلفنی
                 </a>
               </li>
               <% } %>
             <li class="nav-item">
-              <a class="nav-link " href="/DoctorPanel/profile">
+              <a class="nav-link active" href="/DoctorPanel/profile">
                 <i class="fa fa-user-md"></i>
                 پروفایل
               </a>
@@ -62,7 +62,7 @@
             </li>
             <% if(doctor.membershiptypes.includes("chatconsultant")) { %>
             <li class="nav-item">
-              <a class="nav-link active" href="/DoctorPanel/tickets">
+              <a class="nav-link" href="/DoctorPanel/tickets">
                 <i class="fa fa-commenting"></i>
                 گفتگو متنی
               </a>

@@ -34,14 +34,14 @@
         <div class="sidebar-sticky">
           <ul class="nav flex-column">
             <li class="nav-item">
-              <a class="nav-link" href="/DoctorPanel/dashboard">
+              <a class="nav-link active" href="/DoctorPanel/dashboard">
                 <i class="fa fa-tachometer"></i>
                 داشبورد
               </a>
             </li>
             <% if(doctor.membershiptypes.includes("teleconsultant")) { %>
               <li class="nav-item">
-                <a class="nav-link" href="/DoctorPanel/tickets">
+                <a class="nav-link" href="/DoctorPanel/telereserve">
                   <i class="fa fa-phone"></i>
                   رزرو تلفنی
                 </a>
@@ -61,7 +61,7 @@
             </li>
             <% if(doctor.membershiptypes.includes("chatconsultant")) { %>
             <li class="nav-item">
-              <a class="nav-link active" href="/DoctorPanel/tickets">
+              <a class="nav-link" href="/DoctorPanel/tickets">
                 <i class="fa fa-commenting"></i>
                 گفتگو متنی
               </a>

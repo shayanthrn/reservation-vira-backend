@@ -358,23 +358,24 @@ router.get("/api/getAllExperimentsOfHC",function(req,res){
 })
 
 
-router.post("/api/sendTicket",function(req,res){
+router.post("/api/sendTicket",function(req,res){       //should get chat i
   var query=url.parse(req.url,true).query;
   if(query.key!="pouyarahmati"){
     res.json({data:"noaccess"});
     res.end();
   }
   else{
+    var chatid=new ObjectID(req.body.chatid)
     MongoClient.connect(dburl,function(err,db){
       var dbo=db.db("mydb");
-      dbo.collection("Chats").findOne({doctor:query.dname,userphone:query.uphone},function(err,chat){
+      dbo.collection("Chats").findOne({doctor:query.dname,userphone:query.uphone,_id:chatid},function(err,chat){
         if(chat!=null){
           var now=new Date();
           var newticket;
           if(req.files==null){
-            newticket=new Ticket(req.body.subject,req.body.text,null,now);
+            newticket=new Ticket(req.body.subject,req.body.text,null,now,req.body.sender);
             chat.tickets.push(newticket);
-            dbo.collection("Chats").updateOne({doctor:query.dname,userphone:query.uphone},{$set:{tickets:chat.tickets}},function(err,asd){
+            dbo.collection("Chats").updateOne({doctor:query.dname,userphone:query.uphone,_id:chatid},{$set:{tickets:chat.tickets}},function(err,asd){
               res.json({data:"succesfull"});
               res.end();
             })
@@ -386,7 +387,7 @@ router.post("/api/sendTicket",function(req,res){
             newticket = new Ticket(req.body.subject,req.body.text,file,now,req.body.sender);
             mv(req.files.file.tempFilePath,file.path,{mkdirp:true},function(err){
               chat.tickets.push(newticket);
-              dbo.collection("Chats").updateOne({doctor:query.dname,userphone:query.uphone},{$set:{tickets:chat.tickets}},function(err,asd){
+              dbo.collection("Chats").updateOne({doctor:query.dname,userphone:query.uphone,_id:chatid},{$set:{tickets:chat.tickets}},function(err,asd){
                 res.json({data:"succesfull"});
                 res.end();
               })
@@ -398,7 +399,7 @@ router.post("/api/sendTicket",function(req,res){
           var now=new Date();
           var newticket;
           if(req.files==null){
-            newticket=new Ticket(req.body.subject,req.body.text,null,now);
+            newticket=new Ticket(req.body.subject,req.body.text,null,now,req.body.sender);
             newchat.tickets.push(newticket);
               dbo.collection("Chats").insertOne(newchat,function(err,as){
                 res.json({data:"succesfull"});
@@ -409,7 +410,7 @@ router.post("/api/sendTicket",function(req,res){
             var arr=req.files.file.name.split('.');
             var fileformat=arr[arr.length-1];
             var file={format:fileformat,path:"data/ticketfiles/"+arr[0]+now.getTime()+"."+fileformat};
-            newticket = new Ticket(req.body.subject,req.body.text,file,now);
+            newticket = new Ticket(req.body.subject,req.body.text,file,now,req.body.sender);
             mv(req.files.file.tempFilePath,file.path,{mkdirp:true},function(err){
               newchat.tickets.push(newticket);
               dbo.collection("Chats").insertOne(newchat,function(err,as){
@@ -2358,12 +2359,124 @@ router.get("/doctorpanel/tickets/:tid",function(req,res){
         else{
           var tid=ObjectID(req.params.tid);
           dbo.collection("Chats").findOne({_id:tid,doctor:result.name},function(err,chat){
+            chat.tickets.forEach(function(doc){
+              doc.datecreated=new persianDate(doc.datecreated).format()
+            })
             res.render("DoctorPanel/chatpage.ejs",{doctor:result,chat:chat});
             db.close();
             res.end();
           })
         }
       })
+    })
+  }
+})
+
+router.post("/sendticket",function(req,res){
+  if(req.cookies.doctortoken==undefined){
+    res.redirect('/noaccess');
+  }
+  else{
+    MongoClient.connect(dburl,function(err,db){
+      var dbo=db.db("mydb");
+      dbo.collection('Doctors').findOne({token:req.cookies.doctortoken},async function(err,result){
+        if(result==null || !result.membershiptypes.includes("chatconsultant")){
+          db.close();
+          res.redirect('noaccess');
+        }
+        else{
+          var chatid=new ObjectID(req.body.chatid)
+          dbo.collection("Chats").findOne({doctor:req.body.dname,userphone:req.body.uphone,_id:chatid},function(err,chat){
+            if(chat!=null){
+              var now=new Date();
+              var newticket;
+              if(req.files==null){
+                newticket=new Ticket(req.body.subject,req.body.text,null,now,req.body.sender);
+                chat.tickets.push(newticket);
+                dbo.collection("Chats").updateOne({doctor:req.body.dname,userphone:req.body.uphone,_id:chatid},{$set:{tickets:chat.tickets}},function(err,asd){
+                  res.redirect(req.body.from);
+                  db.close();
+                })
+              }
+              else{
+                var arr=req.files.file.name.split('.');
+                var fileformat=arr[arr.length-1];
+                var file={format:fileformat,path:"data/ticketfiles/"+arr[0]+now.getTime()+"."+fileformat};
+                newticket = new Ticket(req.body.subject,req.body.text,file,now,req.body.sender);
+                mv(req.files.file.tempFilePath,file.path,{mkdirp:true},function(err){
+                  chat.tickets.push(newticket);
+                  dbo.collection("Chats").updateOne({doctor:req.body.dname,userphone:req.body.uphone,_id:chatid},{$set:{tickets:chat.tickets}},function(err,asd){
+                    res.redirect(req.body.from);
+                    db.close();
+                  })
+                })
+              }
+            }
+            else{
+              var newchat = new Chat(req.body.dname,req.body.uphone);
+              var now=new Date();
+              var newticket;
+              if(req.files==null){
+                newticket=new Ticket(req.body.subject,req.body.text,null,now,req.body.sender);
+                newchat.tickets.push(newticket);
+                  dbo.collection("Chats").insertOne(newchat,function(err,as){
+                    res.redirect(req.body.from);
+                    db.close();
+                  })
+              }
+              else{
+                var arr=req.files.file.name.split('.');
+                var fileformat=arr[arr.length-1];
+                var file={format:fileformat,path:"data/ticketfiles/"+arr[0]+now.getTime()+"."+fileformat};
+                newticket = new Ticket(req.body.subject,req.body.text,file,now,req.body.sender);
+                mv(req.files.file.tempFilePath,file.path,{mkdirp:true},function(err){
+                  newchat.tickets.push(newticket);
+                  dbo.collection("Chats").insertOne(newchat,function(err,as){
+                    res.redirect(req.body.from);
+                    db.close();;
+                  })
+                })
+              } 
+            }
+          })
+        }
+      })
+    })
+  }
+})
+
+router.get("/Download",function(req,res){
+  var query=url.parse(req.url,true).query;
+  if(req.cookies.doctortoken==undefined && req.cookies.admintoken==undefined){
+    res.redirect("noaccess");
+  }
+  else{
+    MongoClient.connect(dburl,function(err,db){
+      var dbo=db.db("mydb");
+      if(req.cookies.doctortoken!=undefined){
+        dbo.collection("Doctors").findOne({token:req.cookies.doctortoken},function(err,doctor){
+          if(doctor==null){
+            res.redirect("noaccess");
+            db.close();
+          }
+          else{
+            res.download(query.path);
+             db.close();
+          }
+        })
+      }
+      else{
+        dbo.collection("Admins").findOne({token:req.cookies.admintoken},function(err,admin){
+          if(admin==null){
+            res.redirect("noaccess");
+            db.close();
+          }
+          else{
+            res.download(query.path);
+             db.close();
+          }
+        })
+      }
     })
   }
 })

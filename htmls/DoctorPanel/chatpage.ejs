@@ -102,7 +102,7 @@
             </li>
             <% if(doctor.membershiptypes.includes("teleconsultant")) { %>
               <li class="nav-item">
-                <a class="nav-link" href="/DoctorPanel/tickets">
+                <a class="nav-link" href="/DoctorPanel/telereserve">
                   <i class="fa fa-phone"></i>
                   رزرو تلفنی
                 </a>
@@ -175,6 +175,7 @@
               
                 <div class="card-header bg-site-primary text-white p-2">
                     <%=chat.tickets[i].subject%>
+                    <p><%= chat.tickets[i].datecreated %></p>
                 </div>
                 <div class="card-body">
                 <div>
@@ -183,7 +184,7 @@
                 <br/>
                 <% if (chat.tickets[i].file!=null) { %>
                 <div>
-                    <a href="<%= "/DoctorPanel/tickets/" + chat._id %>" class="btn btn-info">دریافت فایل </a>
+                    <a href="<%= "/Download?path=" + chat.tickets[i].file.path %>" class="btn btn-info">دریافت فایل </a>
                 </div>
                 <% } %>
                 </div>
@@ -191,6 +192,7 @@
             </div> 
             <% } %>
             <% if(chat.finished==false) { %>
+            <form action="sendticket" method="POST" enctype="multipart/form-data" >
             <div  class="col-sm-12 col-md-6 col-lg-4 mb-3" style="float: right; clear: both; max-width: 50%;">
                 <div class="card shadow">
                     <div class="card-header bg-site-primary text-white p-2" style="background-color:#25d366;">
@@ -200,16 +202,22 @@
                     <div>
                         <label for="subject">موضوع :</label>
                         <input name="subject" id="subject" type="text">
-                        <textarea style="min-height: 100px;min-width: 430px;"></textarea>
+                        <textarea id="text" name="text" style="min-height: 100px;min-width: 430px;"></textarea>
                     </div>
                     <br/>
                     <div>
-                        <input type="file" class="btn btn-info">
-                        <a href="test" class="btn btn-info" style="float: left;">ارسال</a>
+                        <input type="file" name="file" id="file" class="btn btn-info">
+                        <input type="text" name="sender" id="sender" value="doctor" style="visibility: hidden;">
+                        <input type="text" name="chatid" id="chatid" value="<%= chat._id %>" style="visibility: hidden;">
+                        <input type="text" name="uphone" id="uphone" value="<%= chat.userphone %>" style="visibility: hidden;">
+                        <input type="text" name="dname" id="dname" value="<%= chat.doctor %>" style="visibility: hidden;">
+                        <input type="text" name="from" id="from" value="<%= "/DoctorPanel/tickets/" + chat._id %>" style="visibility: hidden;">
+                        <button type="submit" class="btn btn-info" style="float: left;">ارسال</a>
                     </div>
                     </div>
                 </div>
             </div>
+            </form>
             <% } %>
           </div>
         </div>
