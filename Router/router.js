@@ -2323,7 +2323,9 @@ router.get("/doctorpanel/tickets",function(req,res){
           res.redirect('noaccess');
         }
         else{
+          console.log("here")
           chats=await dbo.collection("Chats").find({doctor:result.name}).toArray()
+          console.log("and here")
           var foreach = new Promise((resolve, reject) => {
             chats.forEach(async function(doc,index,array){
               user=await dbo.collection("Users").findOne({phonenumber:doc.userphone})
