@@ -2156,9 +2156,9 @@ router.get("/doctorpanel/removevisittimes",function(req,res){
             days.push(currentday);
             freetimes.push(getDoctimeslots(result,new myDate(currentday.toArray()[2],currentday.toArray()[1],currentday.toArray()[0])));
           }
-          res.render("Doctorpanel/removevisittimes.ejs",{doctor:result,days:createDayboxobj(days),freetimes:freetimes});
+          res.render("DoctorPanel/removevisittimes.ejs",{doctor:result,days:createDayboxobj(days),freetimes:freetimes});
           db.close();
-          //res.end();
+          res.end();
         }
       })
     })
