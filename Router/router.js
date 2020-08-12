@@ -3465,7 +3465,7 @@ router.post("/telepayment",function(req,res){
   }
 })
 
-router.get("telepaymenthandler",function(req,res){
+router.get("/telepaymenthandler",function(req,res){
   var query= url.parse(req.url,true).query;
   MongoClient.connect(dburl,function(err,db){
     var dbo=db.db("mydb");
