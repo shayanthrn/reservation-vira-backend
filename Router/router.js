@@ -14,6 +14,7 @@ var Chat = require('../coreapp/Chat.js');
 var User = require('../coreapp/User.js');
 var Reservation = require('../coreapp/Reservation.js');
 var ReservationHC = require('../coreapp/ReservationHC.js');
+var teleReservation = require('../coreapp/teleReservation.js');
 var Category = require('../coreapp/Category.js');
 var dburl="mongodb://localhost:27017/";          //url of database            auth o doros kon 
 var lodash =require('lodash');
@@ -1733,7 +1734,8 @@ function createDayboxobj(days){
       month:days[i].format("MMMM"),
       monthnum:days[i].toArray()[1],
       year:days[i].toArray()[0],
-      index:i
+      index:i,
+      ndayofweek:(days[i].day()-1)+""
     })
   }
   return result;
@@ -3411,6 +3413,123 @@ router.get("/reservation/:type/:HCname",function(req,res){
   })
 })
 
+
+router.post("/telepayment",function(req,res){
+  var query= url.parse(req.url,true).query;
+  if(req.cookies.usertoken==undefined){
+    res.redirect("/signup?from="+query.from);
+  }
+  else{
+    if(req.body.choice==undefined){
+      res.redirect("/"+ query.from);
+    }
+    else{
+      MongoClient.connect(dburl,function(err,db){
+        var dbo=db.db("mydb");
+        dbo.collection("Users").findOne({token:req.cookies.usertoken},function(err,user){
+          if(user==null){
+            res.redirect("/signup?from="+query.from);
+            db.close();
+            res.end();
+          }
+          else{
+            dbo.collection("Doctors").findOne({name:req.body.doctor},function(err,doctor){
+              var reservedata=req.body.choice.split(":");
+              var date=new myDate(Number(reservedata[2]),Number(reservedata[1]),Number(reservedata[0]));
+              var time={start:reservedata[3],end:reservedata[4]};
+              var timeinfo={time:time,date:date}
+              zarinpal.PaymentRequest({
+                Amount: req.body.cost , // In Tomans
+                CallbackURL: 'http://reservation.drtajviz.com/telepaymenthandler',
+                Description: 'Dr tajviz payment',
+                Email: 'shayanthrn@gmail.com',
+                Mobile: '09128993687'
+              }).then(response => {
+                if (response.status === 100) {
+                  reservation = new teleReservation(user._id,doctor._id,timeinfo,response.authority,req.body.cost);
+                  dbo.collection("TempteleReserves").insertOne(reservation,function(err,reserve){
+                    res.redirect(response.url)
+                  })
+                }
+              }).catch(err => {
+                res.write("<html><body><p>there is a problem on server please try again later</p><a href='/' >go back to main page</a></body></html>");
+                console.error(err);
+                db.close();
+                res.end();
+              });
+            })
+          }
+        })
+      })
+    }
+  }
+})
+
+router.get("telepaymenthandler",function(req,res){
+  var query= url.parse(req.url,true).query;
+  MongoClient.connect(dburl,function(err,db){
+    var dbo=db.db("mydb");
+    dbo.collection("TempteleReserves").findOne({authority:query.Authority},function(err,reserve){
+      if(reserve==null){
+        db.close();
+        res.redirect("/noaccess");
+        
+      }
+      else{
+        if(query.Status=="NOK"){
+          strtime=reserve.timeinfo.time.start+"-"+reserve.timeinfo.time.end;
+          dbo.collection("Doctors").findOne({_id:reserve.doctor},function(err,doctor){
+            dbo.collection("TempteleReserves").deleteOne({authority:query.Authority},function(err,result){
+              res.render("paymentfail.ejs",{doctor:doctor,time:strtime,href:0});
+              db.close();
+              res.end();
+            })
+          })
+        }
+        else{
+          zarinpal.PaymentVerification({
+          Amount: reserve.cost, // In Tomans
+          Authority: reserve.authority,
+          }).then(response => {
+          if (response.status === 100 && response.RefID!=0) {
+            var reservation=reserve;
+            reservation.refid=response.RefID;
+            dbo.collection("teleReservations").insertOne(reservation,function(err,result234){
+              dbo.collection("TempteleReserves").deleteOne({authority:query.Authority},function(err,aa){
+                  dbo.collection("Users").updateOne({_id:reservation.user},{$addToSet:{telereservations:reservation}},function(err,ad){
+                    dbo.collection("Doctors").findOne({_id:reservation.doctor},function(err,HC){
+                        dbo.collection("Doctors").updateOne({_id:reservation.doctor},{$addToSet:{telereservations:reservation}},function(err,sas){
+                          strtime=reserve.timeinfo.time.start+"-"+reserve.timeinfo.time.end;
+                          res.render("paymentaccept.ejs",{doctor:doctor,time:strtime,resid:reservation.refid});
+                          //sendSMSforres(reservation);
+                          res.end();
+                        })
+                    })
+                  })
+              })
+            })
+          } 
+          else {
+            strtime=reserve.timeinfo.time.start+"-"+reserve.timeinfo.time.end;
+              dbo.collection("Doctors").findOne({_id:reserve.doctor},function(err,doctor){
+              dbo.collection("TempteleReserves").deleteOne({authority:query.Authority},function(err,result){
+              res.render("paymentfail.ejs",{doctor:doctor,time:strtime,href:0});
+              res.end();
+            })
+          })
+          }
+          }).catch(err => {
+            res.write("<html><body><p>there is a problem on server please try again later</p><a href='/' >go back to main page</a></body></html>");
+            console.error(err);
+            res.end();
+          });
+        }
+      }
+    })
+  })
+})
+
+
 router.post("/paymentHC",function(req,res){
   var query= url.parse(req.url,true).query;
   req.session.prevurl=req.session.currurl;
@@ -3553,9 +3672,9 @@ router.get("/paymenthandlerHC",function(req,res){
             })
           } else {
               strtime=reserve.time.start.hour+":"+reserve.time.start.min;
-              dbo.collection("Doctors").findOne({_id:reserve.doctor},function(err,doctor){
+              dbo.collection("HealthCenters").findOne({_id:reserve.HC},function(err,HC){
               dbo.collection("TempReservesHC").deleteOne({authority:query.Authority},function(err,result){
-              res.render("paymentfail.ejs",{doctor:doctor,time:strtime,href:0});
+              res.render("paymentfail.ejs",{doctor:HC,time:strtime,href:0});
               res.end();
             })
           })
@@ -3665,6 +3784,76 @@ router.get("/reserve/:Doctor",function(req,res){
       }
       categories().then(basiccategories=>{
         res.render("reserve.ejs",{doctor:result,days:createDayboxobj(days),freetimes:freetimes,categories:basiccategories});
+        db.close();
+        res.end();
+      })
+      }
+    })
+  })
+})
+
+router.get("/telereserve/:Doctor",function(req,res){
+  MongoClient.connect(dburl,function(err,db){
+    if(err) throw err;
+    var dbo=db.db("mydb");
+    days=[];
+    freetimes=[]
+    dbo.collection("Doctors").findOne({name:req.params.Doctor.split('-').join(' ')},function(err,result){
+      if(result==null){
+        db.close();
+        res.redirect('/');
+      }
+      else{
+      currentday=new persianDate();
+      days.push(currentday);
+      for(let i=0;i<14;i++){
+        currentday=currentday.add("d",1);
+        days.push(currentday);
+      }
+      myteletimes={'0':[],'1':[],'2':[],'3':[],'4':[],'5':[],'6':[]}
+      result.teletimes.forEach(function(doc){
+        switch (Number(doc[0])) {
+          case 0:
+            arr=doc.split("-");
+            obj={start:arr[1],end:arr[2]}
+            myteletimes['0'].push(obj)
+            break;
+          case 1:
+            arr=doc.split("-");
+            obj={start:arr[1],end:arr[2]}
+            myteletimes['1'].push(obj)
+            break;
+          case 2:
+            arr=doc.split("-");
+            obj={start:arr[1],end:arr[2]}
+            myteletimes['2'].push(obj)
+            break;
+          case 3:
+            arr=doc.split("-");
+            obj={start:arr[1],end:arr[2]}
+            myteletimes['3'].push(obj)
+            break;
+          case 4:
+            arr=doc.split("-");
+            obj={start:arr[1],end:arr[2]}
+            myteletimes['4'].push(obj)
+            break;
+          case 5:
+            arr=doc.split("-");
+            obj={start:arr[1],end:arr[2]}
+            myteletimes['5'].push(obj)
+            break;
+          case 6:
+            arr=doc.split("-");
+            obj={start:arr[1],end:arr[2]}
+            myteletimes['6'].push(obj)
+            break;
+          default:
+            break;
+        }
+      })
+      categories().then(basiccategories=>{
+        res.render("telereserve.ejs",{doctor:result,days:createDayboxobj(days),teletimes:myteletimes,categories:basiccategories});
         db.close();
         res.end();
       })

@@ -20,6 +20,7 @@ class Doctor{
         if(membershiptypes.includes("teleconsultant")){
             this.teletimes=[]
             this.telereservations=[];
+            this.televisitcost=5000;
         }
         this.token="";
         this.appknowledge=appknowledge;
