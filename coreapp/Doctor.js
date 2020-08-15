@@ -22,6 +22,9 @@ class Doctor{
             this.telereservations=[];
             this.televisitcost=5000;
         }
+        if(membershiptypes.includes("chatconsultant")){
+            this.chatcost=5000;
+        }
         this.token="";
         this.appknowledge=appknowledge;
         this.reservations=[];

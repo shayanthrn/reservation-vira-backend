@@ -23,16 +23,6 @@
     <link href="assets/css/main.css" rel="stylesheet" />
     <link rel="stylesheet" href="https://unpkg.com/flickity@2/dist/flickity.min.css">
     <link rel="stylesheet" href="/styleres.css">
-    
-    <style>
-        .reserve-time {
-        border-radius: 5px !important;
-        }
-        .reserve-time.active {
-        background-color: #06cdd1 !important;
-        border-color: #06cdd1 !important;
-        }
-    </style>
  
 </head>
 
@@ -94,7 +84,7 @@
                                 </ul>
                                     <div class="row">
                                       <div class="col-12">
-                                        <form action="ticketpayment" method="POST" enctype="multipart/form-data" >
+                                        <form action="<%= "ticketpayment?from=" + "/ticket/" + doctor.name %>" method="POST" enctype="multipart/form-data" >
                                             <div  class="col-sm-12 col-md-6 mb-3" style="float: right; clear: both;">
                                                 <div class="card shadow">
                                                     <div class="card-header bg-site-primary text-white p-2" style="background-color:#25d366;">
@@ -123,7 +113,7 @@
                             <div class="checkout-summary">
                                 <div class="checkout-summary-main">
                                     <ul class="checkout-summary-summary">
-                                        <li><span>مبلغ کل</span><span><%= doctor.televisitcost %> تومان</span></li>
+                                        <li><span>مبلغ کل</span><span><%= doctor.chatcost %> تومان</span></li>
                                     </ul>
                                     <div class="checkout-summary-devider">
                                         <div></div>
@@ -131,7 +121,7 @@
                                     <div class="checkout-summary-content">
                                         <div class="checkout-summary-price-title">مبلغ قابل پرداخت:</div>
                                         <div class="checkout-summary-price-value">
-                                            <span class="checkout-summary-price-value-amount"><%= doctor.televisitcost %></span>تومان
+                                            <span class="checkout-summary-price-value-amount"><%= doctor.chatcost %></span>تومان
                                         </div>
                                         <a href="#" class="selenium-next-step-shipping">
                                             <div class="parent-btn">
@@ -172,7 +162,7 @@
                                             <!-- modal -->
                                         </a>
                                         <input type="text" name="doctor" id="doctor" value="<%= doctor.name %>" style="visibility: hidden;">
-                                        <input type="text" name="cost" value="<%= doctor.televisitcost %>" style="visibility: hidden;">
+                                        <input type="text" name="cost" value="<%= doctor.chatcost %>" style="visibility: hidden;">
                                         </form>
                                     </div>
                                 </div>

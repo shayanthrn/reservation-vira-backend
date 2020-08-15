@@ -3432,7 +3432,142 @@ router.get("/ticket/:doctor",function(req,res){
 })
 
 router.post("/ticketpayment",function(req,res){
-  console.log(req.body);
+  var query= url.parse(req.url,true).query;
+  if(req.cookies.usertoken==undefined){
+    res.redirect("/signup?from="+query.from);
+  }
+  else{
+    MongoClient.connect(dburl,function(err,db){
+      var dbo=db.db("mydb");
+      dbo.collection("Users").findOne({token:req.cookies.usertoken},function(err,user){
+        if(user==null){
+          res.redirect("/signup?from="+query.from);
+          db.close();
+          res.end();
+        }
+        else{
+          dbo.collection("Doctors").findOne({name:req.body.doctor},function(err,doctor){
+            zarinpal.PaymentRequest({
+              Amount: req.body.cost , // In Tomans
+              CallbackURL: 'http://reservation.drtajviz.com/ticketpaymenthandler',
+              Description: 'Dr tajviz payment',
+              Email: 'shayanthrn@gmail.com',
+              Mobile: '09128993687'
+            }).then(response => {
+              if (response.status === 100) {
+                var newchat = new Chat(req.body.doctor,user.phonenumber);
+                newchat.authority=response.authority;
+                var now=new Date();
+                var newticket;
+                if(req.files==null){
+                  newticket=new Ticket(req.body.subject,req.body.text,null,now,"patient");
+                  newchat.tickets.push(newticket);
+                  dbo.collection("TempChats").insertOne(newchat,function(err,as){
+                    res.redirect(response.url);
+                    db.close();
+                  })
+                }
+                else{
+                  var arr=req.files.file.name.split('.');
+                  var fileformat=arr[arr.length-1];
+                  var file={format:fileformat,path:"data/ticketfiles/"+arr[0]+now.getTime()+"."+fileformat};
+                  newticket = new Ticket(req.body.subject,req.body.text,file,now,"patient");
+                  mv(req.files.file.tempFilePath,file.path,{mkdirp:true},function(err){
+                    newchat.tickets.push(newticket);
+                    dbo.collection("TempChats").insertOne(newchat,function(err,as){
+                      res.redirect(response.url);
+                      db.close();
+                    })
+                  })
+                }
+              }
+              else{
+                res.redirect("/failure");
+                db.close()
+              }
+            }).catch(err => {
+              res.write("<html><body><p>there is a problem on server please try again later</p><a href='/' >go back to main page</a></body></html>");
+              console.error(err);
+              db.close();
+              res.end();
+            });
+          })
+        }
+      })
+    })
+  }
+})
+
+router.get("/ticketpaymenthandler",function(req,res){
+  var query= url.parse(req.url,true).query;
+  MongoClient.connect(dburl,function(err,db){
+    var dbo=db.db("mydb");
+    dbo.collection("TempChats").findOne({authority:query.Authority},function(err,chat){
+      if(chat==null){
+        db.close();
+        res.redirect("/noaccess");
+        
+      }
+      else{
+        if(query.Status=="NOK"){
+          dbo.collection("Doctors").findOne({name:chat.doctor},function(err,doctor){
+            dbo.collection("TempChats").deleteOne({authority:query.Authority},function(err,result){
+              fs.unlink(chat.tickets[0].file.path, function(err) {
+                if(err && err.code == 'ENOENT') {
+                    console.info("File doesn't exist, won't remove it.");
+                } else if (err) {
+                    console.error("Error occurred while trying to remove file");
+                } else {
+                    console.info(`removed`);
+                }
+              });
+              res.render("paymentfail.ejs",{doctor:doctor,time:"123123",href:0});
+              db.close();
+              res.end();
+            })
+          })
+        }
+        else{
+          zarinpal.PaymentVerification({
+          Amount: reserve.cost, // In Tomans
+          Authority: reserve.authority,
+          }).then(response => {
+          if (response.status === 100 && response.RefID!=0) {
+            var reservation=reserve;
+            reservation.refid=response.RefID;
+            dbo.collection("teleReservations").insertOne(reservation,function(err,result234){
+              dbo.collection("TempteleReserves").deleteOne({authority:query.Authority},function(err,aa){
+                  dbo.collection("Users").updateOne({_id:reservation.user},{$addToSet:{telereservations:reservation}},function(err,ad){
+                    dbo.collection("Doctors").findOne({_id:reservation.doctor},function(err,HC){
+                        dbo.collection("Doctors").updateOne({_id:reservation.doctor},{$addToSet:{telereservations:reservation}},function(err,sas){
+                          strtime=reserve.timeinfo.time.start+"-"+reserve.timeinfo.time.end;
+                          res.render("paymentaccept.ejs",{doctor:doctor,time:strtime,resid:reservation.refid});
+                          //sendSMSforres(reservation);
+                          res.end();
+                        })
+                    })
+                  })
+              })
+            })
+          } 
+          else {
+            strtime=reserve.timeinfo.time.start+"-"+reserve.timeinfo.time.end;
+              dbo.collection("Doctors").findOne({_id:reserve.doctor},function(err,doctor){
+              dbo.collection("TempteleReserves").deleteOne({authority:query.Authority},function(err,result){
+              res.render("paymentfail.ejs",{doctor:doctor,time:strtime,href:0});
+              res.end();
+            })
+          })
+          }
+          }).catch(err => {
+            res.write("<html><body><p>there is a problem on server please try again later</p><a href='/' >go back to main page</a></body></html>");
+            console.error(err);
+            res.end();
+          });
+        }
+      }
+    })
+  })
 })
 
 
