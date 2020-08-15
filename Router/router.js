@@ -1599,11 +1599,6 @@ router.post('/addHC',function(req,res){
 
 //-----------------------test route--------------------------//
 
-router.post("/test",function(req,res){
-    console.log(req.body)
-    res.end();
-})
-
 router.get("/test2",function(req,res){
   reservation={
     "user": {
@@ -1638,10 +1633,9 @@ router.get("/test2",function(req,res){
 
 router.post("/test",function(req,res){
   console.log("asdfasdf")
-  //console.log(req.files);
-  //console.log(req.body);
-  res.write("testtest")
-  //res.json({data:req.body,data2:req.files});
+  console.log(req.files);
+  console.log(req.body);
+  res.json({data:req.body,data2:req.files});
   res.end();
 })
 
