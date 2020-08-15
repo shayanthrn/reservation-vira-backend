@@ -3512,15 +3512,17 @@ router.get("/ticketpaymenthandler",function(req,res){
         if(query.Status=="NOK"){
           dbo.collection("Doctors").findOne({name:chat.doctor},function(err,doctor){
             dbo.collection("TempChats").deleteOne({authority:query.Authority},function(err,result){
-              fs.unlink(chat.tickets[0].file.path, function(err) {
-                if(err && err.code == 'ENOENT') {
-                    console.info("File doesn't exist, won't remove it.");
-                } else if (err) {
-                    console.error("Error occurred while trying to remove file");
-                } else {
-                    console.info(`removed`);
-                }
-              });
+              if(chat.tickets[0].file!=null){
+                fs.unlink(chat.tickets[0].file.path, function(err) {
+                  if(err && err.code == 'ENOENT') {
+                      console.info("File doesn't exist, won't remove it.");
+                  } else if (err) {
+                      console.error("Error occurred while trying to remove file");
+                  } else {
+                      console.info(`removed`);
+                  }
+                });
+              }
               res.render("paymentfail.ejs",{doctor:doctor,time:"123123",href:0});
               db.close();
               res.end();
