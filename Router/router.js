@@ -1638,9 +1638,10 @@ router.get("/test2",function(req,res){
 
 router.post("/test",function(req,res){
   console.log("asdfasdf")
-  console.log(req.files);
+  //console.log(req.files);
   console.log(req.body);
-  res.json({data:req.body,data2:req.files});
+  res.write("testtest")
+  //res.json({data:req.body,data2:req.files});
   res.end();
 })
 
