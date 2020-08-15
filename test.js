@@ -6,7 +6,7 @@ var dburl="mongodb://localhost:27017/";
 
 MongoClient.connect(dburl,function(err,db){
     var dbo=db.db("mydb");
-    dbo.collection("Doctors").updateMany({membershiptypes:"chatconsultant"},{$set:{chatcost:5000}},function(err,res){
+    dbo.collection("Users").updateMany({},{$set:{chats:[]}},function(err,res){
         console.log(res);
     })
 })

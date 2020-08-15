@@ -3523,7 +3523,8 @@ router.get("/ticketpaymenthandler",function(req,res){
                   }
                 });
               }
-              res.render("paymentfail.ejs",{doctor:doctor,time:"123123",href:0});
+              doctor.visitcost=doctor.chatcost;
+              res.render("paymentfail.ejs",{doctor:doctor,time:"-",href:0});
               db.close();
               res.end();
             })
@@ -3531,19 +3532,18 @@ router.get("/ticketpaymenthandler",function(req,res){
         }
         else{
           zarinpal.PaymentVerification({
-          Amount: reserve.cost, // In Tomans
-          Authority: reserve.authority,
+          Amount: chat.cost, // In Tomans
+          Authority: chat.authority,
           }).then(response => {
           if (response.status === 100 && response.RefID!=0) {
-            var reservation=reserve;
-            reservation.refid=response.RefID;
-            dbo.collection("teleReservations").insertOne(reservation,function(err,result234){
-              dbo.collection("TempteleReserves").deleteOne({authority:query.Authority},function(err,aa){
-                  dbo.collection("Users").updateOne({_id:reservation.user},{$addToSet:{telereservations:reservation}},function(err,ad){
-                    dbo.collection("Doctors").findOne({_id:reservation.doctor},function(err,HC){
-                        dbo.collection("Doctors").updateOne({_id:reservation.doctor},{$addToSet:{telereservations:reservation}},function(err,sas){
-                          strtime=reserve.timeinfo.time.start+"-"+reserve.timeinfo.time.end;
-                          res.render("paymentaccept.ejs",{doctor:doctor,time:strtime,resid:reservation.refid});
+            var mychat=chat;
+            mychat.refid=response.RefID;
+            dbo.collection("Chats").insertOne(mychat,function(err,result234){
+              dbo.collection("TempChats").deleteOne({authority:query.Authority},function(err,aa){
+                  dbo.collection("Users").updateOne({phonenumber:mychat.userphone},{$addToSet:{chats:mychat}},function(err,ad){
+                    dbo.collection("Doctors").findOne({name:mychat.doctor},function(err,HC){
+                        dbo.collection("Doctors").updateOne({name:mychat.doctor},{$addToSet:{chats:reservation}},function(err,sas){
+                          res.render("paymentaccept.ejs",{doctor:doctor,time:"-",resid:mychat.refid});
                           //sendSMSforres(reservation);
                           res.end();
                         })
@@ -3553,13 +3553,25 @@ router.get("/ticketpaymenthandler",function(req,res){
             })
           } 
           else {
-            strtime=reserve.timeinfo.time.start+"-"+reserve.timeinfo.time.end;
-              dbo.collection("Doctors").findOne({_id:reserve.doctor},function(err,doctor){
-              dbo.collection("TempteleReserves").deleteOne({authority:query.Authority},function(err,result){
-              res.render("paymentfail.ejs",{doctor:doctor,time:strtime,href:0});
-              res.end();
-            })
-          })
+              dbo.collection("Doctors").findOne({name:chat.doctor},function(err,doctor){
+                dbo.collection("TempChats").deleteOne({authority:query.Authority},function(err,result){
+                  if(chat.tickets[0].file!=null){
+                    fs.unlink(chat.tickets[0].file.path, function(err) {
+                      if(err && err.code == 'ENOENT') {
+                          console.info("File doesn't exist, won't remove it.");
+                      } else if (err) {
+                          console.error("Error occurred while trying to remove file");
+                      } else {
+                          console.info(`removed`);
+                      }
+                    });
+                  }
+                  doctor.visitcost=doctor.chatcost;
+                  res.render("paymentfail.ejs",{doctor:doctor,time:"-",href:0});
+                  db.close();
+                  res.end();
+                })
+              })
           }
           }).catch(err => {
             res.write("<html><body><p>there is a problem on server please try again later</p><a href='/' >go back to main page</a></body></html>");
