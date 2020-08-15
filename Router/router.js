@@ -3417,7 +3417,7 @@ router.get("/reservation/:type/:HCname",function(req,res){
 router.get("/ticket/:doctor",function(req,res){
   MongoClient.connect(dburl,function(err,db){
     var dbo=db.db("mydb");
-    dbo.collection("Doctors").findOne({name:req.params.doctor},function(err,doctor){
+    dbo.collection("Doctors").findOne({name:req.params.doctor.split('-').join(' ')},function(err,doctor){
       if(doctor==null){
         console.log(req.url)
         res.end();
