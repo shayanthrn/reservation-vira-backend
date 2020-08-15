@@ -1637,6 +1637,7 @@ router.get("/test2",function(req,res){
 })
 
 router.post("/test",function(req,res){
+  console.log("asdfasdf")
   console.log(req.files);
   console.log(req.body);
   res.json({data:req.body,data2:req.files});
@@ -2686,8 +2687,50 @@ router.get("/AdminPanel/dashboard",function(req,res){
 })
 
 router.get("/AdminPanel/doctors",function(req,res){
-  res.render("notimp.ejs");
-  res.end()
+  if(req.cookies.admintoken==undefined){
+    res.redirect('/noaccess');
+  }
+  else{
+    MongoClient.connect(dburl,function(err,db){
+      var dbo=db.db("mydb");
+      dbo.collection("Admins").findOne({token:req.cookies.admintoken},async function(err,result){
+        if(result==null){
+          db.close();
+          res.redirect('/noaccess');
+        }
+        else{
+          var doctors= await dbo.collection("Doctors").find().toArray()
+          res.render("AdminPanel/doctors-list.ejs",{doctors:doctors});
+          db.close();
+          res.end();
+        }
+      })
+    })
+  }
+})
+
+router.get("/AdminPanel/doctors/:doctor",function(req,res){
+  if(req.cookies.admintoken==undefined){
+    res.redirect('/noaccess');
+  }
+  else{
+    MongoClient.connect(dburl,function(err,db){
+      var dbo=db.db("mydb");
+      dbo.collection("Admins").findOne({token:req.cookies.admintoken},function(err,result){
+        if(result==null){
+          db.close();
+          res.redirect('/noaccess');
+        }
+        else{
+          dbo.collection("Doctors").findOne({name:req.params.doctor},function(err,doctor){
+            res.render("AdminPanel/doctors-profile.ejs",{doctor:doctor});
+            db.close();
+            res.end();
+          })
+        }
+      })
+    })
+  }
 })
 
 router.get("/AdminPanel/patients",function(req,res){

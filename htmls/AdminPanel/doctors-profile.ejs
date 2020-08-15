@@ -3,15 +3,24 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
   <meta name="description" content="">
+  <base id="base">
+  <script src="/assets/js/config.js"></script>
   <meta name="author" content="">
   <link rel="icon" href="favicon.ico">
 
   <title></title>
 
   <link rel="stylesheet" href="https://cdn.rtlcss.com/bootstrap/v4.1.3/css/bootstrap.min.css" integrity="sha384-Jt6Tol1A2P9JBesGeCxNrxkmRFSjWCBW1Af7CSQSKsfMVQCqnUVWhZzG0puJMCK6" crossorigin="anonymous">
-  <link href="../assets/dashboard.rtl.css" rel="stylesheet">
+  <link href="assets/panelassests/dashboard.rtl.css" rel="stylesheet">
+  
+
+  <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+  <script>window.jQuery || document.write('<script src="assets/panelassests/jquery-slim.min.js"><\/script>')</script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+  <script src="https://cdn.rtlcss.com/bootstrap/v4.1.3/js/bootstrap.min.js" integrity="sha384-C/pvytx0t5v9BEbkMlBAGSPnI1TQU1IrTJ6DJbC8GBHqdMnChcb6U4xg4uRkIQCV" crossorigin="anonymous"></script>
   <script src="https://use.fontawesome.com/6d68f18b97.js"></script>
   <link href="https://use.fontawesome.com/6d68f18b97.css" media="all" rel="stylesheet">
+  <link href="assets/css/main.css" rel="stylesheet" />
 
   <link rel="stylesheet" href="https://unpkg.com/persian-datepicker@latest/dist/css/persian-datepicker.min.css">
 </head>
@@ -19,7 +28,7 @@
 <body>
 
   <nav class="navbar fixed-top navbar-expand-lg nav-dark">
-    <a class="navbar-brand mr-2" href="#">داشبورد برند</a>
+    <a class="navbar-brand mr-2" >داشبورد برند</a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarTogglerDemo" aria-controls="navbarTogglerDemo" aria-expanded="false" aria-label="Toggle navigation">
       <i class="fa fa-bars menu-icon"></i>
     </button>
@@ -41,13 +50,13 @@
               </a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="/adminpanel/doctors" >
+              <a class="nav-link active" href="/adminpanel/doctors" >
                 <i class="fa fa-user-md"></i>
                 دکتر ها
               </a>
             </li>
             <li class="nav-item">
-                <a class="nav-link active" href="/adminpanel/visittimes">
+                <a class="nav-link" href="/adminpanel/visittimes">
                   <i class="fa fa-calendar"></i>
                   تعیین زمانبندی
                 </a>
@@ -89,7 +98,7 @@
 
           <div class="row">
             <div class="col-sm-6 col-md-2 mb-5">
-              <img class="img-fluid" src="../assets/avatar-1.png">
+              <img class="img-fluid" src="<%= doctor.image %>" onerror="this.src='assets/img/altimage.png'">
             </div>
             <div class="col-sm-12 col-md-10">
               <div class="row">
@@ -97,15 +106,21 @@
                   <h5>نام</h5>
                 </div>
                 <div class="col-md-6 col-lg-6">
-                  <p>علی</p>
+                  <p><%= doctor.name %></p>
                 </div>
               </div>
               <div class="row">
                 <div class="col-md-4 col-lg-2">
-                  <h5>تخصص</h5>
+                  <h5>تخصص ها</h5>
                 </div>
                 <div class="col-md-6 col-lg-6">
-                  <p>پوست</p>
+                  <p><% for( let j=0 ; j<doctor.categories.length; j++) { %>
+                    <% if(j==0) { %>
+                      <%= doctor.categories[j] %>
+                    <% } else { %>
+                      <%= ", " + doctor.categories[j] %>
+                    <% } %>
+                  <% } %></p>
                 </div>
               </div>
               <div class="row">
@@ -113,7 +128,7 @@
                   <h5>سابقه کار</h5>
                 </div>  
                 <div class="col-md-6 col-lg-6">
-                  <p>5 سال</p>
+                  <p><%= doctor.background +" " %>سال </p>
                 </div>
               </div>
               <div class="row">
@@ -121,7 +136,7 @@
                   <h5>ادرس</h5>
                 </div>
                 <div class="col-md-6 col-lg-6">
-                  <p>تهران ایران</p>
+                  <p><%= doctor.address %></p>
                 </div>
               </div>
               <div class="row">
@@ -129,23 +144,23 @@
                   <h5>شماره تماس</h5>
                 </div>
                 <div class="col-md-6 col-lg-6">
-                  <p>093123456789</p>
+                  <p><%= doctor.phonenumber %></p>
                 </div>
               </div>
               <div class="row">
                 <div class="col-md-4 col-lg-2">
-                  <h5>مدت هر ویزیت</h5>
+                  <h5>نوع عضویت</h5>
                 </div>
                 <div class="col-md-6 col-lg-6">
-                  <p>15 دقیقه</p>
-                </div>
-              </div>
-              <div class="row">
-                <div class="col-md-4 col-lg-2">
-                  <h5>هزینه هر ویزیت</h5>
-                </div>
-                <div class="col-md-6 col-lg-6">
-                  <p>50 هزار تومان</p>
+                  <% if(doctor.membershiptypes.includes("reserve")) { %>
+                    <p>رزرو آنلاین</p>
+                  <% } %>
+                  <% if(doctor.membershiptypes.includes("teleconsultant")) { %>
+                    <p>مشاوره تلفنی</p>
+                  <% } %>
+                  <% if(doctor.membershiptypes.includes("chatconsultant")) { %>
+                    <p>گفتگو متنی</p>
+                  <% } %>
                 </div>
               </div>
               <div class="row">
@@ -154,20 +169,73 @@
                 </div>
                 <div class="col-md-6 col-lg-6">
                   <p>
-                    لورم ایپسوم متن ساختگی با تولید سادگی نامفهوم از صنعت چاپ و با استفاده از طراحان گرافیک است. چاپگرها و متون بلکه روزنامه و مجله در ستون و سطرآنچنان که لازم است و برای شرایط فعلی تکنولوژی مورد نیاز و کاربردهای متنوع با هدف بهبود ابزارهای کاربردی می باشد.
+                    <%= doctor.description %>
                   </p>
                 </div>
               </div>
             </div>
           </div>
 
-          <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+          <div class="d-flex flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
             <h1 class="h2">لیست رزرو ها</h1>
+            <h1 class="h2" style="margin-right:110px; max-width: 190px;">لیست مشاوره های تلفنی</h1>
+            <h1 class="h2" style="margin-right:110px;">لیست گفتگو ها</h1>
           </div>
+          
           
           <div class="row">
             <div class="col-xl-3 col-lg-6">
               <div class="list-group">
+                <% for(let i=0;i<doctor.reservations.length;i++) {  %>
+                <a href="#" class="list-group-item list-group-item-action flex-column align-items-start">
+                  <div class="d-flex w-100 justify-content-between">
+                    <h5 class="mb-1"><%=doctor.reservations[i].user.firstname + " " + doctor.reservations[i].user.lastname %></h5>
+                    <small class="text-muted">
+                      16:15 - 17:15
+                    </small>
+                  </div>
+                </a>
+                <% } %>
+              </div>
+            </div>
+            <div class="col-xl-3 col-lg-6">
+              <div class="list-group">
+                <a href="#" class="list-group-item list-group-item-action flex-column align-items-start">
+                  <div class="d-flex w-100 justify-content-between">
+                    <h5 class="mb-1">نام بیمار</h5>
+                    <small class="text-muted">
+                      16:15 - 17:15
+                    </small>
+                  </div>
+                </a>
+                <a href="#" class="list-group-item list-group-item-action flex-column align-items-start">
+                  <div class="d-flex w-100 justify-content-between">
+                    <h5 class="mb-1">نام بیمار</h5>
+                    <small class="text-muted">
+                      16:15 - 17:15
+                    </small>
+                  </div>
+                </a>
+              </div>
+            </div>
+            <div class="col-xl-3 col-lg-6">
+              <div class="list-group">
+                <a href="#" class="list-group-item list-group-item-action flex-column align-items-start">
+                  <div class="d-flex w-100 justify-content-between">
+                    <h5 class="mb-1">نام بیمار</h5>
+                    <small class="text-muted">
+                      16:15 - 17:15
+                    </small>
+                  </div>
+                </a>
+                <a href="#" class="list-group-item list-group-item-action flex-column align-items-start">
+                  <div class="d-flex w-100 justify-content-between">
+                    <h5 class="mb-1">نام بیمار</h5>
+                    <small class="text-muted">
+                      16:15 - 17:15
+                    </small>
+                  </div>
+                </a>
                 <a href="#" class="list-group-item list-group-item-action flex-column align-items-start">
                   <div class="d-flex w-100 justify-content-between">
                     <h5 class="mb-1">نام بیمار</h5>
@@ -195,10 +263,14 @@
   
 
 
+
   <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
-  <script>window.jQuery || document.write('<script src="../assets/jquery-slim.min.js"><\/script>')</script>
+  <script>window.jQuery || document.write('<script src="assets/panelassests/jquery-slim.min.js"><\/script>')</script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
   <script src="https://cdn.rtlcss.com/bootstrap/v4.1.3/js/bootstrap.min.js" integrity="sha384-C/pvytx0t5v9BEbkMlBAGSPnI1TQU1IrTJ6DJbC8GBHqdMnChcb6U4xg4uRkIQCV" crossorigin="anonymous"></script>
+
+  <script src="https://unpkg.com/persian-date@latest/dist/persian-date.min.js"></script>
+  <script src="https://unpkg.com/persian-datepicker@latest/dist/js/persian-datepicker.min.js"></script>
 
 </body>
 </html>

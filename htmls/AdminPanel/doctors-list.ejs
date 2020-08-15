@@ -3,15 +3,24 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
   <meta name="description" content="">
+  <base id="base">
+  <script src="/assets/js/config.js"></script>
   <meta name="author" content="">
   <link rel="icon" href="favicon.ico">
 
   <title></title>
 
   <link rel="stylesheet" href="https://cdn.rtlcss.com/bootstrap/v4.1.3/css/bootstrap.min.css" integrity="sha384-Jt6Tol1A2P9JBesGeCxNrxkmRFSjWCBW1Af7CSQSKsfMVQCqnUVWhZzG0puJMCK6" crossorigin="anonymous">
-  <link href="../assets/dashboard.rtl.css" rel="stylesheet">
+  <link href="assets/panelassests/dashboard.rtl.css" rel="stylesheet">
+  
+
+  <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+  <script>window.jQuery || document.write('<script src="assets/panelassests/jquery-slim.min.js"><\/script>')</script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+  <script src="https://cdn.rtlcss.com/bootstrap/v4.1.3/js/bootstrap.min.js" integrity="sha384-C/pvytx0t5v9BEbkMlBAGSPnI1TQU1IrTJ6DJbC8GBHqdMnChcb6U4xg4uRkIQCV" crossorigin="anonymous"></script>
   <script src="https://use.fontawesome.com/6d68f18b97.js"></script>
   <link href="https://use.fontawesome.com/6d68f18b97.css" media="all" rel="stylesheet">
+  <link href="assets/css/main.css" rel="stylesheet" />
 
   <link rel="stylesheet" href="https://unpkg.com/persian-datepicker@latest/dist/css/persian-datepicker.min.css">
 </head>
@@ -19,7 +28,7 @@
 <body>
 
   <nav class="navbar fixed-top navbar-expand-lg nav-dark">
-    <a class="navbar-brand mr-2" href="#">داشبورد برند</a>
+    <a class="navbar-brand mr-2" >داشبورد برند</a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarTogglerDemo" aria-controls="navbarTogglerDemo" aria-expanded="false" aria-label="Toggle navigation">
       <i class="fa fa-bars menu-icon"></i>
     </button>
@@ -41,13 +50,13 @@
               </a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="/adminpanel/doctors" >
+              <a class="nav-link active" href="/adminpanel/doctors" >
                 <i class="fa fa-user-md"></i>
                 دکتر ها
               </a>
             </li>
             <li class="nav-item">
-                <a class="nav-link active" href="/adminpanel/visittimes">
+                <a class="nav-link" href="/adminpanel/visittimes">
                   <i class="fa fa-calendar"></i>
                   تعیین زمانبندی
                 </a>
@@ -85,7 +94,7 @@
         <div class="container-fluid">
           <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
             <h1 class="h2">دکتر ها</h1>
-            <a class="btn btn-success text-white">
+            <a href="/AdminPanel/addDoctor" class="btn btn-success text-white">
               <i class="fa fa-plus"></i>
               اضافه کردن دکتر
             </a>
@@ -107,23 +116,33 @@
                     </tr>
                   </thead>
                   <tbody>
+                    <% for(let i = 0 ; i < doctors.length ; i++) { %>
                     <tr>
-                      <th scope="row">1</th>
+                      <th scope="row"><%= i+1 %></th>
                       <td>
-                        <img src="../assets/avatar-1.png">
+                        <img src="<%= doctors[i].image %>" onerror="this.src='assets/img/altimage.png'">
                       </td>
-                      <td>علی کریمی</td>
-                      <td>مغز و اعصاب</td>
+                      <td><%= doctors[i].name %></td>
                       <td>
-                        09312345678
+                      <% for( let j=0 ; j<doctors[i].categories.length; j++) { %>
+                        <% if(j==0) { %>
+                          <%= doctors[i].categories[j] %>
+                        <% } else { %>
+                          <%= ", " + doctors[i].categories[j] %>
+                        <% } %>
+                      <% } %>
                       </td>
                       <td>
-                        <a class="btn btn-primary" href="#">
+                       <%= doctors[i].phonenumber %>
+                      </td>
+                      <td>
+                        <a href="<%= "AdminPanel/Doctors/" + doctors[i].name %>" class="btn btn-info" href="#">
                           <i class="fa fa-eye"></i>
                           مشاهده
                         </a>
                       </td>
                     </tr>
+                    <% } %>
                   </tbody>
                 </table>
               </div>
@@ -155,9 +174,12 @@
 
 
   <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
-  <script>window.jQuery || document.write('<script src="../assets/jquery-slim.min.js"><\/script>')</script>
+  <script>window.jQuery || document.write('<script src="assets/panelassests/jquery-slim.min.js"><\/script>')</script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
   <script src="https://cdn.rtlcss.com/bootstrap/v4.1.3/js/bootstrap.min.js" integrity="sha384-C/pvytx0t5v9BEbkMlBAGSPnI1TQU1IrTJ6DJbC8GBHqdMnChcb6U4xg4uRkIQCV" crossorigin="anonymous"></script>
+
+  <script src="https://unpkg.com/persian-date@latest/dist/persian-date.min.js"></script>
+  <script src="https://unpkg.com/persian-datepicker@latest/dist/js/persian-datepicker.min.js"></script>
 
 </body>
 </html>
