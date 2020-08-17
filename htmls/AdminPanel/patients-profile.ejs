@@ -89,6 +89,13 @@
         <div class="container-fluid">
           <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
             <h1 class="h2">پروفایل</h1>
+            <button class="btn btn-info" onclick="goBack()">بازگشت به صفحه قبل</button>
+
+          <script>
+          function goBack() {
+            window.history.back();
+          }
+          </script>
           </div>
 
           <div class="row">
@@ -103,18 +110,23 @@
               </div>
               <div class="row">
                 <div class="col-md-4 col-lg-2">
-                  <h5>نام کاربری</h5>
+                  <h5>تاریخ تولد</h5>
                 </div>
                 <div class="col-md-6 col-lg-6">
-                  <p><%= user.username %></p>
+                  <p><%= user.birthdate.year + "/" + user.birthdate.month + "/" + user.birthdate.day %></p>
                 </div>
               </div>
               <div class="row">
                 <div class="col-md-4 col-lg-2">
-                  <h5>کد ملی</h5>
+                  <h5>جنسیت</h5>
                 </div>  
                 <div class="col-md-6 col-lg-6">
-                  <p><%= user.codemeli%></p>
+                  <% if(user.sex=="male") { %>
+                  <p>مرد</p>
+                  <% } %>
+                  <% if(user.sex=="female") { %>
+                    <p>زن</p>
+                  <% } %>
                 </div>
               </div>
               <div class="row">
@@ -122,15 +134,7 @@
                   <h5>شماره تلفن</h5>
                 </div>
                 <div class="col-md-6 col-lg-6">
-                  <p><%=user.phone%></p>
-                </div>
-              </div>
-              <div class="row">
-                <div class="col-md-4 col-lg-2">
-                  <h5>ایمیل</h5>
-                </div>
-                <div class="col-md-6 col-lg-6">
-                  <p><%= user.email %></p>
+                  <p><%=user.phonenumber%></p>
                 </div>
               </div>
             </div>

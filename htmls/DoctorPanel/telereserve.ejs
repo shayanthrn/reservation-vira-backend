@@ -123,21 +123,21 @@
                 <h1 class="h2">برنامه 6 روز آینده</h1>
             </div>
             <div class='row'>
-                <% for(let i = 0; i<5;i++) { %>
-                <div class="col-sm-12 col-md-6 col-lg-4 mb-3">
-                  <div class="card shadow">
-                    <div class="card-header bg-site-primary text-white p-2">
-                     123
-                    </div>
-                    <div class="card-body p-1 d-flex flex-wrap">
-                      <% for(let j=0;j<5;j++) { %>
-                      <a href="as" class="cursor-pointer badge badge-secondary p-1 m-1">dfsg</a>
-                      <% } %>
-                    </div>
+              <% for(let i = 0; i<visittimes.length;i++) { %>
+              <div class="col-sm-12 col-md-6 col-lg-4 mb-3">
+                <div class="card shadow">
+                  <div class="card-header bg-site-primary text-white p-2">
+                    <%= visittimes[i].dayofweek +" " + visittimes[i].date1.day + " " + visittimes[i].date1.month %>
                   </div>
-                </div> 
-                <% } %>  
-              </div>
+                  <div class="card-body p-1 d-flex flex-wrap">
+                    <% for(let j=0;j<visittimes[i].times.length;j++) { %>
+                    <a href="<%="AdminPanel/reserves/" +visittimes[i].times[j]._id%>" class="cursor-pointer badge badge-secondary p-1 m-1"><%=visittimes[i].times[j].time.start.hour +":"+visittimes[i].times[j].time.start.min + "-" + visittimes[i].times[j].time.end.hour+":"+visittimes[i].times[j].time.end.min %></a>
+                    <% } %>
+                  </div>
+                </div>
+              </div> 
+              <% } %>  
+            </div>
         </div>
      </main>  
 

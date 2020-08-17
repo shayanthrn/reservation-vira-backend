@@ -2450,46 +2450,55 @@ router.post("/sendticket",function(req,res){
 
 router.get("/search",function(req,res){
   var query=url.parse(req.url,true).query;
-  MongoClient.connect(dburl,function(err,db){
-    var dbo=db.db("mydb");
-    myregex= '.*'+query.query+'.*'
-    dbo.collection("Users").findOne({token:req.cookies.usertoken},function(err,user){
-      if(query.filter=="category"){
-        dbo.collection("Doctors").find({categories:{$regex:myregex}},async function(err,results){
-          results=await results.toArray();
-          dbo.collection("HealthCenters").find({systype:"A","categories.name":{$regex:myregex}},async function(err,results2){
-            results2=await results2.toArray();
-            finalresult=results.concat(results2);
+  if(query.filter!="category"&&query.filter!="Doctors"&&query.filter!="HealthCenters"){
+    res.redirect("noaccess");
+  }
+  else{
+    MongoClient.connect(dburl,function(err,db){
+      var dbo=db.db("mydb");
+      qcity={$regex:'.*'}
+      if(query.city!=undefined&&query.city!="all"){
+        qcity=query.city;
+      }
+      myregex= '.*'+query.query+'.*'
+      dbo.collection("Users").findOne({token:req.cookies.usertoken},function(err,user){
+        if(query.filter=="category"){
+          dbo.collection("Doctors").find({categories:{$regex:myregex},city:qcity},async function(err,results){
+            results=await results.toArray();
+            dbo.collection("HealthCenters").find({systype:"A","categories.name":{$regex:myregex},city:qcity},async function(err,results2){
+              results2=await results2.toArray();
+              finalresult=results.concat(results2);
+              categories().then(basiccategories=>{
+                if(user==null){
+                  res.render('search.ejs',{Objects:finalresult,type:"category",category:"",user:"",categories:basiccategories});
+                }
+                else{
+                  res.render('search.ejs',{Objects:finalresult,type:"category",category:"",user:user,categories:basiccategories});
+                }
+                res.end();
+                db.close();
+              })
+            })
+          })
+        }
+        else{
+          dbo.collection(query.filter).find({name:{$regex:myregex},city:qcity},async function(err,results){
+            results=await results.toArray();
             categories().then(basiccategories=>{
               if(user==null){
-                res.render('index.ejs',{Objects:finalresult,type:"category",category:"",user:"",categories:basiccategories});
+                res.render('search.ejs',{Objects:results,type:"sd",category:"",user:"",categories:basiccategories});
               }
               else{
-                res.render('index.ejs',{Objects:finalresult,type:"category",category:"",user:user,categories:basiccategories});
+                res.render('search.ejs',{Objects:results,type:"category",category:"",user:user,categories:basiccategories});
               }
               res.end();
               db.close();
             })
           })
-        })
-      }
-      else{
-        dbo.collection(query.filter).find({name:{$regex:myregex}},async function(err,results){
-          results=await results.toArray();
-          categories().then(basiccategories=>{
-            if(user==null){
-              res.render('index.ejs',{Objects:results,type:"category",category:"",user:"",categories:basiccategories});
-            }
-            else{
-              res.render('index.ejs',{Objects:results,type:"category",category:"",user:user,categories:basiccategories});
-            }
-            res.end();
-            db.close();
-          })
-        })
-      }
+        }
+      })
     })
-  })
+  }
 })
 
 
@@ -2645,8 +2654,21 @@ router.get("/doctorpanel/telereserve",function(req,res){
           res.redirect('noaccess');
         }
         else{
-          //pass visit times
-          res.render("DoctorPanel/telereserve.ejs",{doctor:result});
+          var visittimes=[];
+          var currentday=new persianDate();
+          visittimes.push({date1:{year:currentday.toArray()[0],month:currentday.format("MMMM"),day:currentday.toArray()[2]},date:{year:currentday.toArray()[0],month:currentday.toArray()[1],day:currentday.toArray()[2]},times:[],dayofweek:currentday.format("dddd")});
+          for(let i=0;i<5;i++){
+            currentday=currentday.add('d',1);
+            visittimes.push({date1:{year:currentday.toArray()[0],month:currentday.format("MMMM"),day:currentday.toArray()[2]},date:{year:currentday.toArray()[0],month:currentday.toArray()[1],day:currentday.toArray()[2]},times:[],dayofweek:currentday.format("dddd")});
+          }
+          result.telereservations.forEach(function(doc){
+            for(i=0;i<6;i++){
+              if(lodash.isEqual(visittimes[i].date,doc.time.date)){
+                visittimes[i].times.push(doc);
+              }
+            }
+          })
+          res.render("DoctorPanel/telereserve.ejs",{visittimes:visittimes,doctor:result});
           db.close()
           res.end()
         }
@@ -2774,8 +2796,28 @@ router.get("/AdminPanel/doctors/:doctor",function(req,res){
 })
 
 router.get("/AdminPanel/patients",function(req,res){
-  res.render("notimp.ejs");
-  res.end()
+  if(req.cookies.admintoken==undefined){
+    res.redirect('/noaccess');
+  }
+  else{
+    MongoClient.connect(dburl,function(err,db){
+      var dbo=db.db("mydb");
+      dbo.collection("Admins").findOne({token:req.cookies.admintoken},function(err,result){
+        if(result==null){
+          db.close();
+          res.redirect('/noaccess');
+        }
+        else{
+          dbo.collection("Users").find({},async function(err,users){
+            users=await users.toArray();
+            res.render('AdminPanel/patients.ejs',{patients:users});
+            db.close();
+            res.end();
+          })
+        }
+      })
+    })
+  }
 })
 
 
@@ -2860,12 +2902,32 @@ router.get("/Adminpanel/reserves/:resid",function(req,res){
               res.redirect('noaccess');
             }
             else{
-              res.render("AdminPanel/reserve-status.ejs");
+              dbo.collection("Reservations").findOne({_id:resid},function(err,reserve){
+                dbo.collection("Users").findOne({_id:reserve.user},function(err,user){
+                  dbo.collection("Doctors").findOne({_id:reserve.doctor},function(err,doctor){
+                    reserve.user=user;
+                    reserve.doctor=doctor;
+                    res.render("AdminPanel/reserve-status.ejs",{reserve:reserve});
+                    res.end();
+                    db.close();
+                  })
+                })
+              })
             }
           })
         }
         else{
-          res.render("AdminPanel/reserve-status.ejs");
+          dbo.collection("Reservations").findOne({_id:resid},function(err,reserve){
+            dbo.collection("Users").findOne({_id:reserve.user},function(err,user){
+              dbo.collection("Doctors").findOne({_id:reserve.doctor},function(err,doctor){
+                reserve.user=user;
+                reserve.doctor=doctor;
+                res.render("AdminPanel/reserve-status.ejs",{reserve:reserve});
+                res.end();
+                db.close();
+              })
+            })
+          })
         }
       })
     })
