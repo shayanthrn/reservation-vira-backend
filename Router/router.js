@@ -2448,6 +2448,51 @@ router.post("/sendticket",function(req,res){
   }
 })
 
+router.get("/search",function(req,res){
+  var query=url.parse(req.url,true).query;
+  MongoClient.connect(dburl,function(err,db){
+    var dbo=db.db("mydb");
+    myregex= '.*'+query.query+'.*'
+    dbo.collection("Users").findOne({token:req.cookies.usertoken},function(err,user){
+      if(query.filter=="category"){
+        dbo.collection("Doctors").find({categories:{$regex:myregex}},async function(err,results){
+          results=await results.toArray();
+          dbo.collection("HealthCenters").find({systype:"A","categories.name":{$regex:myregex}},async function(err,results2){
+            results2=await results2.toArray();
+            finalresult=results.concat(results2);
+            categories().then(basiccategories=>{
+              if(user==null){
+                res.render('index.ejs',{Objects:finalresult,type:"category",category:"",user:"",categories:basiccategories});
+              }
+              else{
+                res.render('index.ejs',{Objects:finalresult,type:"category",category:"",user:user,categories:basiccategories});
+              }
+              res.end();
+              db.close();
+            })
+          })
+        })
+      }
+      else{
+        dbo.collection(query.filter).find({name:{$regex:myregex}},async function(err,results){
+          results=await results.toArray();
+          categories().then(basiccategories=>{
+            if(user==null){
+              res.render('index.ejs',{Objects:results,type:"category",category:"",user:"",categories:basiccategories});
+            }
+            else{
+              res.render('index.ejs',{Objects:results,type:"category",category:"",user:user,categories:basiccategories});
+            }
+            res.end();
+            db.close();
+          })
+        })
+      }
+    })
+  })
+})
+
+
 router.get("/Download",function(req,res){
   var query=url.parse(req.url,true).query;
   if(req.cookies.doctortoken==undefined && req.cookies.admintoken==undefined){
