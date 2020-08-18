@@ -2482,7 +2482,7 @@ router.get("/search",function(req,res){
           })
         }
         else{
-          dbo.collection(query.filter).find({name:{$regex:myregex},city:qcity},async function(err,results){
+          dbo.collection(query.filter).find({name:{$regex:myregex},categories:{$ne:[]},city:qcity},async function(err,results){
             results=await results.toArray();
             categories().then(basiccategories=>{
               if(user==null){
@@ -2744,9 +2744,29 @@ router.post("/trsettime",function(req,res){
 //------------------------adminpanel---------------------------//
 
 router.get("/AdminPanel/dashboard",function(req,res){
-  res.render("notimp.ejs");
-  res.end()
+  if(req.cookies.admintoken==undefined){
+    res.redirect('/noaccess');
+  }
+  else{
+    MongoClient.connect(dburl,function(err,db){
+      var dbo=db.db("mydb");
+      dbo.collection("Admins").findOne({token:req.cookies.admintoken},async function(err,result){
+        if(result==null){
+          db.close();
+          res.redirect('/noaccess');
+        }
+        else{
+          var doctors= await dbo.collection("Doctors").find().toArray()
+          res.render("AdminPanel/dashboard.ejs",{doctors:doctors});
+          db.close();
+          res.end()
+        }
+      })
+    })
+  }
 })
+
+
 
 router.get("/AdminPanel/doctors",function(req,res){
   if(req.cookies.admintoken==undefined){
