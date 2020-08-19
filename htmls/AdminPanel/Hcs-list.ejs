@@ -44,19 +44,19 @@
           <ul class="nav flex-column">
             
             <li class="nav-item">
-              <a class="nav-link" href="/adminpanel/dashboard" >
+              <a class="nav-link " href="/adminpanel/dashboard" >
                 <i class="fa fa-tachometer"></i>
                 داشبورد
               </a>
             </li>
             <li class="nav-item">
-              <a class="nav-link active" href="/adminpanel/doctors" >
+              <a class="nav-link " href="/adminpanel/doctors" >
                 <i class="fa fa-user-md"></i>
                 دکتر ها
               </a>
             </li>
             <li class="nav-item">
-              <a class="nav-link " href="/adminpanel/healthcenters" >
+              <a class="nav-link active" href="/adminpanel/healthcenters" >
                 <i class="fa fa-heartbeat"></i>
                 مراکز درمانی
               </a>
@@ -96,97 +96,74 @@
           </div>
       </nav>
       
-      <main role="main" class=" ml-sm-auto col-lg-9 col-xl-10 px-4" id="doctors-profile">
+      <main role="main" class=" ml-sm-auto col-lg-9 col-xl-10 px-4" id="doctors-list">
         <div class="container-fluid">
           <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-            <h1 class="h2">پروفایل دکتر</h1>
-            <button class="btn btn-info" onclick="goBack()">بازگشت به صفحه قبل</button>
-
-            <script>
-            function goBack() {
-              window.history.back();
-            }
-            </script>
+            <h1 class="h2">مراکز درمانی</h1>
+            <a href="/HCsignup" class="btn btn-success text-white">
+              <i class="fa fa-plus"></i>
+              اضافه کردن مرکز
+            </a>
           </div>
+          
 
           <div class="row">
-            <div class="col-sm-6 col-md-2 mb-5">
-              <img class="img-fluid" src="<%= doctor.image %>" onerror="this.src='assets/img/altimage.png'">
-            </div>
-            <div class="col-sm-12 col-md-10">
-              <div class="row">
-                <div class="col-md-4 col-lg-2">
-                  <h5>نام</h5>
-                </div>
-                <div class="col-md-6 col-lg-6">
-                  <p><%= doctor.name %></p>
-                </div>
-              </div>
-              <div class="row">
-                <div class="col-md-4 col-lg-2">
-                  <h5>تخصص ها</h5>
-                </div>
-                <div class="col-md-6 col-lg-6">
-                  <p><% for( let j=0 ; j<doctor.categories.length; j++) { %>
-                    <% if(j==0) { %>
-                      <%= doctor.categories[j] %>
-                    <% } else { %>
-                      <%= ", " + doctor.categories[j] %>
+            <div class="col">
+              <div class="table-responsive">
+                <table class="table table-bordered">
+                  <thead>
+                    <tr>
+                      <th scope="col">#</th>
+                      <th scope="col">عکس</th>
+                      <th scope="col">نام و نام خانوادگی</th>
+                      <th scope="col">نوع</th>
+                      <th scope="col">شماره تماس</th>
+                      <th scope="col">عملیات</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <% for(let i = 0 ; i < HCs.length ; i++) { %>
+                    <tr>
+                      <th scope="row"><%= i+1 %></th>
+                      <td>
+                        <img src="<%= HCs[i].image %>" onerror="this.src='assets/img/altimage.png'">
+                      </td>
+                      <td><%= HCs[i].name %></td>
+                      <td>
+                        <%=  HCs[i].type %>
+                      </td>
+                      <td>
+                       <%= HCs[i].phonenumber %>
+                      </td>
+                      <td>
+                        <a href="<%= "AdminPanel/healthcenters/" + HCs[i].name %>" class="btn btn-info" href="#">
+                          <i class="fa fa-eye"></i>
+                          مشاهده
+                        </a>
+                      </td>
+                    </tr>
                     <% } %>
-                  <% } %></p>
-                </div>
-              </div>
-              <div class="row">
-                <div class="col-md-4 col-lg-2">
-                  <h5>سابقه کار</h5>
-                </div>  
-                <div class="col-md-6 col-lg-6">
-                  <p><%= doctor.background +" " %>سال </p>
-                </div>
-              </div>
-              <div class="row">
-                <div class="col-md-4 col-lg-2">
-                  <h5>ادرس</h5>
-                </div>
-                <div class="col-md-6 col-lg-6">
-                  <p><%= doctor.address %></p>
-                </div>
-              </div>
-              <div class="row">
-                <div class="col-md-4 col-lg-2">
-                  <h5>شماره تماس</h5>
-                </div>
-                <div class="col-md-6 col-lg-6">
-                  <p><%= doctor.phonenumber %></p>
-                </div>
-              </div>
-              <div class="row">
-                <div class="col-md-4 col-lg-2">
-                  <h5>نوع عضویت</h5>
-                </div>
-                <div class="col-md-6 col-lg-6">
-                  <% if(doctor.membershiptypes.includes("reserve")) { %>
-                    <p>رزرو آنلاین</p>
-                  <% } %>
-                  <% if(doctor.membershiptypes.includes("teleconsultant")) { %>
-                    <p>مشاوره تلفنی</p>
-                  <% } %>
-                  <% if(doctor.membershiptypes.includes("chatconsultant")) { %>
-                    <p>گفتگو متنی</p>
-                  <% } %>
-                </div>
-              </div>
-              <div class="row">
-                <div class="col-md-4 col-lg-2">
-                  <h5>توضیحات شخصی</h5>
-                </div>
-                <div class="col-md-6 col-lg-6">
-                  <p>
-                    <%= doctor.description %>
-                  </p>
-                </div>
+                  </tbody>
+                </table>
               </div>
             </div>
+          </div>
+          <div class="row justify-content-center">
+            <ul class="pagination">
+              <li class="page-item">
+                <a class="page-link" href="#">
+                  <i class="fa fa-arrow-right"></i>
+                </a>
+              </li>
+              <li class="page-item active"><a class="page-link" href="#">1</a></li>
+              <li class="page-item"><a class="page-link" href="#">2</a></li>
+              <li class="page-item"><a class="page-link" href="#">3</a></li>
+              <li class="page-item">
+                <a class="page-link" href="#">
+                  <i class="fa fa-arrow-left"></i>
+                </a>
+              </li>
+            </ul>
           </div>
         </div>
       </main>
@@ -194,7 +171,6 @@
     </div>
   </div>
   
-
 
 
   <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>

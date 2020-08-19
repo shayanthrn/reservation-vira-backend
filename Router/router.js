@@ -2891,9 +2891,52 @@ router.get("/AdminPanel/doctors/:doctor",function(req,res){
 
 
 router.get("/AdminPanel/healthcenters",function(req,res){
-  res.render("notimp.ejs");
-  res.end();
+  if(req.cookies.admintoken==undefined){
+    res.redirect('/noaccess');
+  }
+  else{
+    MongoClient.connect(dburl,function(err,db){
+      var dbo=db.db("mydb");
+      dbo.collection("Admins").findOne({token:req.cookies.admintoken},async function(err,result){
+        if(result==null){
+          db.close();
+          res.redirect('/noaccess');
+        }
+        else{
+          var HCs= await dbo.collection("HealthCenters").find().toArray()
+          res.render("AdminPanel/Hcs-list.ejs",{HCs:HCs});
+          db.close();
+          res.end();
+        }
+      })
+    })
+  }
 })
+
+router.get("/AdminPanel/HealthCenters/:hcname",function(req,res){
+  if(req.cookies.admintoken==undefined){
+    res.redirect('/noaccess');
+  }
+  else{
+    MongoClient.connect(dburl,function(err,db){
+      var dbo=db.db("mydb");
+      dbo.collection("Admins").findOne({token:req.cookies.admintoken},function(err,result){
+        if(result==null){
+          db.close();
+          res.redirect('/noaccess');
+        }
+        else{
+          dbo.collection("HealthCenters").findOne({name:req.params.hcname},function(err,HC){
+            res.render("AdminPanel/Hcs-profile.ejs",{HC:HC});
+            db.close();
+            res.end();
+          })
+        }
+      })
+    })
+  }
+})
+
 
 router.get("/AdminPanel/patients",function(req,res){
   if(req.cookies.admintoken==undefined){

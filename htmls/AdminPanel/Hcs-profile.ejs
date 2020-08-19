@@ -50,13 +50,13 @@
               </a>
             </li>
             <li class="nav-item">
-              <a class="nav-link active" href="/adminpanel/doctors" >
+              <a class="nav-link" href="/adminpanel/doctors" >
                 <i class="fa fa-user-md"></i>
                 دکتر ها
               </a>
             </li>
-            <li class="nav-item">
-              <a class="nav-link " href="/adminpanel/healthcenters" >
+            <li class="nav-item ">
+              <a class="nav-link active" href="/adminpanel/healthcenters" >
                 <i class="fa fa-heartbeat"></i>
                 مراکز درمانی
               </a>
@@ -111,7 +111,7 @@
 
           <div class="row">
             <div class="col-sm-6 col-md-2 mb-5">
-              <img class="img-fluid" src="<%= doctor.image %>" onerror="this.src='assets/img/altimage.png'">
+              <img class="img-fluid" src="<%= HC.image %>" onerror="this.src='assets/img/altimage.png'">
             </div>
             <div class="col-sm-12 col-md-10">
               <div class="row">
@@ -119,29 +119,31 @@
                   <h5>نام</h5>
                 </div>
                 <div class="col-md-6 col-lg-6">
-                  <p><%= doctor.name %></p>
+                  <p><%= HC.name %></p>
                 </div>
               </div>
+              <% if(HC.categories!=undefined) {  %>
               <div class="row">
                 <div class="col-md-4 col-lg-2">
                   <h5>تخصص ها</h5>
                 </div>
                 <div class="col-md-6 col-lg-6">
-                  <p><% for( let j=0 ; j<doctor.categories.length; j++) { %>
-                    <% if(j==0) { %>
-                      <%= doctor.categories[j] %>
+                  <p><% for(let i = 0 ; i < HC.categories.length ; i++ ) {  %>
+                    <% if(i==0) { %>
+                        <%= HC.categories[i].name %>
                     <% } else { %>
-                      <%= ", " + doctor.categories[j] %>
-                    <% } %>
-                  <% } %></p>
+                        <%= "," + HC.categories[i].name %>
+                    <% } }%>
+                  </p>
                 </div>
               </div>
+              <% } %>
               <div class="row">
                 <div class="col-md-4 col-lg-2">
-                  <h5>سابقه کار</h5>
+                  <h5>شهر</h5>
                 </div>  
                 <div class="col-md-6 col-lg-6">
-                  <p><%= doctor.background +" " %>سال </p>
+                  <p><%= HC.city %></p>
                 </div>
               </div>
               <div class="row">
@@ -149,7 +151,7 @@
                   <h5>ادرس</h5>
                 </div>
                 <div class="col-md-6 col-lg-6">
-                  <p><%= doctor.address %></p>
+                  <p><%= HC.address %></p>
                 </div>
               </div>
               <div class="row">
@@ -157,33 +159,15 @@
                   <h5>شماره تماس</h5>
                 </div>
                 <div class="col-md-6 col-lg-6">
-                  <p><%= doctor.phonenumber %></p>
+                  <p><%= HC.phonenumber %></p>
                 </div>
               </div>
               <div class="row">
                 <div class="col-md-4 col-lg-2">
-                  <h5>نوع عضویت</h5>
+                  <h5>نوع</h5>
                 </div>
                 <div class="col-md-6 col-lg-6">
-                  <% if(doctor.membershiptypes.includes("reserve")) { %>
-                    <p>رزرو آنلاین</p>
-                  <% } %>
-                  <% if(doctor.membershiptypes.includes("teleconsultant")) { %>
-                    <p>مشاوره تلفنی</p>
-                  <% } %>
-                  <% if(doctor.membershiptypes.includes("chatconsultant")) { %>
-                    <p>گفتگو متنی</p>
-                  <% } %>
-                </div>
-              </div>
-              <div class="row">
-                <div class="col-md-4 col-lg-2">
-                  <h5>توضیحات شخصی</h5>
-                </div>
-                <div class="col-md-6 col-lg-6">
-                  <p>
-                    <%= doctor.description %>
-                  </p>
+                 <%= HC.type %>
                 </div>
               </div>
             </div>
