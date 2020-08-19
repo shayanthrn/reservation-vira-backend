@@ -2756,10 +2756,83 @@ router.get("/AdminPanel/dashboard",function(req,res){
           res.redirect('/noaccess');
         }
         else{
-          var doctors= await dbo.collection("Doctors").find().toArray()
-          res.render("AdminPanel/dashboard.ejs",{doctors:doctors});
+          var doctors= await dbo.collection("Doctors").find().toArray();
+          var HCs = await dbo.collection("HealthCenters").find({systype:{$ne:"C"}}).toArray();
+          res.render("AdminPanel/dashboard.ejs",{doctors:doctors,HCs:HCs,reserves:[]});
           db.close();
           res.end()
+        }
+      })
+    })
+  }
+})
+
+router.post("/AdminPanel/dashboard",function(req,res){
+  if(req.cookies.admintoken==undefined){
+    res.redirect('/noaccess');
+  }
+  else{
+    MongoClient.connect(dburl,function(err,db){
+      var dbo=db.db("mydb");
+      dbo.collection("Admins").findOne({token:req.cookies.admintoken},async function(err,result){
+        if(result==null){
+          db.close();
+          res.redirect('/noaccess');
+        }
+        else{
+          if(req.body.name==undefined || req.body.type == undefined){
+            res.redirect("/AdminPanel/dashboard");
+            db.close();
+          }
+          else{
+            if(req.body.datePicker==""){
+              if(req.body.type=="HC"){
+                dbo.collection("HealthCenters").findOne({name:req.body.name},async function(err,HC){
+                  reserves=await dbo.collection("Reservations").find({HC:HC._id}).toArray();
+                  var doctors= await dbo.collection("Doctors").find().toArray();
+                  var HCs = await dbo.collection("HealthCenters").find({systype:{$ne:"C"}}).toArray();
+                  res.render("AdminPanel/dashboard.ejs",{doctors:doctors,HCs:HCs,reserves:reserves});
+                  db.close();
+                  res.end()
+                })
+              }
+              else{
+                dbo.collection("Doctors").findOne({name:req.body.name},async function(err,doctor){
+                  reserves=await dbo.collection("Reservations").find({doctor:doctor._id}).toArray();
+                  var doctors= await dbo.collection("Doctors").find().toArray();
+                  var HCs = await dbo.collection("HealthCenters").find({systype:{$ne:"C"}}).toArray();
+                  res.render("AdminPanel/dashboard.ejs",{doctors:doctors,HCs:HCs,reserves:reserves});
+                  db.close();
+                  res.end()
+                })
+              }
+            }
+            else{
+              mydate=new persianDate(Number(req.body.datePicker));
+              mydate = mydate.toArray();
+              mydate = {year:mydate[0],month:mydate[1],day:mydate[2]};
+              if(req.body.type=="HC"){
+                dbo.collection("HealthCenters").findOne({name:req.body.name},async function(err,HC){
+                  reserves=await dbo.collection("Reservations").find({HC:HC._id,'time.date':mydate}).toArray();
+                  var doctors= await dbo.collection("Doctors").find().toArray();
+                  var HCs = await dbo.collection("HealthCenters").find({systype:{$ne:"C"}}).toArray();
+                  res.render("AdminPanel/dashboard.ejs",{doctors:doctors,HCs:HCs,reserves:reserves});
+                  db.close();
+                  res.end()
+                })
+              }
+              else{
+                dbo.collection("Doctors").findOne({name:req.body.name},async function(err,doctor){
+                  reserves=await dbo.collection("Reservations").find({doctor:doctor._id,'time.date':mydate}).toArray();
+                  var doctors= await dbo.collection("Doctors").find().toArray();
+                  var HCs = await dbo.collection("HealthCenters").find({systype:{$ne:"C"}}).toArray();
+                  res.render("AdminPanel/dashboard.ejs",{doctors:doctors,HCs:HCs,reserves:reserves});
+                  db.close();
+                  res.end()
+                })
+              }
+            }
+          }
         }
       })
     })
@@ -2791,6 +2864,7 @@ router.get("/AdminPanel/doctors",function(req,res){
   }
 })
 
+
 router.get("/AdminPanel/doctors/:doctor",function(req,res){
   if(req.cookies.admintoken==undefined){
     res.redirect('/noaccess');
@@ -2813,6 +2887,12 @@ router.get("/AdminPanel/doctors/:doctor",function(req,res){
       })
     })
   }
+})
+
+
+router.get("/AdminPanel/healthcenters",function(req,res){
+  res.render("notimp.ejs");
+  res.end();
 })
 
 router.get("/AdminPanel/patients",function(req,res){
@@ -2926,10 +3006,20 @@ router.get("/Adminpanel/reserves/:resid",function(req,res){
                 dbo.collection("Users").findOne({_id:reserve.user},function(err,user){
                   dbo.collection("Doctors").findOne({_id:reserve.doctor},function(err,doctor){
                     reserve.user=user;
-                    reserve.doctor=doctor;
-                    res.render("AdminPanel/reserve-status.ejs",{reserve:reserve});
-                    res.end();
-                    db.close();
+                    if(doctor==null){
+                      dbo.collection("HealthCenters").findOne({_id:reserve.HC},function(err,HC){
+                        reserve.doctor=HC;  
+                        res.render("AdminPanel/reserve-status.ejs",{reserve:reserve});
+                        res.end();
+                        db.close();
+                      })
+                    }
+                    else{
+                      reserve.doctor=doctor;
+                      res.render("AdminPanel/reserve-status.ejs",{reserve:reserve});
+                      res.end();
+                      db.close();
+                    }
                   })
                 })
               })
@@ -2941,10 +3031,20 @@ router.get("/Adminpanel/reserves/:resid",function(req,res){
             dbo.collection("Users").findOne({_id:reserve.user},function(err,user){
               dbo.collection("Doctors").findOne({_id:reserve.doctor},function(err,doctor){
                 reserve.user=user;
-                reserve.doctor=doctor;
-                res.render("AdminPanel/reserve-status.ejs",{reserve:reserve});
-                res.end();
-                db.close();
+                if(doctor==null){
+                  dbo.collection("HealthCenters").findOne({_id:reserve.HC},function(err,HC){
+                    reserve.doctor=HC;  
+                    res.render("AdminPanel/reserve-status.ejs",{reserve:reserve});
+                    res.end();
+                    db.close();
+                  })
+                }
+                else{
+                  reserve.doctor=doctor;
+                  res.render("AdminPanel/reserve-status.ejs",{reserve:reserve});
+                  res.end();
+                  db.close();
+                }
               })
             })
           })
@@ -3954,7 +4054,6 @@ router.get("/paymenthandlerHC",function(req,res){
       if(reserve==null){
         db.close();
         res.redirect("/noaccess");
-        
       }
       else{
         if(query.Status=="NOK"){

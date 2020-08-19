@@ -18,6 +18,7 @@
 
   <link rel="stylesheet" href="https://unpkg.com/persian-datepicker@latest/dist/css/persian-datepicker.min.css">
   <link href="assets/css/main.css" rel="stylesheet" />
+  
 </head>
 
 <body>
@@ -38,7 +39,7 @@
               <ul class="nav flex-column">
                 
                 <li class="nav-item">
-                  <a class="nav-link" href="/adminpanel/dashboard" >
+                  <a class="nav-link active" href="/adminpanel/dashboard" >
                     <i class="fa fa-tachometer"></i>
                     داشبورد
                   </a>
@@ -50,13 +51,19 @@
                   </a>
                 </li>
                 <li class="nav-item">
+                  <a class="nav-link" href="/adminpanel/healthcenters" >
+                    <i class="fa fa-heartbeat"></i>
+                    مراکز درمانی
+                  </a>
+                </li>
+                <li class="nav-item">
                     <a class="nav-link" href="/adminpanel/visittimes">
                       <i class="fa fa-calendar"></i>
                       تعیین زمانبندی
                     </a>
                 </li>
                 <li class="nav-item">
-                  <a class="nav-link active" href="/adminpanel/costmanage">
+                  <a class="nav-link " href="/adminpanel/costmanage">
                     <i class="fa fa-calendar"></i>
                     تعیین هزینه ها
                   </a>
@@ -90,15 +97,39 @@
           <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
             <h1 class="h2">جستجوی تایم های رزرو شده</h1>
           </div>
-          <form autocomplete="off">
+          <form autocomplete="off" action="/AdminPanel/dashboard" method="POST">
           <div class='row'>
             <div class="col-xl-2 col-lg-6">
               <div class="form-group">
-                <label for="weekDayPicker">دکتر</label>
-                <select class="form-control" id="doctors-list" name="doctor" required>
-                  <option disabled selected>--- انتخاب دکتر ---</option>
+                <label for="type">انتخاب  دسته بندی   </label>
+                <select class="form-control" id="type" name="type" onchange="changetype()" required>
+                  <option disabled selected>---انتخاب ---</option>
+                  <option value="doctor">دکتر ها</option>
+                  <option value="HC">مراکز درمانی</option>
+                </select>
+              </div>
+            </div>
+            <div class="col-xl-2 col-lg-6">
+              <div class="form-group">
+                <label for="type-list">انتخاب دکتر یا مرکز  </label>
+                <select class="form-control" id="type-list" name="name" required>
+                  <option disabled selected>---انتخاب ---</option>
                   
                 </select>
+                <div id="doclist" style="display: none;">
+                  <% for(let i = 0 ; i < doctors.length;i++) {  %>
+                    <option>
+                      <%= doctors[i].name %>
+                    </option>
+                  <% } %>
+                  </div>
+                <div id="hclist" style="display: none;">">
+                  <% for(let i = 0 ; i < HCs.length;i++) {  %>
+                    <option>
+                      <%= HCs[i].name %>
+                    </option>
+                  <% } %>
+                  </div>
               </div>
             </div>
             <div class="col-xl-2 col-lg-6">
@@ -106,19 +137,20 @@
                 <label for="datePicker">
                   تاریخ
                 </label>
-                <input type="text" class="form-control datePicker" id="datePicker" required/>
-                <input type="text" class="form-control datePicker" name="datePicker" id="datePickerTimeStamp" required hidden/>
+                <input type="text" class="form-control datePicker" id="datePicker" />
+                <input type="text" class="form-control datePicker" name="datePicker" id="datePickerTimeStamp"  hidden/>
+                <p>در صورت تمایل برای دریافت تمام رزرو ها این قسمت را خالی بگذارید</p>
               </div>
-              <button type="button" class="btn btn-success submit-button float-right" id="reserveTimesRequestButton">
+              <button type="submit" class="btn btn-success submit-button float-right" id="reserveTimesRequestButton">
                 <i class="fa fa-check"></i>
-                اضافه کردن
+                 نمایش
               </button>
             </div>
           </div>
           </form>
 
           <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-            <h1 class="h2">بیماران ها</h1>
+            <h1 class="h2">لیست رزرو ها</h1>
           </div>
           
 
@@ -129,20 +161,20 @@
                   <thead>
                     <tr>
                       <th scope="col">#</th>
-                      <th scope="col">نام و نام خانوادگی</th>
+                      <th scope="col">عملیات</th>
+                      <th scope="col">تاریخ</th>
                       <th scope="col">ساعت</th>
-                      <th scope="col">شماره تماس</th>
-                      <th scope="col">ایمیل</th>
                     </tr>
                   </thead>
                   <tbody id="patients-list">
+                    <% for( let i=0 ; i < reserves.length ; i++ ) { %>
                     <tr>
-                      <th scope="row">1</th>
-                      <td>نام1</td>
-                      <td>1:10 - 2:0</td>
-                      <td>123456</td>
-                      <td>name_1@gmail.com</td>
+                      <th scope="row"><%= i+1 %></th>
+                      <td><a href="<%= "/AdminPanel/reserves/" + reserves[i]._id %>" class="btn btn-info" >مشاهده جزئیات</a></td>
+                      <td><%= reserves[i].time.date.year + "/" + reserves[i].time.date.month + "/" + reserves[i].time.date.day %></td>
+                      <td><%= reserves[i].time.start.hour + ":" + reserves[i].time.start.min + "-" + reserves[i].time.end.hour + ":" + reserves[i].time.end.min %></td>
                     </tr>
+                    <% } %>
                   </tbody>
                 </table>
               </div>
@@ -167,18 +199,31 @@
 
 <script>
 
-let datePickerOptions = {
-  autoClose: true,
-  initialValue: false,
-  format: 'dddd YYYY/MM/DD',
-  altField: "#datePickerTimeStamp"
-}
+  let datePickerOptions = {
+    autoClose: true,
+    initialValue: false,
+    format: 'dddd YYYY/MM/DD',
+    altField: "#datePickerTimeStamp"
+  }
+  function changetype(){
+    if(document.getElementById("type").value=="doctor"){
+      document.getElementById("type-list").innerHTML="";
+      let temp=document.getElementById("doclist").innerHTML;
+      document.getElementById("type-list").innerHTML=temp;
+    }
+    if(document.getElementById("type").value=="HC"){
+      document.getElementById("type-list").innerHTML="";
+      let temp=document.getElementById("hclist").innerHTML;
+      document.getElementById("type-list").innerHTML=temp;
+    }
+  }
 
-$(document).ready(function() {
-  let datePicker = $("#datePicker").persianDatepicker(datePickerOptions)
-})
+  $(document).ready(function() {
+    let datePicker = $("#datePicker").persianDatepicker(datePickerOptions)
+  })
 
 </script>
 
 </body>
+
 </html>
