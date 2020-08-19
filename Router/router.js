@@ -2938,6 +2938,94 @@ router.get("/AdminPanel/HealthCenters/:hcname",function(req,res){
 })
 
 
+router.get("/AdminPanel/Chats",function(req,res){
+  if(req.cookies.admintoken==undefined){
+    res.redirect('/noaccess');
+  }
+  else{
+    MongoClient.connect(dburl,function(err,db){
+      var dbo=db.db("mydb");
+      dbo.collection("Admins").findOne({token:req.cookies.admintoken},async function(err,result){
+        if(result==null){
+          db.close();
+          res.redirect('/noaccess');
+        }
+        else{
+          var doctors= await dbo.collection("Doctors").find().toArray()
+          res.render("AdminPanel/chats.ejs",{doctors:doctors,chats:[]})
+          res.end();
+          db.close();
+        }
+      })
+    })
+  }
+})
+
+router.post("/AdminPanel/Chats",function(req,res){
+  if(req.cookies.admintoken==undefined){
+    res.redirect('/noaccess');
+  }
+  else{
+    MongoClient.connect(dburl,function(err,db){
+      var dbo=db.db("mydb");
+      dbo.collection("Admins").findOne({token:req.cookies.admintoken},async function(err,result){
+        if(result==null){
+          db.close();
+          res.redirect('/noaccess');
+        }
+        else{
+          if(req.body.name==undefined){
+            db.close();
+            res.redirect("/AdminPanel/Chats")
+          }
+          else{
+            var chats=await dbo.collection("Chats").find({doctor:req.body.name}).toArray()
+            var doctors= await dbo.collection("Doctors").find().toArray()
+            res.render("AdminPanel/chats.ejs",{doctors:doctors,chats:chats})
+            res.end();
+            db.close();
+          }
+        }
+      })
+    })
+  }
+})
+
+
+router.get("/AdminPanel/Chats/:chatid",function(req,res){
+  chatid= new ObjectID(req.params.chatid)
+  if(req.cookies.admintoken==undefined){
+    res.redirect('/noaccess');
+  }
+  else{
+    MongoClient.connect(dburl,function(err,db){
+      var dbo=db.db("mydb");
+      dbo.collection("Admins").findOne({token:req.cookies.admintoken},async function(err,result){
+        if(result==null){
+          db.close();
+          res.redirect('/noaccess');
+        }
+        else{
+          dbo.collection("Chats").findOne({_id:chatid},function(err,chat){
+            res.render("AdminPanel/chatpage.ejs",{doctor:result,chat:chat});
+            db.close();
+            res.end();
+          })
+        }
+      })
+    })
+  }
+})
+
+router.get("/AdminPanel/telereserves",function(req,res){
+
+})
+
+router.get("/AdminPanel/telereserves/:teleresid",function(req,res){
+
+})
+
+
 router.get("/AdminPanel/patients",function(req,res){
   if(req.cookies.admintoken==undefined){
     res.redirect('/noaccess');
@@ -4713,7 +4801,7 @@ router.post('/loginAdmin',function(req,res){
           dbo.collection("Admins").updateOne({username:req.body.username},{$set:{token:mytoken}},function(err,result2){
             res.cookie('admintoken',mytoken);
             db.close();
-            res.redirect('/AdminPanel/addDoctor');
+            res.redirect('/AdminPanel/dashboard');
           })
         }
       }
