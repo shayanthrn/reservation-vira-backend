@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="fa">
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+
+
+<head>
+    <meta charset="utf-8" />
+    <base id="base">
+    <script src="/assets/js/config.js"></script>
+    <link rel="apple-touch-icon" sizes="76x76" href="assets/img/logo.png">
+    <link rel="icon" type="image/png" href="assets/img/logo.png">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+    <meta content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0, shrink-to-fit=no'
+        name='viewport' />
+    <title>دکتر تجویز</title>
+    <!--     Fonts and icons     -->
+    <link rel="stylesheet" href="assets/fonts/font-awesome/css/font-awesome.min.css" />
+    <!-- CSS Files -->
+    <link href="assets/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="assets/css/now-ui-kit.css" rel="stylesheet" />
+    <link href="assets/css/plugins/owl.carousel.css" rel="stylesheet" />
+    <link href="assets/css/plugins/owl.theme.default.min.css" rel="stylesheet" />
+    <link href="assets/css/main.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://unpkg.com/flickity@2/dist/flickity.min.css">
+    <link rel="stylesheet" href="styleres.css">
+
+    <style>
+        .reserve-time {
+            border-radius: 5px !important;
+        }
+
+        .reserve-time.active {
+            background-color: #06cdd1 !important;
+            border-color: #06cdd1 !important;
+        }
+    </style>
+
+</head>
+
+<body>
+
+    <div class="wrapper default shopping-page">
+        <!-- header-shopping -->
+        <%- include('header-shopping.ejs', {p:''}); -%>
+        <!-- header-shopping -->
+
+        <!-- main-shopping -->
+        <main class="cart-page default">
+            <div class="container">
+                <div class="row">
+                    <div class="cart-page-content col-xl-9 col-lg-8 col-md-12 order-1">
+                        <div class="cart-page-title">
+                            <h1>انتخاب ساعت</h1>
+                        </div>
+                        <section class="page-content default">
+                            <div class="checkout-shipment">
+                                <form action="payment?from=/reserve/<%=doctor.name%>" method="POST">
+                                    <ul>
+                                        <li><span> نام دکتر :</span><span><%= doctor.name %></span></li>
+                                        <li><span> تخصص :</span><span><%= doctor.category %></span></li>
+                                    </ul>
+                                    <div class="row">
+                                        <div class="col-12">
+                                            <div class="reservation-carousel">
+                                                <% for(let i=0;i<days.length;i++) { %>
+                                                <% if(freetimes[i].length==0) { %>
+                                                <div class="carousel-cell m-2 disabled" data-key="<%= days[i].index %>">
+                                                    <% } else { %>
+                                                    <div class="carousel-cell m-2" data-key="<%= days[i].index %>">
+                                                        <% } %>
+                                                        <div class="card px-4">
+                                                            <div class="card-body text-center">
+                                                                <p class="mb-0" style="width: max-content;">
+                                                                    <%= days[i].dayofweek%></p>
+                                                                <p class="mb-0"><%= days[i].day %></p>
+                                                                <p class="mb-0"><%= days[i].month%></p>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <% } %>
+                                                </div>
+
+                                                <div id="reserveTimesContainer">
+                                                    <% for(let j=0;j<days.length;j++) { %>
+                                                    <div class="reserveTimes" data-key="<%= days[j].index %>">
+                                                        <div data-toggle="buttons">
+                                                            <% for(let k=0;k<freetimes[j].length;k++) { %>
+                                                            <label
+                                                                class="reserve-time btn btn-outline-secondary float-right ml-2">
+                                                                <input class="d-none" type="radio" name="choice"
+                                                                    id="<%= days[j].index %>"
+                                                                    value="<%=freetimes[j][k].start.hour + ":" + freetimes[j][k].start.min + ":" + days[j].year +":"+days[j].monthnum + ":" + days[j].day %>">
+                                                                <%= freetimes[j][k].start.hour + ":" + freetimes[j][k].start.min + "-" + freetimes[j][k].end.hour + ":" + freetimes[j][k].end.min %>
+                                                            </label>
+                                                            <% } %>
+                                                        </div>
+                                                    </div>
+                                                    <% } %>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                        </section>
+                    </div>
+                    <aside class="cart-page-aside col-xl-3 col-lg-4 col-md-6 center-section order-2">
+                        <div class="checkout-aside">
+                            <div class="checkout-summary">
+                                <div class="checkout-summary-main">
+                                    <ul class="checkout-summary-summary">
+                                        <li><span>مبلغ کل</span><span><%= doctor.visitcost %> تومان</span></li>
+                                    </ul>
+                                    <div class="checkout-summary-devider">
+                                        <div></div>
+                                    </div>
+                                    <div class="checkout-summary-content">
+                                        <div class="checkout-summary-price-title">مبلغ قابل پرداخت:</div>
+                                        <div class="checkout-summary-price-value">
+                                            <span
+                                                class="checkout-summary-price-value-amount"><%= doctor.visitcost %></span>تومان
+                                        </div>
+                                        <a href="#" class="selenium-next-step-shipping">
+                                            <div class="parent-btn">
+                                                <a class="dk-btn dk-btn-info" data-toggle="modal"
+                                                    data-target="#exampleModalLong" style="color:#ffff;">
+                                                    پرداخت
+                                                    <i class="now-ui-icons shopping_basket"></i>
+                                                </a>
+                                            </div>
+                                            <!-- modal -->
+                                            <div class="modal fade" id="exampleModalLong" tabindex="-1" role="dialog"
+                                                aria-labelledby="exampleModalLongTitle" aria-hidden="true">
+                                                <div class="modal-dialog" role="document">
+                                                    <div class="modal-content">
+                                                        <div class="modal-header">
+                                                            <h5 class="modal-title" id="exampleModalLongTitle"
+                                                                style="margin-top: 24px;">قوانین و مقررات</h5>
+                                                            <button type="button" class="close" data-dismiss="modal"
+                                                                aria-label="Close">
+                                                                <span aria-hidden="true">&times;</span>
+                                                            </button>
+                                                        </div>
+                                                        <div class="modal-body">
+                                                            لطفا مطالعه شود
+                                                            میزان معطلی شما با توجه به قوانین هر مطب غیرقابل پیش‌بینی
+                                                            است.
+                                                            پرداختی شما به مبلغ3،000 تومان صرفا جهت اخذ نوبت بوده و کل
+                                                            مبلغ ویزیت پزشک در مطب از شما دریافت می‌گردد.
+                                                            با توجه به شایع بودن ویروس کرونا حتما با رعایت قوانین
+                                                            بهداشتی و بهمراه داشتن ماسک و دستکش، بدون همراه و راس ساعت
+                                                            به مطب مراجعه کنید.
+                                                            در صورت داشتن هرگونه علایم بیماری از جمله تب، سرفه، گلودرد
+                                                            لطفا از حضور در مطب خودداری کنید.
+
+
+                                                        </div>
+                                                        <div class="modal-footer">
+                                                            <button type="button" class="btn btn-secondary"
+                                                                data-dismiss="modal">بستن</button>
+                                                            <button type="submit" class="btn btn-primary">خواندم و قبول
+                                                                دارم</button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+
+
+                                            <!-- modal -->
+                                        </a>
+                                        <input type="text" name="doctor" id="doctor" value="<%= doctor.name %>"
+                                            style="visibility: hidden;">
+                                        <input type="text" name="cost" value="<%= doctor.visitcost %>"
+                                            style="visibility: hidden;">
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </aside>
+                </div>
+            </div>
+        </main>
+        <!-- main-shopping -->
+
+        <!-- footer -->
+        <%- include('footer.ejs'); -%>
+        <!-- footer -->
+
+    </div>
+
+</body>
+<!--   Core JS Files   -->
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"
+    integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj"
+    crossorigin="anonymous"></script>
+<script src="https://unpkg.com/flickity@2/dist/flickity.pkgd.min.js"></script>
+<script src="scriptres.js"></script>
+<script src="assets/js/core/popper.min.js" type="text/javascript"></script>
+<script src="assets/js/core/bootstrap.min.js" type="text/javascript"></script>
+<!--  Plugin for Switches, full documentation here: http://www.jque.re/plugins/version3/bootstrap.switch/ -->
+<script src="assets/js/plugins/bootstrap-switch.js"></script>
+<!--  Plugin for the Sliders, full documentation here: http://refreshless.com/nouislider/ -->
+<script src="assets/js/plugins/nouislider.min.js" type="text/javascript"></script>
+<!--  Plugin for the DatePicker, full documentation here: https://github.com/uxsolutions/bootstrap-datepicker -->
+<script src="assets/js/plugins/bootstrap-datepicker.js" type="text/javascript"></script>
+<!-- Share Library etc -->
+<script src="assets/js/plugins/jquery.sharrre.js" type="text/javascript"></script>
+<!-- Control Center for Now Ui Kit: parallax effects, scripts for the example pages etc -->
+<script src="assets/js/now-ui-kit.js" type="text/javascript"></script>
+<!--  CountDown -->
+<script src="assets/js/plugins/countdown.min.js" type="text/javascript"></script>
+<!--  Plugin for Sliders -->
+<script src="assets/js/plugins/owl.carousel.min.js" type="text/javascript"></script>
+<!--  Jquery easing -->
+<script src="assets/js/plugins/jquery.easing.1.3.min.js" type="text/javascript"></script>
+<!-- Main Js -->
+<script src="assets/js/main.js" type="text/javascript"></script>
+
+
+</html>
