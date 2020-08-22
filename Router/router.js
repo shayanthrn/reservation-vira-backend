@@ -3018,7 +3018,26 @@ router.get("/AdminPanel/Chats/:chatid",function(req,res){
 })
 
 router.get("/AdminPanel/telereserves",function(req,res){
-
+  if(req.cookies.admintoken==undefined){
+    res.redirect('/noaccess');
+  }
+  else{
+    MongoClient.connect(dburl,function(err,db){
+      var dbo=db.db("mydb");
+      dbo.collection("Admins").findOne({token:req.cookies.admintoken},async function(err,result){
+        if(result==null){
+          db.close();
+          res.redirect('/noaccess');
+        }
+        else{
+          var doctors= await dbo.collection("Doctors").find().toArray()
+          res.render("AdminPanel/telereserves.ejs",{doctors:doctors,reserves:[]})
+          res.end();
+          db.close();
+        }
+      })
+    })
+  }
 })
 
 router.get("/AdminPanel/telereserves/:teleresid",function(req,res){
