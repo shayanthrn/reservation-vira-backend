@@ -2666,7 +2666,7 @@ router.get("/doctorpanel/telereserve",function(req,res){
           }
           result.telereservations.forEach(function(doc){
             for(i=0;i<6;i++){
-              if(lodash.isEqual(visittimes[i].date,doc.time.date)){
+              if(lodash.isEqual(visittimes[i].date,doc.timeinfo.date)){
                 visittimes[i].times.push(doc);
               }
             }
@@ -3010,7 +3010,7 @@ router.get("/AdminPanel/Chats/:chatid",function(req,res){
         }
         else{
           dbo.collection("Chats").findOne({_id:chatid},function(err,chat){
-            res.render("AdminPanel/chatpage.ejs",{doctor:result,chat:chat});
+            res.render("AdminPanel/chatpage.ejs",{chat:chat});
             db.close();
             res.end();
           })
@@ -3043,8 +3043,64 @@ router.get("/AdminPanel/telereserves",function(req,res){
   }
 })
 
-router.get("/AdminPanel/telereserves/:teleresid",function(req,res){
+router.post("/AdminPanel/telereserves",function(req,res){
+  if(req.cookies.admintoken==undefined){
+    res.redirect('/noaccess');
+  }
+  else{
+    MongoClient.connect(dburl,function(err,db){
+      var dbo=db.db("mydb");
+      dbo.collection("Admins").findOne({token:req.cookies.admintoken},async function(err,result){
+        if(result==null){
+          db.close();
+          res.redirect('/noaccess');
+        }
+        else{
+          if(req.body.name==undefined){
+            db.close();
+            res.redirect("/AdminPanel/telereserves")
+          }
+          else{
+            dbo.collection("Doctors").findOne({name:req.body.name},async function(err,doctor){
+              var doctors= await dbo.collection("Doctors").find().toArray()
+              res.render("AdminPanel/telereserves.ejs",{doctors:doctors,reserves:doctor.telereservations})
+              res.end();
+              db.close();
+            })
+          }
+        }
+      })
+    })
+  }
+})
 
+router.get("/AdminPanel/telereserves/:teleresid",function(req,res){
+  teleresid = new ObjectID(req.params.teleresid)
+  if(req.cookies.admintoken==undefined){
+    res.redirect('/noaccess');
+  }
+  else{
+    MongoClient.connect(dburl,function(err,db){
+      var dbo=db.db("mydb");
+      dbo.collection("Admins").findOne({token:req.cookies.admintoken},async function(err,result){
+        if(result==null){
+          db.close();
+          res.redirect('/noaccess');
+        }
+        else{
+          dbo.collection("teleReservations").findOne({_id:teleresid},async function(err,reserve){
+            reserve.doctor=await dbo.collection("Doctors").findOne({_id:reserve.doctor});
+            reserve.doctor=reserve.doctor.name;
+            reserve.user=await dbo.collection("Users").findOne({_id:reserve.user});
+            reserve.user=reserve.user.firstname + " " + reserve.user.lastname;
+            res.render("AdminPanel/telreserve-status.ejs",{reserve:reserve});
+            db.close();
+            res.end();
+          })
+        }
+      })
+    })
+  }
 })
 
 

@@ -109,7 +109,7 @@
           <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
             <h1 class="h2">رزرو های تلفنی</h1>
           </div>
-          <form autocomplete="off" action="/AdminPanel/chats" method="POST">
+          <form autocomplete="off" action="/AdminPanel/telereserves" method="POST">
           <div class='row'>
             <div class="col-xl-2 col-lg-6">
               <div class="form-group">
@@ -144,8 +144,8 @@
                     <tr>
                       <th scope="col">#</th>
                       <th scope="col">عملیات</th>
-                      <th scope="col">وضعیت</th>
-                      <th scope="col">شماره همراه بیمار</th>
+                      <th scope="col">تاریخ</th>
+                      <th scope="col">ساعت</th>
                     </tr>
                   </thead>
                   <tbody id="patients-list">
@@ -153,13 +153,8 @@
                     <tr>
                       <th scope="row"><%= i+1 %></th>
                       <td><a href="<%= "/AdminPanel/telereserves/"+ reserves[i]._id %>" class="btn btn-info" >مشاهده جزئیات</a></td>
-                      <td><% if(chats.finished==true) {  %>
-                            <p>پایان یافته</p>
-                            <% } else { %>
-                            <p>فعال </p>
-                            <% }  %>
-                      </td>
-                      <td><%= reserves[i] %></td>
+                      <td><p><%= reserves[i].timeinfo.date.year +"/"+ reserves[i].timeinfo.date.month +"/"+ reserves[i].timeinfo.date.day %> </p></td>
+                      <td><%= reserves[i].timeinfo.time.start + "-" + reserves[i].timeinfo.time.end%></td>
                     </tr>
                     <% } %>
                   </tbody>
