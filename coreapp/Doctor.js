@@ -17,10 +17,18 @@ class Doctor{
         this.visitcost=3000;
         this.description=description;
         this.membershiptypes=membershiptypes;
+        if(membershiptypes.includes("teleconsultant")){
+            this.teletimes=[]
+            this.telereservations=[];
+            this.televisitcost=5000;
+        }
+        if(membershiptypes.includes("chatconsultant")){
+            this.chatcost=5000;
+            this.chats=[];
+        }
         this.token="";
         this.appknowledge=appknowledge;
         this.reservations=[];
-        this.telereservation=[];
     }
 }
 

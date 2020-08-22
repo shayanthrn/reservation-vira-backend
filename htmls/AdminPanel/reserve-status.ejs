@@ -17,6 +17,7 @@
   <link href="https://use.fontawesome.com/6d68f18b97.css" media="all" rel="stylesheet">
 
   <link rel="stylesheet" href="https://unpkg.com/persian-datepicker@latest/dist/css/persian-datepicker.min.css">
+  <link href="assets/css/main.css" rel="stylesheet" />
 </head>
 
 <body>
@@ -36,44 +37,63 @@
       <nav class="col-lg-3 col-xl-2 d-lg-block sidebar collapse" id="navbarTogglerDemo">
         <div class="sidebar-sticky">
           <ul class="nav flex-column">
+            
             <li class="nav-item">
-              <a class="nav-link" href="/AdminPanel/dashboard">
+              <a class="nav-link active" href="/adminpanel/dashboard" >
                 <i class="fa fa-tachometer"></i>
                 داشبورد
               </a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="/AdminPanel/Doctors">
+              <a class="nav-link " href="/adminpanel/chats" >
+                <i class="fa fa-commenting"></i>
+                گفتگو های متنی
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/AdminPanel/telereserves" >
+                <i class="fa fa-phone"></i>
+                رزرو های تلفنی
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/adminpanel/doctors" >
                 <i class="fa fa-user-md"></i>
                 دکتر ها
               </a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="/AdminPanel/categories">
+              <a class="nav-link" href="/adminpanel/healthcenters" >
+                <i class="fa fa-heartbeat"></i>
+                مراکز درمانی
+              </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/adminpanel/visittimes">
+                  <i class="fa fa-calendar"></i>
+                  تعیین زمانبندی
+                </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link " href="/adminpanel/costmanage">
+                <i class="fa fa-calendar"></i>
+                تعیین هزینه ها
+              </a>
+          </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/adminpanel/categories" >
                 <i class="fa fa-book"></i>
                 تخصص ها
               </a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="/AdminPanel/users">
+              <a class="nav-link" href="/adminpanel/patients" >
                 <i class="fa fa-users"></i>
                 بیماران
               </a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="/AdminPanel/aboutus">
-                <i class="fa fa-cog"></i>
-                درباره ما
-              </a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="/AdminPanel/contactus">
-                <i class="fa fa-cog"></i>
-                تماس با ما
-              </a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="/exit">
+              <a class="nav-link" href="/exit" >
                 <i class="fa fa-sign-out"></i>
                 خروج
               </a>
@@ -83,10 +103,18 @@
           </div>
       </nav>
 
+
       <main role="main" class=" ml-sm-auto col-lg-9 col-xl-10 px-4" id="doctors-reserve-status">
         <div class="container-fluid">
           <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
             <h1 class="h2">جزئیات رزرو</h1>
+            <button class="btn btn-info" onclick="goBack()">بازگشت به صفحه قبل</button>
+
+          <script>
+          function goBack() {
+            window.history.back();
+          }
+          </script>
           </div>
 
           <div class="row">
@@ -96,7 +124,15 @@
                   <h5>نام بیمار</h5>
                 </div>
                 <div class="col-md-6 col-lg-6">
-                  <p>علی</p>
+                  <p><%= reserve.user.firstname + " " + reserve.user.lastname %></p>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-md-4 col-lg-2">
+                  <h5>نام دکتر</h5>
+                </div>
+                <div class="col-md-6 col-lg-6">
+                  <p><%= reserve.doctor.name %></p>
                 </div>
               </div>
               <div class="row">
@@ -104,7 +140,7 @@
                   <h5>روز هفته</h5>
                 </div>  
                 <div class="col-md-6 col-lg-6">
-                  <p>شنبه</p>
+                  <p><%= reserve.time.dayofweek %></p>
                 </div>
               </div>
               <div class="row">
@@ -112,7 +148,7 @@
                   <h5>تاریخ</h5>
                 </div>
                 <div class="col-md-6 col-lg-6">
-                  <p>1399/1/2</p>
+                  <p><%= reserve.time.date.year + "/" + reserve.time.date.month + "/" + reserve.time.date.day  %></p>
                 </div>
               </div>
               <div class="row">
@@ -120,7 +156,10 @@
                   <h5>ساعت</h5>
                 </div>
                 <div class="col-md-6 col-lg-6">
-                  <p>13:15 - 14:15</p>
+                  <% function n(n){
+                    return n > 9 ? "" + n: "0" + n;
+                    } %>
+                  <p><%=  n(reserve.time.start.hour) + ":" + n(reserve.time.start.min) +  "-" + n(reserve.time.end.hour) + ":" + n(reserve.time.end.min) %></p>
                 </div>
               </div>
             </div>

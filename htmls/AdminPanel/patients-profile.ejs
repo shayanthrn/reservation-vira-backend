@@ -15,6 +15,7 @@
   <link href="assets/panelassests/dashboard.rtl.css" rel="stylesheet">
   <script src="https://use.fontawesome.com/6d68f18b97.js"></script>
   <link href="https://use.fontawesome.com/6d68f18b97.css" media="all" rel="stylesheet">
+  <link href="assets/css/main.css" rel="stylesheet" />
 
   <link rel="stylesheet" href="https://unpkg.com/persian-datepicker@latest/dist/css/persian-datepicker.min.css">
 </head>
@@ -36,44 +37,63 @@
       <nav class="col-lg-3 col-xl-2 d-lg-block sidebar collapse" id="navbarTogglerDemo">
         <div class="sidebar-sticky">
           <ul class="nav flex-column">
+            
             <li class="nav-item">
-              <a class="nav-link" href="/AdminPanel/dashboard">
+              <a class="nav-link " href="/adminpanel/dashboard" >
                 <i class="fa fa-tachometer"></i>
                 داشبورد
               </a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="/AdminPanel/Doctors">
+              <a class="nav-link " href="/adminpanel/chats" >
+                <i class="fa fa-commenting"></i>
+                گفتگو های متنی
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/AdminPanel/telereserves" >
+                <i class="fa fa-phone"></i>
+                رزرو های تلفنی
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/adminpanel/doctors" >
                 <i class="fa fa-user-md"></i>
                 دکتر ها
               </a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="/AdminPanel/categories">
+              <a class="nav-link" href="/adminpanel/healthcenters" >
+                <i class="fa fa-heartbeat"></i>
+                مراکز درمانی
+              </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/adminpanel/visittimes">
+                  <i class="fa fa-calendar"></i>
+                  تعیین زمانبندی
+                </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link " href="/adminpanel/costmanage">
+                <i class="fa fa-calendar"></i>
+                تعیین هزینه ها
+              </a>
+          </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/adminpanel/categories" >
                 <i class="fa fa-book"></i>
                 تخصص ها
               </a>
             </li>
             <li class="nav-item">
-              <a class="nav-link active" href="/AdminPanel/users">
+              <a class="nav-link active" href="/adminpanel/patients" >
                 <i class="fa fa-users"></i>
                 بیماران
               </a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="/AdminPanel/aboutus">
-                <i class="fa fa-cog"></i>
-                درباره ما
-              </a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="/AdminPanel/contactus">
-                <i class="fa fa-cog"></i>
-                تماس با ما
-              </a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="/exit">
+              <a class="nav-link" href="/exit" >
                 <i class="fa fa-sign-out"></i>
                 خروج
               </a>
@@ -82,11 +102,19 @@
 
           </div>
       </nav>
+
       
       <main role="main" class=" ml-sm-auto col-lg-9 col-xl-10 px-4" id="patients-profile">
         <div class="container-fluid">
           <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
             <h1 class="h2">پروفایل</h1>
+            <button class="btn btn-info" onclick="goBack()">بازگشت به صفحه قبل</button>
+
+          <script>
+          function goBack() {
+            window.history.back();
+          }
+          </script>
           </div>
 
           <div class="row">
@@ -101,18 +129,23 @@
               </div>
               <div class="row">
                 <div class="col-md-4 col-lg-2">
-                  <h5>نام کاربری</h5>
+                  <h5>تاریخ تولد</h5>
                 </div>
                 <div class="col-md-6 col-lg-6">
-                  <p><%= user.username %></p>
+                  <p><%= user.birthdate.year + "/" + user.birthdate.month + "/" + user.birthdate.day %></p>
                 </div>
               </div>
               <div class="row">
                 <div class="col-md-4 col-lg-2">
-                  <h5>کد ملی</h5>
+                  <h5>جنسیت</h5>
                 </div>  
                 <div class="col-md-6 col-lg-6">
-                  <p><%= user.codemeli%></p>
+                  <% if(user.sex=="male") { %>
+                  <p>مرد</p>
+                  <% } %>
+                  <% if(user.sex=="female") { %>
+                    <p>زن</p>
+                  <% } %>
                 </div>
               </div>
               <div class="row">
@@ -120,15 +153,7 @@
                   <h5>شماره تلفن</h5>
                 </div>
                 <div class="col-md-6 col-lg-6">
-                  <p><%=user.phone%></p>
-                </div>
-              </div>
-              <div class="row">
-                <div class="col-md-4 col-lg-2">
-                  <h5>ایمیل</h5>
-                </div>
-                <div class="col-md-6 col-lg-6">
-                  <p><%= user.email %></p>
+                  <p><%=user.phonenumber%></p>
                 </div>
               </div>
             </div>

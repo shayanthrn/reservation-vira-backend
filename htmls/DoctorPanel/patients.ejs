@@ -10,11 +10,11 @@
   <link rel="icon" href="favicon.ico">
 
   <title></title>
-
+  
   <link rel="stylesheet" href="https://cdn.rtlcss.com/bootstrap/v4.1.3/css/bootstrap.min.css" integrity="sha384-Jt6Tol1A2P9JBesGeCxNrxkmRFSjWCBW1Af7CSQSKsfMVQCqnUVWhZzG0puJMCK6" crossorigin="anonymous">
   <link href="assets/panelassests/dashboard.rtl.css" rel="stylesheet">
   <script src="https://use.fontawesome.com/6d68f18b97.js"></script><link href="https://use.fontawesome.com/6d68f18b97.css" media="all" rel="stylesheet">
-
+  <link href="assets/css/main.css" rel="stylesheet" />
 </head>
 
 <body>
@@ -33,15 +33,22 @@
       <nav class="col-lg-3 col-xl-2 d-lg-block sidebar collapse" id="navbarTogglerDemo">
         <div class="sidebar-sticky">
           <ul class="nav flex-column">
-            
             <li class="nav-item">
               <a class="nav-link" href="/DoctorPanel/dashboard">
                 <i class="fa fa-tachometer"></i>
                 داشبورد
               </a>
             </li>
+            <% if(doctor.membershiptypes.includes("teleconsultant")) { %>
+              <li class="nav-item">
+                <a class="nav-link" href="/DoctorPanel/telereserve">
+                  <i class="fa fa-phone"></i>
+                  رزرو تلفنی
+                </a>
+              </li>
+              <% } %>
             <li class="nav-item">
-              <a class="nav-link" href="/DoctorPanel/profile">
+              <a class="nav-link " href="/DoctorPanel/profile">
                 <i class="fa fa-user-md"></i>
                 پروفایل
               </a>
@@ -51,6 +58,20 @@
                 <i class="fa fa-users"></i>
                 بیماران
               </a>
+            </li>
+            <% if(doctor.membershiptypes.includes("chatconsultant")) { %>
+            <li class="nav-item">
+              <a class="nav-link" href="/DoctorPanel/tickets">
+                <i class="fa fa-commenting"></i>
+                گفتگو متنی
+              </a>
+            </li>
+            <% } %>
+            <li class="nav-item">
+                <a class="nav-link" href="/DoctorPanel/removevisittimes">
+                  <i class="fa fa-calendar"></i>
+                  حذف زمانبندی
+                </a>
             </li>
             <li class="nav-item">
               <a class="nav-link" href="/DoctorPanel/visittimes">
@@ -98,7 +119,7 @@
                     <tr>
                       <th scope="row"><%=i+1%></th>
                       <td><a href="<%= "AdminPanel/users/" + patients[i]._id %>"><%=patients[i].firstname + " " +  patients[i].lastname%></a></td>
-                      <td><%= patients[i].phone %></td>
+                      <td><%= patients[i].phonenumber %></td>
                     </tr>
                     <% } %>
                   </tbody>

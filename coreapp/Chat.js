@@ -3,6 +3,7 @@ class Chat{
         this.doctor=dname;
         this.userphone=uphone;
         this.tickets=[];
+        this.finished=false;
     }
 }
 

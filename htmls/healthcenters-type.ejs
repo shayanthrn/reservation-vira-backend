@@ -30,7 +30,110 @@
     <div class="wrapper default">
 
         <!-- header -->
+<<<<<<< HEAD
         <%- include('header.ejs'); -%>
+=======
+        <header class="main-header default">
+            <div class="container">
+                <div class="row">
+                    <div class="col-lg-2 col-md-3 col-sm-4 col-5">
+                        <div class="logo-area default">
+                            <a href="#">
+                                <img src="assets/img/logo.png"  alt="">
+                            </a>
+                        </div>
+                    </div>
+                    <div class="col-lg-6 col-md-5 col-sm-8 col-7">
+                        <div class="search-area default">
+                            <form action="/search" class="search">
+                                <table>
+                                    <tr>
+                                        <td>
+                                            <label for="filter" >جستجو در:</label>
+                                            <select id="filter" name="filter">
+                                                <option value="Doctors">دکتر ها</option>
+                                                <option value="category">تخصص</option>
+                                                <option value="HealthCenters">مراکز درمانی</option>
+                                            </select>
+                                        </td>
+                                        <td>
+                                            <input type="text" name="query" id="gsearchsimple"
+                                            placeholder="نام تخصص ، دکتر یا مرکز درمانی مورد نظر خود را وارد کنید..." style="min-width: 558px;">
+                                        </td>
+                                    </tr>
+                                </table>
+                                
+                                <div class="localSearchSimple">
+                                </div>
+                                <button type="submit" style="max-height: 44px;top: 8px;"><img src="assets/img/search.png" alt=""></button>
+                            </form>
+                        </div>
+                    </div>
+                    <div class="col-md-4 col-sm-12">
+                        <% if(user=="") { %>
+                        <div class="user-login dropdown">
+                            <a href="#" class="btn btn-neutral dropdown-toggle" data-toggle="dropdown"
+                                id="navbarDropdownMenuLink1">
+                                ورود / ثبت نام
+                            </a>
+                            <ul class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink1">
+                                <div class="dropdown-item">
+                                    <a href="<%= "/signup?from=/healthcenters/" + type.split(' ').join('-') %>" class="btn btn-info">ورود به دکتر تجویز</a>
+                                </div>
+                            </ul>
+                        </div>
+                        <% } else{ %>
+                            <div class="user-login dropdown">
+                                <a href="#" class="btn btn-neutral dropdown-toggle" data-toggle="dropdown"
+                                    id="navbarDropdownMenuLink1">
+                                    <%= user.firstname + " " + user.lastname %>
+                                </a>
+                                <ul class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink1">
+                                    <div class="dropdown-item">
+                                        <a  href="#"  id="profileview" class="btn btn-info"> مشاهده پروفایل  </a>
+                                    </div>
+                                    <div class="dropdown-item font-weight-bold">
+                                        <a href="/exit" class="register" href="#">خروج</a>
+                                    </div>
+                                </ul>
+                            </div>
+                        <% } %>
+                    </div>
+                </div>
+            </div>
+            <nav class="main-menu">
+                <div class="container">
+                    <ul class="list float-right">
+                        <li class="list-item list-item-has-children mega-menu mega-menu-col-5">
+                            <a class="nav-link" href="#">تخصص</a>
+                            <ul class="sub-menu nav">
+                                <% for(let i=0;i<categories.length;i++) { %>
+                                <li class="list-item list-item-has-children">
+                                    <a class="main-list-item nav-link"
+                                        href="<%= "/category/"+categories[i].name.split(' ').join('-')+"?city=all" %>"><%= categories[i].name %> </a>
+                                </li>
+                                <% } %>
+                                <img src="assets/img/logo.png"  style="max-height: 140px;" alt="">
+                            </ul>
+                        </li>
+                        <li class="list-item">
+                            <a class="nav-link" href="/healthcenters">بانک سلامت</a>
+                        </li>
+                        <li class="list-item">
+                            <a class="nav-link" href="https://drtajviz.com/mag/">بلاگ</a>
+                        </li>
+                        <li class="list-item">
+                            <a class="nav-link" href="https://drtajviz.com/contact-us/" id="contactus">تماس با ما</a>
+                        </li>
+                        <li class="list-item">
+                            <a class="nav-link" href="https://drtajviz.com/aboutus/" id="aboutus">درباره ی ما</a>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+    </header>
+        <div class="overlay-search-box"></div>
+>>>>>>> e2a6032aa870e81e6868e9b87768de23970298b3
         <!-- header -->
 
         <!-- main -->
