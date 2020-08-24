@@ -258,7 +258,6 @@ router.post("/api/paymentHC",function(req,res){
   }
 })
 
-router.post("/api/getteletimes")
 
 
 router.post("/api/addExperimentFile",function(req,res){
@@ -720,6 +719,70 @@ router.get("/api/getTimeSlots",function(req,res){
 router.post("/api/payment",function(req,res){
   if(req.body.usertoken==undefined){
     console.log(req.body);
+    res.json({data:"user token not found"})
+    res.end();
+  }
+  else{
+  if(req.body.choice==undefined){
+    res.json({data:"choice is not defined"})
+    res.end();
+  }
+  else{
+    
+  MongoClient.connect(dburl,function(err,db){
+    var dbo=db.db("mydb");
+    dbo.collection("Users").findOne({token:req.body.usertoken},function(err,user){
+      if(user==null){
+        res.json({data:"user not found"});
+        db.close();
+        res.end();
+      }
+      else{
+        if(checkinterval(1)){
+          dbo.collection("Doctors").findOne({name:req.body.doctor},function(err,doctor){
+            if(doctor==null){
+              res.json({data:"doctor not found"});
+              db.close();
+              res.end();
+            }
+            else{
+              reservedata=req.body.choice.split(":");
+              date=new myDate(Number(reservedata[4]),Number(reservedata[3]),Number(reservedata[2]));
+              start={hour:Number(reservedata[0]),min:Number(reservedata[1])};
+              temp=(start.hour*60)+start.min+doctor.visitduration;
+              end={hour:Math.floor(temp/60),min:temp%60}
+              unavb={start:start,end:end,date:date,dayofweek:new persianDate([Number(reservedata[2]),Number(reservedata[3]),Number(reservedata[4])]).format("dddd")};
+              zarinpal.PaymentRequest({
+                Amount: req.body.cost , // In Tomans
+                CallbackURL: 'http://reservation.drtajviz.com/paymenthandler',
+                Description: 'Dr tajviz payment',
+                Email: 'shayanthrn@gmail.com',
+                Mobile: '09128993687'
+              }).then(response => {
+                if (response.status === 100) {
+                  reservation = new Reservation(user._id,doctor._id,unavb,response.authority,req.body.cost);
+                  dbo.collection("TempReserves").insertOne(reservation,function(err,reserve){
+                    res.json({url:response.url})
+                  })
+                }
+              }).catch(err => {
+                res.write("<html><body><p>there is a problem on server please try again later</p><a href='/' >go back to main page</a></body></html>");
+                console.error(err);
+                db.close();
+                res.end();
+              });
+            }
+          })
+        }
+      }
+    })
+  })
+  }
+  }
+})
+
+router.post("/api/ticketpayment",function(req,res){
+  if(req.body.usertoken==undefined){
     res.json({data:"user token not found"})
     res.end();
   }
@@ -1637,11 +1700,7 @@ router.get("/test2",function(req,res){
 })
 
 router.post("/test",function(req,res){
-  console.log("asdfasdf")
-  console.log(req.files);
-  console.log(req.body);
-  res.json({data:req.body,data2:req.files});
-  res.end();
+  res.redirect("/123123");
 })
 
 
