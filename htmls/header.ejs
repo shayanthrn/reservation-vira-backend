@@ -11,10 +11,26 @@
             <div class="col-lg-6 col-md-5 col-sm-8 col-7">
                 <div class="search-area default">
                     <form action="/search" class="search">
-                        <input type="text" name="query" id="gsearchsimple"
-                            placeholder="تخصص یا دکتر مورد نظر خود را جستجو کنید">
-                        <div class="localSearchSimple"></div>
-                        <button type="submit"><img src="assets/img/search.png" alt=""></button>
+                        <table>
+                            <tr>
+                                <td>
+                                    <label for="filter" >جستجو در:</label>
+                                    <select id="filter" name="filter">
+                                        <option value="Doctors">دکتر ها</option>
+                                        <option value="category">تخصص</option>
+                                        <option value="HealthCenters">مراکز درمانی</option>
+                                    </select>
+                                </td>
+                                <td>
+                                    <input type="text" name="query" id="gsearchsimple"
+                                    placeholder="نام تخصص ، دکتر یا مرکز درمانی مورد نظر خود را وارد کنید..." style="min-width: 558px;">
+                                </td>
+                            </tr>
+                        </table>
+                        
+                        <div class="localSearchSimple">
+                        </div>
+                        <button type="submit" style="max-height: 44px;top: 8px;"><img src="assets/img/search.png" alt=""></button>
                     </form>
                 </div>
             </div>

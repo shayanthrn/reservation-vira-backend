@@ -258,6 +258,8 @@ router.post("/api/paymentHC",function(req,res){
   }
 })
 
+router.post("/api/getteletimes")
+
 
 router.post("/api/addExperimentFile",function(req,res){
   var query=url.parse(req.url,true).query;
@@ -4016,7 +4018,7 @@ router.get("/ticketpaymenthandler",function(req,res){
               dbo.collection("TempChats").deleteOne({authority:query.Authority},function(err,aa){
                   dbo.collection("Users").updateOne({phonenumber:mychat.userphone},{$addToSet:{chats:mychat}},function(err,ad){
                     dbo.collection("Doctors").findOne({name:mychat.doctor},function(err,HC){
-                        dbo.collection("Doctors").updateOne({name:mychat.doctor},{$addToSet:{chats:reservation}},function(err,sas){
+                        dbo.collection("Doctors").updateOne({name:mychat.doctor},{$addToSet:{chats:mychat}},function(err,sas){
                           res.render("paymentaccept.ejs",{doctor:doctor,time:"-",resid:mychat.refid});
                           //sendSMSforres(reservation);
                           res.end();
