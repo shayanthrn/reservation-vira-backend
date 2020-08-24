@@ -12,7 +12,6 @@ class User{
         this.token="";
         this.reserves=[];
         this.telereservations=[];
-        this.chats=[];
     }
 }
 

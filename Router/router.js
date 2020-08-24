@@ -782,50 +782,104 @@ router.post("/api/payment",function(req,res){
 })
 
 router.post("/api/ticketpayment",function(req,res){
-  if(req.body.usertoken==undefined){
+  if(req.body.usertoken==undefined || req.body.key !="pouyarahmati"){
     res.json({data:"user token not found"})
     res.end();
   }
   else{
-  if(req.body.choice==undefined){
-    res.json({data:"choice is not defined"})
+    MongoClient.connect(dburl,function(err,db){
+      var dbo=db.db("mydb");
+      dbo.collection("Users").findOne({token:req.body.usertoken},function(err,user){
+        if(user==null){
+          res.json({data:"not found user"})
+        }
+        else{
+          dbo.collection("Doctors").findOne({name:req.body.doctor},function(err,doctor){
+            zarinpal.PaymentRequest({
+              Amount: req.body.cost , // In Tomans
+              CallbackURL: 'http://reservation.drtajviz.com/ticketpaymenthandler',
+              Description: 'Dr tajviz payment',
+              Email: 'shayanthrn@gmail.com',
+              Mobile: '09128993687'
+            }).then(response => {
+              if (response.status === 100) {
+                var newchat = new Chat(req.body.doctor,user.phonenumber);
+                newchat.authority=response.authority;
+                var now=new Date();
+                var newticket;
+                if(req.files==null){
+                  newticket=new Ticket(req.body.subject,req.body.text,null,now,"patient");
+                  newchat.tickets.push(newticket);
+                  dbo.collection("TempChats").insertOne(newchat,function(err,as){
+                    res.json({url:response.url})
+                    db.close();
+                  })
+                }
+                else{
+                  var arr=req.files.file.name.split('.');
+                  var fileformat=arr[arr.length-1];
+                  var file={format:fileformat,path:"data/ticketfiles/"+arr[0]+now.getTime()+"."+fileformat};
+                  newticket = new Ticket(req.body.subject,req.body.text,file,now,"patient");
+                  mv(req.files.file.tempFilePath,file.path,{mkdirp:true},function(err){
+                    newchat.tickets.push(newticket);
+                    dbo.collection("TempChats").insertOne(newchat,function(err,as){
+                      res.json({url:response.url})
+                      db.close();
+                    })
+                  })
+                }
+              }
+              else{
+                res.json({data:"fail"})
+                db.close()
+              }
+            }).catch(err => {
+              res.write("<html><body><p>there is a problem on server please try again later</p><a href='/' >go back to main page</a></body></html>");
+              console.error(err);
+              db.close();
+              res.end();
+            });
+          })
+        }
+      })
+    })
+  }
+})
+
+router.post("/api/telepayment",function(req,res){
+  if(req.body.usertoken==undefined || req.body.key !="pouyarahmati"){
+    res.json({data:"user token not found"})
     res.end();
   }
   else{
-    
-  MongoClient.connect(dburl,function(err,db){
-    var dbo=db.db("mydb");
-    dbo.collection("Users").findOne({token:req.body.usertoken},function(err,user){
-      if(user==null){
-        res.json({data:"user not found"});
-        db.close();
-        res.end();
-      }
-      else{
-        if(checkinterval(1)){
-          dbo.collection("Doctors").findOne({name:req.body.doctor},function(err,doctor){
-            if(doctor==null){
-              res.json({data:"doctor not found"});
-              db.close();
-              res.end();
-            }
-            else{
-              reservedata=req.body.choice.split(":");
-              date=new myDate(Number(reservedata[4]),Number(reservedata[3]),Number(reservedata[2]));
-              start={hour:Number(reservedata[0]),min:Number(reservedata[1])};
-              temp=(start.hour*60)+start.min+doctor.visitduration;
-              end={hour:Math.floor(temp/60),min:temp%60}
-              unavb={start:start,end:end,date:date,dayofweek:new persianDate([Number(reservedata[2]),Number(reservedata[3]),Number(reservedata[4])]).format("dddd")};
+    if(req.body.choice==undefined){
+      res.json({data:"choice not found"})
+    }
+    else{
+      MongoClient.connect(dburl,function(err,db){
+        var dbo=db.db("mydb");
+        dbo.collection("Users").findOne({token:req.body.usertoken},function(err,user){
+          if(user==null){
+            res.json({data:"user token not found"})
+            db.close();
+            res.end();
+          }
+          else{
+            dbo.collection("Doctors").findOne({name:req.body.doctor},function(err,doctor){
+              var reservedata=req.body.choice.split(":");
+              var date=new myDate(Number(reservedata[2]),Number(reservedata[1]),Number(reservedata[0]));
+              var time={start:reservedata[3],end:reservedata[4]};
+              var timeinfo={time:time,date:date}
               zarinpal.PaymentRequest({
                 Amount: req.body.cost , // In Tomans
-                CallbackURL: 'http://reservation.drtajviz.com/paymenthandler',
+                CallbackURL: 'http://reservation.drtajviz.com/telepaymenthandler',
                 Description: 'Dr tajviz payment',
                 Email: 'shayanthrn@gmail.com',
                 Mobile: '09128993687'
               }).then(response => {
                 if (response.status === 100) {
-                  reservation = new Reservation(user._id,doctor._id,unavb,response.authority,req.body.cost);
-                  dbo.collection("TempReserves").insertOne(reservation,function(err,reserve){
+                  reservation = new teleReservation(user._id,doctor._id,timeinfo,response.authority,req.body.cost);
+                  dbo.collection("TempteleReserves").insertOne(reservation,function(err,reserve){
                     res.json({url:response.url})
                   })
                 }
@@ -835,13 +889,11 @@ router.post("/api/ticketpayment",function(req,res){
                 db.close();
                 res.end();
               });
-            }
-          })
-        }
-      }
-    })
-  })
-  }
+            })
+          }
+        })
+      })
+    }
   }
 })
 
@@ -1699,9 +1751,6 @@ router.get("/test2",function(req,res){
   res.end();
 })
 
-router.post("/test",function(req,res){
-  res.redirect("/123123");
-})
 
 
 //-----------------------test route--------------------------//
@@ -2448,6 +2497,79 @@ router.post("/sendticket",function(req,res){
       var dbo=db.db("mydb");
       dbo.collection('Doctors').findOne({token:req.cookies.doctortoken},async function(err,result){
         if(result==null || !result.membershiptypes.includes("chatconsultant")){
+          db.close();
+          res.redirect('noaccess');
+        }
+        else{
+          var chatid=new ObjectID(req.body.chatid)
+          dbo.collection("Chats").findOne({doctor:req.body.dname,userphone:req.body.uphone,_id:chatid},function(err,chat){
+            if(chat!=null){
+              var now=new Date();
+              var newticket;
+              if(req.files==null){
+                newticket=new Ticket(req.body.subject,req.body.text,null,now,req.body.sender);
+                chat.tickets.push(newticket);
+                dbo.collection("Chats").updateOne({doctor:req.body.dname,userphone:req.body.uphone,_id:chatid},{$set:{tickets:chat.tickets}},function(err,asd){
+                  res.redirect(req.body.from);
+                  db.close();
+                })
+              }
+              else{
+                var arr=req.files.file.name.split('.');
+                var fileformat=arr[arr.length-1];
+                var file={format:fileformat,path:"data/ticketfiles/"+arr[0]+now.getTime()+"."+fileformat};
+                newticket = new Ticket(req.body.subject,req.body.text,file,now,req.body.sender);
+                mv(req.files.file.tempFilePath,file.path,{mkdirp:true},function(err){
+                  chat.tickets.push(newticket);
+                  dbo.collection("Chats").updateOne({doctor:req.body.dname,userphone:req.body.uphone,_id:chatid},{$set:{tickets:chat.tickets}},function(err,asd){
+                    res.redirect(req.body.from);
+                    db.close();
+                  })
+                })
+              }
+            }
+            else{
+              var newchat = new Chat(req.body.dname,req.body.uphone);
+              var now=new Date();
+              var newticket;
+              if(req.files==null){
+                newticket=new Ticket(req.body.subject,req.body.text,null,now,req.body.sender);
+                newchat.tickets.push(newticket);
+                  dbo.collection("Chats").insertOne(newchat,function(err,as){
+                    res.redirect(req.body.from);
+                    db.close();
+                  })
+              }
+              else{
+                var arr=req.files.file.name.split('.');
+                var fileformat=arr[arr.length-1];
+                var file={format:fileformat,path:"data/ticketfiles/"+arr[0]+now.getTime()+"."+fileformat};
+                newticket = new Ticket(req.body.subject,req.body.text,file,now,req.body.sender);
+                mv(req.files.file.tempFilePath,file.path,{mkdirp:true},function(err){
+                  newchat.tickets.push(newticket);
+                  dbo.collection("Chats").insertOne(newchat,function(err,as){
+                    res.redirect(req.body.from);
+                    db.close();;
+                  })
+                })
+              } 
+            }
+          })
+        }
+      })
+    })
+  }
+})
+
+router.post("/sendticketuser",function(req,res){
+  if(req.cookies.usertoken==undefined){
+    res.redirect('/noaccess');
+  }
+  else{
+    MongoClient.connect(dburl,function(err,db){
+      var dbo=db.db("mydb");
+      dbo.collection('Users').findOne({token:req.cookies.usertoken},async function(err,result){
+        if(result==null){
           db.close();
           res.redirect('noaccess');
         }
@@ -3636,6 +3758,221 @@ router.get("/HCsignup",function(req,res){
 
 
 //------------------------adminpanel---------------------------//
+//------------------------userpanel----------------------------//
+
+router.get("/UserPanel/profile",function(req,res){
+  if(req.cookies.usertoken==undefined){
+    res.redirect("noaccess");
+  }
+  else{
+    MongoClient.connect(dburl,function(err,db){
+      var dbo=db.db("mydb");
+      dbo.collection("Users").findOne({token:req.cookies.usertoken},function(err,user){
+        if(user==null){
+          res.redirect("noaccess");
+          db.close();
+        }
+        else{
+          res.render("UserPanel/profile.ejs",{user:user})
+          res.end();
+          db.close();
+        }
+      })
+    })
+  }
+})
+
+
+
+router.post("/changeuserinfo",function(req,res){
+  if(req.cookies.usertoken==undefined){
+    res.redirect("noaccess");
+  }
+  else{
+    MongoClient.connect(dburl,function(err,db){
+      var dbo=db.db("mydb");
+      dbo.collection("Users").findOne({token:req.cookies.usertoken},function(err,user){
+        if(user==null){
+          res.redirect("noaccess");
+          db.close();
+        }
+        else{
+          dbo.collection("Users").updateOne({token:req.cookies.usertoken},{$set:{firstname:req.body.firstname,lastname:req.body.lastname,sex:req.body.sex}},function(err,asdf){
+            res.redirect("/UserPanel/profile");
+            db.close();
+          })
+        }
+      })
+    })
+  }
+})
+
+
+
+router.get("/UserPanel/chats",function(req,res){   //buggggggg
+  if(req.cookies.usertoken==undefined){
+    res.redirect("noaccess");
+  }
+  else{
+    MongoClient.connect(dburl,function(err,db){
+      var dbo=db.db("mydb");
+      dbo.collection("Users").findOne({token:req.cookies.usertoken},function(err,user){
+        if(user==null){
+          res.redirect("noaccess");
+          db.close();
+        }
+        else{
+          user.chats.forEach(function(doc){
+            doc.datecreated=new persianDate(doc.tickets[doc.tickets.length-1].datecreated).format("L")
+          })
+          res.render("UserPanel/chats.ejs",{user:user,chats:user.chats})
+          res.end();
+          db.close();
+        }
+      })
+    })
+  }
+})
+
+router.get("/UserPanel/chats/:chatid",function(req,res){
+  if(req.cookies.usertoken==undefined){
+    res.redirect('/noaccess');
+  }
+  else{
+    MongoClient.connect(dburl,function(err,db){
+      var dbo=db.db("mydb");
+      dbo.collection('Users').findOne({token:req.cookies.usertoken},async function(err,result){
+        if(result==null){
+          db.close();
+          res.redirect('noaccess');
+        }
+        else{
+          var chatid=ObjectID(req.params.chatid);
+          dbo.collection("Chats").findOne({_id:chatid,userphone:result.phonenumber},function(err,chat){
+            chat.tickets.forEach(function(doc){
+              doc.datecreated=new persianDate(doc.datecreated).format()
+            })
+            res.render("UserPanel/chatpage.ejs",{chat:chat});
+            db.close();
+            res.end();
+          })
+        }
+      })
+    })
+  }
+})
+
+router.get("/UserPanel/reservations",function(req,res){
+  if(req.cookies.usertoken==undefined){
+    res.redirect("noaccess");
+  }
+  else{
+    MongoClient.connect(dburl,function(err,db){
+      var dbo=db.db("mydb");
+      dbo.collection("Users").findOne({token:req.cookies.usertoken},function(err,user){
+        if(user==null){
+          res.redirect("noaccess");
+          db.close();
+        }
+        else{
+          res.render("UserPanel/profile.ejs",{user:user})
+          res.end();
+          db.close();
+        }
+      })
+    })
+  }
+})
+
+router.get("/UserPanel/telereservations",function(req,res){
+  if(req.cookies.usertoken==undefined){
+    res.redirect("noaccess");
+  }
+  else{
+    MongoClient.connect(dburl,function(err,db){
+      var dbo=db.db("mydb");
+      dbo.collection("Users").findOne({token:req.cookies.usertoken},function(err,user){
+        if(user==null){
+          res.redirect("noaccess");
+          db.close();
+        }
+        else{
+          res.render("UserPanel/profile.ejs",{user:user})
+          res.end();
+          db.close();
+        }
+      })
+    })
+  }
+})
+
+router.get("/UserPanel/experiments",function(req,res){
+  if(req.cookies.usertoken==undefined){
+    res.redirect("noaccess");
+  }
+  else{
+    MongoClient.connect(dburl,function(err,db){
+      var dbo=db.db("mydb");
+      dbo.collection("Users").findOne({token:req.cookies.usertoken},function(err,user){
+        if(user==null){
+          res.redirect("noaccess");
+          db.close();
+        }
+        else{
+          res.render("UserPanel/profile.ejs",{user:user})
+          res.end();
+          db.close();
+        }
+      })
+    })
+  }
+})
+
+router.get("/UserPanel/support",function(req,res){
+  if(req.cookies.usertoken==undefined){
+    res.redirect("noaccess");
+  }
+  else{
+    MongoClient.connect(dburl,function(err,db){
+      var dbo=db.db("mydb");
+      dbo.collection("Users").findOne({token:req.cookies.usertoken},function(err,user){
+        if(user==null){
+          res.redirect("noaccess");
+          db.close();
+        }
+        else{
+          res.render("UserPanel/profile.ejs",{user:user})
+          res.end();
+          db.close();
+        }
+      })
+    })
+  }
+})
+
+router.get("/UserPanel/aboutus",function(req,res){
+  if(req.cookies.usertoken==undefined){
+    res.redirect("noaccess");
+  }
+  else{
+    MongoClient.connect(dburl,function(err,db){
+      var dbo=db.db("mydb");
+      dbo.collection("Users").findOne({token:req.cookies.usertoken},function(err,user){
+        if(user==null){
+          res.redirect("noaccess");
+          db.close();
+        }
+        else{
+          res.render("UserPanel/profile.ejs",{user:user})
+          res.end();
+          db.close();
+        }
+      })
+    })
+  }
+})
+
+//------------------------userpanel----------------------------//
 
 router.get("/",function(req,res){
   req.session.prevurl=req.session.currurl;
@@ -3965,6 +4302,7 @@ router.get("/ticket/:doctor",function(req,res){
     })
   })
 })
+
 
 router.post("/ticketpayment",function(req,res){
   var query= url.parse(req.url,true).query;

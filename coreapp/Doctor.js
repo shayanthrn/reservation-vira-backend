@@ -24,7 +24,6 @@ class Doctor{
         }
         if(membershiptypes.includes("chatconsultant")){
             this.chatcost=5000;
-            this.chats=[];
         }
         this.token="";
         this.appknowledge=appknowledge;

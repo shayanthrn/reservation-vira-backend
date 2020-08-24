@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html dir="rtl" class="fa-events-icons-ready" lang="en"><head>
+  <meta charset="utf-8">
+  <base id="base">
+  <script src="/assets/js/config.js"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="">
+  <meta name="author" content="">
+  <title>داشبورد - دکتر تجویز</title>
+  <link rel="icon" href="favicon.ico">
+
+  <title></title>
+  
+  <link rel="stylesheet" href="https://cdn.rtlcss.com/bootstrap/v4.1.3/css/bootstrap.min.css" integrity="sha384-Jt6Tol1A2P9JBesGeCxNrxkmRFSjWCBW1Af7CSQSKsfMVQCqnUVWhZzG0puJMCK6" crossorigin="anonymous">
+  <link href="assets/panelassests/dashboard.rtl.css" rel="stylesheet">
+  <script src="https://use.fontawesome.com/6d68f18b97.js"></script><link href="https://use.fontawesome.com/6d68f18b97.css" media="all" rel="stylesheet">
+  <link href="assets/css/main.css" rel="stylesheet" />
+</head>
+
+<body>
+
+  <nav class="navbar fixed-top navbar-expand-lg nav-dark">
+    <a class="navbar-brand mr-2" href="#">داشبورد برند</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarTogglerDemo" aria-controls="navbarTogglerDemo" aria-expanded="false" aria-label="Toggle navigation">
+      <i class="fa fa-bars menu-icon"></i>
+    </button>
+  </nav>
+
+
+  <div class="container-fluid">
+    <div class="row">
+      
+        <nav class="col-lg-3 col-xl-2 d-lg-block sidebar collapse" id="navbarTogglerDemo">
+            <div class="sidebar-sticky">
+              <ul class="nav flex-column">
+                <li class="nav-item">
+                  <a class="nav-link" href="/UserPanel/profile">
+                    <i class="fa fa-pencil-square"></i>
+                    پروفایل
+                  </a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link active" href="/UserPanel/chats">
+                    <i class="fa fa-commenting"></i>
+                    گفتگوهای متنی
+                  </a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="/UserPanel/reservations">
+                    <i class="fa fa-list-ul"></i>
+                    نوبت های من
+                  </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/UserPanel/telereservations">
+                      <i class="fa fa-phone"></i>
+                       مشاوره های تلفنی من
+                    </a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="/UserPanel/experiments">
+                    <i class="fa fa-id-card"></i>
+                     جواب آزمایش
+                  </a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="/UserPanel/support">
+                    <i class="fa fa-question-circle"></i>
+                    پشتیبانی
+                  </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/UserPanel/aboutus">
+                      <i class="fa fa-info-circle"></i>
+                      درباره ما
+                    </a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="/exit">
+                    <i class="fa fa-sign-out"></i>
+                    خروج
+                  </a>
+                </li>
+              </ul>
+    
+              </div>
+          </nav>
+
+      <main role="main" class=" ml-sm-auto col-lg-9 col-xl-10 px-4" id="dashboard">
+        <div class="container-fluid">
+          <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+            <h1 class="h2">گفتگو ها</h1>
+          </div>
+          <div class='row'>
+            <% for(let i = 0; i<chats.length;i++) { %>
+            <div class="col-sm-12 col-md-6 col-lg-4 mb-3" >
+              <div class="card shadow">
+                <div class="card-header bg-site-primary text-white p-2">
+                  گفتگو شماره   <%= i+1 %>
+                </div>
+                <div class="card-body">
+                <div>
+                    <a>نام دکتر: <%=chats[i].doctor%></a>
+                </div>
+                <div>
+                  <a> تاریخ آخرین پیام: <%=chats[i].datecreated%></a>
+              </div>
+                <br/>
+                </div>
+                
+              <a href="<%= "/UserPanel/chats/" + chats[i]._id %>" class="btn btn-info">ورود</a>
+              </div>
+            </div> 
+            <% } %>  
+          </div>
+        </div>
+      </main>
+
+    </div>
+  </div>
+  
+
+
+  <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+  <script>window.jQuery || document.write('<script src="assets/panelassests/jquery-slim.min.js"><\/script>')</script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+  <script src="https://cdn.rtlcss.com/bootstrap/v4.1.3/js/bootstrap.min.js" integrity="sha384-C/pvytx0t5v9BEbkMlBAGSPnI1TQU1IrTJ6DJbC8GBHqdMnChcb6U4xg4uRkIQCV" crossorigin="anonymous"></script>
+
+</body>
+
+</html>
