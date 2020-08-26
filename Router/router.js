@@ -284,7 +284,7 @@ router.post("/api/addExperimentFile",function(req,res){
               }
               else{
                 var now=new Date();
-                path="/data/Experiments/"+now.getTime()+".zip";
+                path="data/Experiments/"+now.getTime()+".zip";
                 dbo.collection("Experiments").insertOne({userid:user._id,hcid:hc._id,dateuploaded:now,description:req.body.description,path:path},function(err,result){
                   mv(req.files.file.tempFilePath,path,function(err){
                     res.json({data:"file uploaded successfully"});
@@ -3862,7 +3862,46 @@ router.get("/UserPanel/reservations",function(req,res){
 })
 
 router.get("/UserPanel/reservations/:resid",function(req,res){
-
+  var resid=ObjectID(req.params.resid);
+  if(req.cookies.usertoken==undefined){
+    res.redirect("noaccess");
+  }
+  else{
+    MongoClient.connect(dburl,function(err,db){
+      var dbo=db.db("mydb");
+      dbo.collection("Users").findOne({token:req.cookies.usertoken},async function(err,user){
+        if(user==null){
+          res.redirect("noaccess");
+          db.close();
+        }
+        else{
+          dbo.collection("Reservations").findOne({_id:resid},function(err,reserve){
+            dbo.collection("Doctors").findOne({_id:reserve.doctor},function(err,doctor){
+              if(doctor!=null){
+                reserve.doctor=doctor;
+                res.render("UserPanel/reserve-status.ejs",{reserve:reserve});
+                db.close();
+                res.end();
+              }
+              else{
+                dbo.collection("HealthCenters").findOne({_id:reserve.HC},function(err,HC){
+                  if(HC==null){
+                    res.redirect("thereisproblem");
+                  }
+                  else{
+                    reserve.HC=HC;
+                    res.render("UserPanel/reserve-status.ejs",{reserve:reserve});
+                    db.close();
+                    res.end();
+                  }
+                })
+              }
+            })
+          })
+        }
+      })
+    })
+  }
 })
 
 router.get("/UserPanel/telereservations",function(req,res){
@@ -3889,7 +3928,31 @@ router.get("/UserPanel/telereservations",function(req,res){
 })
 
 router.get("/UserPanel/telereservations/:resid",function(req,res){
-
+  var resid=ObjectID(req.params.resid);
+  if(req.cookies.usertoken==undefined){
+    res.redirect("noaccess");
+  }
+  else{
+    MongoClient.connect(dburl,function(err,db){
+      var dbo=db.db("mydb");
+      dbo.collection("Users").findOne({token:req.cookies.usertoken},async function(err,user){
+        if(user==null){
+          res.redirect("noaccess");
+          db.close();
+        }
+        else{
+          dbo.collection("teleReservations").findOne({_id:resid},function(err,reserve){
+            dbo.collection("Doctors").findOne({_id:reserve.doctor},function(err,doctor){
+              reserve.doctor=doctor.name;
+              res.render("UserPanel/telereserve-status.ejs",{reserve:reserve});
+              db.close();
+              res.end();
+            })
+          })
+        }
+      })
+    })
+  }
 })
 
 router.get("/UserPanel/experiments",function(req,res){
@@ -3947,7 +4010,6 @@ router.get("/downloadexp",function(req,res){
               }
               else{
                 res.download(query.path);
-                res.end();
                 db.close();
               }
             }
