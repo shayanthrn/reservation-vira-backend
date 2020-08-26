@@ -665,13 +665,14 @@ router.get("/api/getCurUser",function(req,res){
   else{
     MongoClient.connect(dburl,function(err,db){
       var dbo=db.db("mydb");
-      dbo.collection("Users").findOne({token:query.token},function(err,user){
+      dbo.collection("Users").findOne({token:query.token},async function(err,user){
         if(user==null){
           res.json({data:"not found"});
           db.close();
           res.end();
         }
         else{
+          user.chats=await dbo.collection("Chats").find({userphone:user.phonenumber}).toArray()
           res.json({user:user});
           db.close();
           res.end();
