@@ -4463,7 +4463,7 @@ router.get("/ticketpaymenthandler",function(req,res){
             dbo.collection("Chats").insertOne(mychat,function(err,result234){
               dbo.collection("TempChats").deleteOne({authority:query.Authority},function(err,aa){
                   dbo.collection("Users").updateOne({phonenumber:mychat.userphone},{$addToSet:{chats:mychat}},function(err,ad){
-                    dbo.collection("Doctors").findOne({name:mychat.doctor},function(err,HC){
+                    dbo.collection("Doctors").findOne({name:mychat.doctor},function(err,doctor){
                         dbo.collection("Doctors").updateOne({name:mychat.doctor},{$addToSet:{chats:mychat}},function(err,sas){
                           res.render("paymentaccept.ejs",{doctor:doctor,time:"-",resid:mychat.refid});
                           //sendSMSforres(reservation);
