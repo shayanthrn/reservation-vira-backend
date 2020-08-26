@@ -2,7 +2,7 @@ class Doctor{
     constructor(username,pass,name,categories,medicalnumber,codemeli,workphone,phonenumber,address,city,path,background,description,membershiptypes,appknowledge){
         this.username=username;
         this.password=pass;
-        this.name=name;
+        this.name=name.trim();
         this.categories=categories;
         this.medicalnumber=medicalnumber;
         this.codemeli=codemeli;

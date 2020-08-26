@@ -13,9 +13,5 @@ var dburl="mongodb://localhost:27017/";
 
 MongoClient.connect(dburl,function(err,db){
     var dbo=db.db("mydb");
-    myregex= '.*'+"پریس"+'.*'
-    dbo.collection("Doctors").find({name:{$regex:myregex}},async function(err,cursor){
-        arr=await cursor.toArray();
-        console.log(arr)
-    })
+    dbo.collection("Doctors").updateMany({},{$set:{televisitcost:5000}})
 })

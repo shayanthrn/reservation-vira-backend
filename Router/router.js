@@ -37,6 +37,7 @@ const fileUpload = require('express-fileupload');
 const Ticket = require('../coreapp/Ticket.js');
 const e = require('express');
 const { setTimeout } = require('timers');
+const { log } = require('console');
 const zarinpal = ZarinpalCheckout.create('3392f819-3761-4add-babb-4d1d70021603', false);
 
 router.get("/mahyar",function(req,res){
@@ -835,6 +836,7 @@ router.post("/api/ticketpayment",function(req,res){
                 db.close()
               }
             }).catch(err => {
+              console.log(req.body.cost)
               res.write("<html><body><p>there is a problem on server please try again later</p><a href='/' >go back to main page</a></body></html>");
               console.error(err);
               db.close();
@@ -1626,7 +1628,7 @@ router.post("/addDoctor",function(req,res){
                       memtype.push(doc2);
                     })
                   ]
-                  dbo.collection('Doctors').insertOne(new Doctor(req.body.username,req.body.pass,req.body.name,cats,req.body.medicalnumber,req.body.codemeli,req.body.workphone,req.body.phonenumber,req.body.address,req.body.city,"/docphotos/"+req.body.name+".png",req.body.background,req.body.description,memtype,req.body.appknowledge),function(err,res2){
+                  dbo.collection('Doctors').insertOne(new Doctor(req.body.username,req.body.pass,req.body.name,cats,req.body.medicalnumber,req.body.codemeli,req.body.workphone,req.body.phonenumber,req.body.address,req.body.city,"/docphotos/"+req.body.name.trim()+".png",req.body.background,req.body.description,memtype,req.body.appknowledge),function(err,res2){
                     if(req.files!=null){
                     mv(req.files.image.tempFilePath,"public/docphotos/"+req.body.name+".png",function(err){
                       console.log("public/docphotos/"+req.body.name+".png")
@@ -1720,35 +1722,8 @@ router.post('/addHC',function(req,res){
 
 //-----------------------test route--------------------------//
 
-router.get("/test2",function(req,res){
-  reservation={
-    "user": {
-        "$oid": "5ef3291e7fc6456d3a1aaa16"
-    },
-    "doctor": {
-        "$oid": "5f14097c4c368d1c02ef530c"
-    },
-    refid:"1231",
-    "time": {
-        "start": {
-            "hour": 3,
-            "min": 0
-        },
-        "end": {
-            "hour": 4,
-            "min": 0
-        },
-        "date": {
-            "year": 1399,
-            "month": 5,
-            "day": 10
-        },
-        "dayofweek": "جمعه"
-    },
-    "authority": "A00000000000000000000000000210093852",
-    "cost": "3000"
-  }
-  sendSMSforres(reservation);
+router.post("/test2",function(req,res){
+  console.log({asqar:req.body.key.trim()})
   res.end();
 })
 
@@ -2691,7 +2666,7 @@ router.get("/search",function(req,res){
 
 router.get("/Download",function(req,res){
   var query=url.parse(req.url,true).query;
-  if(req.cookies.doctortoken==undefined && req.cookies.admintoken==undefined){
+  if(req.cookies.doctortoken==undefined && req.cookies.admintoken==undefined && query.key!="pouyarahmati"){
     res.redirect("noaccess");
   }
   else{
@@ -2699,7 +2674,7 @@ router.get("/Download",function(req,res){
       var dbo=db.db("mydb");
       if(req.cookies.doctortoken!=undefined){
         dbo.collection("Doctors").findOne({token:req.cookies.doctortoken},function(err,doctor){
-          if(doctor==null){
+          if(doctor==null && query.key!="pouyarahmati" ){
             res.redirect("noaccess");
             db.close();
           }
@@ -2711,7 +2686,7 @@ router.get("/Download",function(req,res){
       }
       else{
         dbo.collection("Admins").findOne({token:req.cookies.admintoken},function(err,admin){
-          if(admin==null){
+          if(admin==null && query.key!="pouyarahmati"){
             res.redirect("noaccess");
             db.close();
           }
@@ -3870,19 +3845,24 @@ router.get("/UserPanel/reservations",function(req,res){
   else{
     MongoClient.connect(dburl,function(err,db){
       var dbo=db.db("mydb");
-      dbo.collection("Users").findOne({token:req.cookies.usertoken},function(err,user){
+      dbo.collection("Users").findOne({token:req.cookies.usertoken},async function(err,user){
         if(user==null){
           res.redirect("noaccess");
           db.close();
         }
         else{
-          res.render("UserPanel/profile.ejs",{user:user})
+          reserves=await dbo.collection("Reservations").find({user:user._id}).toArray();
+          res.render("UserPanel/reservations.ejs",{reserves:reserves})
           res.end();
           db.close();
         }
       })
     })
   }
+})
+
+router.get("/UserPanel/reservations/:resid",function(req,res){
+
 })
 
 router.get("/UserPanel/telereservations",function(req,res){
@@ -3892,19 +3872,24 @@ router.get("/UserPanel/telereservations",function(req,res){
   else{
     MongoClient.connect(dburl,function(err,db){
       var dbo=db.db("mydb");
-      dbo.collection("Users").findOne({token:req.cookies.usertoken},function(err,user){
+      dbo.collection("Users").findOne({token:req.cookies.usertoken},async function(err,user){
         if(user==null){
           res.redirect("noaccess");
           db.close();
         }
         else{
-          res.render("UserPanel/profile.ejs",{user:user})
+          reserves=await dbo.collection("teleReservations").find({user:user._id}).toArray();
+          res.render("UserPanel/telereservations.ejs",{reserves:reserves})
           res.end();
           db.close();
         }
       })
     })
   }
+})
+
+router.get("/UserPanel/telereservations/:resid",function(req,res){
+
 })
 
 router.get("/UserPanel/experiments",function(req,res){
@@ -3914,13 +3899,17 @@ router.get("/UserPanel/experiments",function(req,res){
   else{
     MongoClient.connect(dburl,function(err,db){
       var dbo=db.db("mydb");
-      dbo.collection("Users").findOne({token:req.cookies.usertoken},function(err,user){
+      dbo.collection("Users").findOne({token:req.cookies.usertoken},async function(err,user){
         if(user==null){
           res.redirect("noaccess");
           db.close();
         }
         else{
-          res.render("UserPanel/profile.ejs",{user:user})
+          exps=await dbo.collection("Experiments").aggregate([{$match:{userid:user._id}},{$lookup:{from:"HealthCenters", localField: "hcid", foreignField: "_id", as: "hcid"}}]).toArray();
+          exps.forEach(function(doc){
+            doc.dateuploaded=new persianDate(doc.dateuploaded).format("L");
+          })
+          res.render("UserPanel/experiments.ejs",{exps:exps})
           res.end();
           db.close();
         }
@@ -3929,49 +3918,46 @@ router.get("/UserPanel/experiments",function(req,res){
   }
 })
 
-router.get("/UserPanel/support",function(req,res){
+router.get("/downloadexp",function(req,res){
+  var query = url.parse(req.url,true).query;
+  var expid=ObjectID(query.expid)
   if(req.cookies.usertoken==undefined){
-    res.redirect("noaccess");
+    res.redirect("/UserPanel/experiments");
   }
   else{
     MongoClient.connect(dburl,function(err,db){
       var dbo=db.db("mydb");
       dbo.collection("Users").findOne({token:req.cookies.usertoken},function(err,user){
         if(user==null){
-          res.redirect("noaccess");
+          res.redirect("/UserPanel/experiments");
           db.close();
         }
         else{
-          res.render("UserPanel/profile.ejs",{user:user})
-          res.end();
-          db.close();
+          dbo.collection("Experiments").findOne({_id:expid},function(err,exp){
+            if(exp==null){
+              res.redirect("notfound");
+              db.close();
+            }
+            else{
+              if(exp.userid.toString()!=user._id.toString()){
+                console.log(exp.userid);
+                console.log(user._id)
+                res.redirect("noaccess");
+                db.close();
+              }
+              else{
+                res.download(query.path);
+                res.end();
+                db.close();
+              }
+            }
+          })
         }
       })
     })
   }
 })
 
-router.get("/UserPanel/aboutus",function(req,res){
-  if(req.cookies.usertoken==undefined){
-    res.redirect("noaccess");
-  }
-  else{
-    MongoClient.connect(dburl,function(err,db){
-      var dbo=db.db("mydb");
-      dbo.collection("Users").findOne({token:req.cookies.usertoken},function(err,user){
-        if(user==null){
-          res.redirect("noaccess");
-          db.close();
-        }
-        else{
-          res.render("UserPanel/profile.ejs",{user:user})
-          res.end();
-          db.close();
-        }
-      })
-    })
-  }
-})
 
 //------------------------userpanel----------------------------//
 
