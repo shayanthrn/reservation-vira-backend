@@ -4454,7 +4454,7 @@ router.get("/ticketpaymenthandler",function(req,res){
         }
         else{
           zarinpal.PaymentVerification({
-          Amount: chat.cost, // In Tomans
+          Amount: "5000", // In Tomans
           Authority: chat.authority,
           }).then(response => {
           if (response.status === 100 && response.RefID!=0) {
