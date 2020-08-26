@@ -120,6 +120,18 @@
               </div>
               <div class="row">
                 <div class="col-md-4 col-lg-2">
+                  <h5>آدرس</h5>
+                </div>
+                <div class="col-md-6 col-lg-6">
+                <% if(reserve.doctor!=undefined) { %>
+                  <p><%= reserve.doctor.address %></p>
+                <% } else { %>
+                  <p><%= reserve.HC.address %></p>
+                <% } %>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-md-4 col-lg-2">
                   <h5>تاریخ</h5>
                 </div>
                 <div class="col-md-6 col-lg-6">
