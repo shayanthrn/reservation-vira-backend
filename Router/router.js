@@ -3384,6 +3384,7 @@ router.get("/Adminpanel/reserves/:resid",function(req,res){
                     }
                     else{
                       reserve.doctor=doctor;
+                      console.log(reserve);
                       res.render("AdminPanel/reserve-status.ejs",{reserve:reserve});
                       res.end();
                       db.close();
