@@ -4377,7 +4377,7 @@ router.post("/ticketpayment",function(req,res){
               Mobile: '09128993687'
             }).then(response => {
               if (response.status === 100) {
-                var newchat = new Chat(req.body.doctor,user.phonenumber);
+                var newchat = new Chat(req.body.doctor,user.phonenumber,doctor.chatcost);
                 newchat.authority=response.authority;
                 var now=new Date();
                 var newticket;
@@ -4454,7 +4454,7 @@ router.get("/ticketpaymenthandler",function(req,res){
         }
         else{
           zarinpal.PaymentVerification({
-          Amount: "5000", // In Tomans
+          Amount: chat.cost, // In Tomans
           Authority: chat.authority,
           }).then(response => {
           if (response.status === 100 && response.RefID!=0) {
