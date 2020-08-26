@@ -4590,7 +4590,7 @@ router.get("/telepaymenthandler",function(req,res){
             dbo.collection("teleReservations").insertOne(reservation,function(err,result234){
               dbo.collection("TempteleReserves").deleteOne({authority:query.Authority},function(err,aa){
                   dbo.collection("Users").updateOne({_id:reservation.user},{$addToSet:{telereservations:reservation}},function(err,ad){
-                    dbo.collection("Doctors").findOne({_id:reservation.doctor},function(err,HC){
+                    dbo.collection("Doctors").findOne({_id:reservation.doctor},function(err,doctor){
                         dbo.collection("Doctors").updateOne({_id:reservation.doctor},{$addToSet:{telereservations:reservation}},function(err,sas){
                           strtime=reserve.timeinfo.time.start+"-"+reserve.timeinfo.time.end;
                           res.render("paymentaccept.ejs",{doctor:doctor,time:strtime,resid:reservation.refid});
@@ -5055,9 +5055,11 @@ router.get("/paymenthandler",function(req,res){
                 dbo.collection("Doctors").updateOne({_id:reservation.doctor},{$addToSet:{reservations:reservation,unavailabletimes:reservation.time}},function(err,ss){
                   dbo.collection("Users").updateOne({_id:reservation.user},{$addToSet:{reserves:reservation}},function(err,ad){
                     strtime=reservation.time.start.hour+":"+reservation.time.start.min;
-                    res.render("paymentaccept.ejs",{doctor:result,time:strtime,resid:reservation.refid});
-                    //sendSMSforres(reservation);
-                    res.end();
+                    dbo.collection("Doctors").findOne({_id:reservation.doctor},function(err,doctor){
+                      res.render("paymentaccept.ejs",{doctor:doctor,time:strtime,resid:reservation.refid});
+                      //sendSMSforres(reservation);
+                      res.end();
+                    })  
                   })
                 })
               })
