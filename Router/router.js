@@ -3323,14 +3323,12 @@ router.get("/AdminPanel/users/:userid",function(req,res){
                 var promises=[];
                 if(result3!=null){
                   result3.reserves.forEach(function(doc){
-                    console.log("Here")
                    promises.push(dbo.collection("Doctors").findOne({_id:doc.doctor},{ projection: {name: 1} }));
                   });
                   Promise.all(promises).then(function(value){
-                      console.log("and hwerw")
                       res.render("AdminPanel/patients-profile.ejs",{user:result3,reservations:value});
                       db.close();
-                      res.end();
+                     // res.end();
                   });
                 }
                 else{
