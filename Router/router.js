@@ -2614,6 +2614,7 @@ router.get("/search",function(req,res){
   var query=url.parse(req.url,true).query;
   if(query.filter!="category"&&query.filter!="Doctors"&&query.filter!="HealthCenters"){
     res.redirect("noaccess");
+    console.log(query.filter)
   }
   else{
     MongoClient.connect(dburl,function(err,db){
