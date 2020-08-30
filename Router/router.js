@@ -3311,47 +3311,18 @@ router.get("/AdminPanel/users/:userid",function(req,res){
   else{
     MongoClient.connect(dburl,function(err,db){
       var dbo=db.db("mydb");
-      dbo.collection('Doctors').findOne({token:req.cookies.doctortoken},function(err,result){
-        if(result==null){
-          dbo.collection('Admins').findOne({token:req.cookies.admintoken},function(err,result2){
-            if(result2==null){
-              db.close();
-              res.redirect('noaccess');
-            }
-            else{
-              dbo.collection("Users").findOne({_id:userid},function(err,result3){
-                var promises=[];
-                if(result3!=null){
-                  result3.reserves.forEach(function(doc){
-                   promises.push(dbo.collection("Doctors").findOne({_id:doc.doctor},{ projection: {name: 1} }));
-                  });
-                  Promise.all(promises).then(function(value){
-                    console.log(value)
-                      res.render("AdminPanel/patients-profile.ejs",{user:result3,reservations:value});
-                      db.close();
-                     // res.end();
-                  });
-                }
-                else{
-                  db.close();
-                  res.redirect("/AdminPanel/users");
-                }
-              })
-            }
-          })
+      dbo.collection('Admins').findOne({token:req.cookies.admintoken},function(err,result2){
+        if(result2==null){
+          db.close();
+          res.redirect('noaccess');
         }
         else{
-          dbo.collection("Users").findOne({_id:userid},function(err,result3){
-            var promises=[];
+          dbo.collection("Users").findOne({_id:userid},async function(err,result3){
             if(result3!=null){
-              result3.reserves.forEach(function(doc){
-               promises.push(dbo.collection("Doctors").findOne({_id:doc.doctor},{ projection: {name: 1} }));
-              });
-              Promise.all(promises).then(function(value){
-                  res.render("AdminPanel/patients-profile.ejs",{user:result3,reservations:value});
+                  result3.reserves=await dbo.collection("Reservations").find({user:userid}).toArray();
+                  res.render("AdminPanel/patients-profile.ejs",{user:result3,reservations:result3.reserves});
                   db.close();
                   res.end();
-              });
             }
             else{
               db.close();

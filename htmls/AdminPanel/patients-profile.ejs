@@ -169,7 +169,7 @@
                 <% for(i=0;i<user.reserves.length;i++) { %>
                 <a href="<%= "/AdminPanel/reserves/" +user.reserves[i]._id %>" class="list-group-item list-group-item-action flex-column align-items-start">
                   <div class="d-flex w-100 justify-content-between">
-                    <h5 class="mb-1"><%= reservations[i] %></h5>
+                    <h5 class="mb-1"><%= i+1 %></h5>
                     <small class="text-muted">
                       <%= user.reserves[i].time.start.hour +":"+user.reserves[i].time.start.min %> - <%= user.reserves[i].time.end.hour +":"+user.reserves[i].time.end.min%>
                     </small>
