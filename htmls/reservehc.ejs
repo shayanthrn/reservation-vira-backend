@@ -54,9 +54,11 @@
                         </div>
                         <section class="page-content default">
                             <div class="checkout-shipment">
-                                <form
-                                    action="<%= "paymentHC?from=reservation/"+ HC.type + "/"+ HC.name +"/"+ cat.name %>"
-                                    method="POST">
+                                <% if(HC.systype=="A") { %>
+                                <form action="<%= "paymentHC?from=reservation/"+ HC.type + "/"+ HC.name +"/"+ cat.name %>" method="POST">
+                                <% } else { %>
+                                <form action="<%= "paymentHC?from=reservation/"+ HC.type + "/"+ HC.name %>" method="POST">
+                                <% } %>
                                     <ul>
                                         <li><span> نام مرکز :</span><span><%= HC.name %></span></li>
                                         <li><span> تخصص :</span><span><%= cat.name %></span></li>

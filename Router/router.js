@@ -1747,12 +1747,19 @@ function getDoctimeslots(doctor,date){
   dayofweek=new persianDate([date.year,date.month,date.day]).format('dddd');
   mintime=0;
   timeslots=[];
+  now=new persianDate().toArray();
+  nowinmin=now[3]*60+now[4];
   while(mintime+duration<=1440){
-    interval=createinterval(mintime,mintime+duration);
-    mintime+=duration;
-    timeslots.push(interval);
+    if(mintime+duration>nowinmin){
+      interval=createinterval(mintime,mintime+duration);
+      mintime+=duration;
+      timeslots.push(interval);
+    }
+    else{
+      mintime+=duration;
+    }
   }
-
+  
   for(let i=0;i<unavb.length;i++){
     temp=new myDate(unavb[i].date.day,unavb[i].date.month,unavb[i].date.year);
     if(lodash.isEqual(temp,date)||(unavb[i].date=="*"&&dayofweek==unavb[i].dayofweek)||(unavb[i].dayofweek=="*")){
@@ -2177,6 +2184,10 @@ router.get("/HCpanel/reserves",function(req,res){
 //-----------------------HCpanel------------------------------//
 
 //-----------------------Doctorpanel---------------------------//
+
+router.get("/doctorpanel",function(req,res){
+  res.redirect("/DoctorPanel/dashboard")
+})
 
 router.get('/doctorpanel/dashboard',function(req,res){
   if(req.cookies.doctortoken==undefined){
@@ -2614,7 +2625,6 @@ router.get("/search",function(req,res){
   var query=url.parse(req.url,true).query;
   if(query.filter!="category"&&query.filter!="Doctors"&&query.filter!="HealthCenters"){
     res.redirect("noaccess");
-    console.log(query.filter)
   }
   else{
     MongoClient.connect(dburl,function(err,db){
@@ -3947,7 +3957,7 @@ router.get("/UserPanel/telereservations/:resid",function(req,res){
         else{
           dbo.collection("teleReservations").findOne({_id:resid},function(err,reserve){
             dbo.collection("Doctors").findOne({_id:reserve.doctor},function(err,doctor){
-              reserve.doctor=doctor.name;
+              reserve.doctor=doctor;
               res.render("UserPanel/telereserve-status.ejs",{reserve:reserve});
               db.close();
               res.end();
@@ -4424,6 +4434,21 @@ router.post("/ticketpayment",function(req,res){
   }
 })
 
+router.get("/paymentaccept2",function(req,res){
+  MongoClient.connect(dburl,function(err,db){
+    var dbo=db.db("mydb");
+    dbo.collection("Users").findOne({token:req.cookies.usertoken},function(err,user){
+      if(user==null){
+        user="";
+      }
+      categories().then(basiccategories=>{
+        res.render("paymentaccept2.ejs",{categories:basiccategories,user:user});
+        res.end();
+      })
+    })
+  })
+})
+
 router.get("/ticketpaymenthandler",function(req,res){
   var query= url.parse(req.url,true).query;
   MongoClient.connect(dburl,function(err,db){
@@ -4431,10 +4456,10 @@ router.get("/ticketpaymenthandler",function(req,res){
     dbo.collection("TempChats").findOne({authority:query.Authority},function(err,chat){
       if(chat==null){
         db.close();
-        res.redirect("/noaccess");
-        
+        res.redirect("/paymentaccept2")
       }
       else{
+        console.log(chat)
         if(query.Status=="NOK"){
           dbo.collection("Doctors").findOne({name:chat.doctor},function(err,doctor){
             dbo.collection("TempChats").deleteOne({authority:query.Authority},function(err,result){
@@ -4457,6 +4482,7 @@ router.get("/ticketpaymenthandler",function(req,res){
           })
         }
         else{
+          console.log("injayim?:|")
           zarinpal.PaymentVerification({
           Amount: chat.cost, // In Tomans
           Authority: chat.authority,
@@ -4518,7 +4544,7 @@ router.post("/telepayment",function(req,res){
   }
   else{
     if(req.body.choice==undefined){
-      res.redirect("/"+ query.from);
+      res.redirect("back");
     }
     else{
       MongoClient.connect(dburl,function(err,db){
@@ -4569,7 +4595,7 @@ router.get("/telepaymenthandler",function(req,res){
     dbo.collection("TempteleReserves").findOne({authority:query.Authority},function(err,reserve){
       if(reserve==null){
         db.close();
-        res.redirect("/noaccess");
+        res.redirect("/paymentaccept2")
         
       }
       else{
@@ -4636,7 +4662,8 @@ router.post("/paymentHC",function(req,res){
   }
   else{
   if(req.body.choice==undefined){
-    res.redirect("/"+query.from);
+    console.log(query.from)
+    res.redirect("back")
     res.end();
   }
   else{
@@ -4714,7 +4741,7 @@ router.get("/paymenthandlerHC",function(req,res){
     dbo.collection("TempReservesHC").findOne({authority:query.Authority},function(err,reserve){
       if(reserve==null){
         db.close();
-        res.redirect("/noaccess");
+        res.redirect("/paymentaccept2")
       }
       else{
         if(query.Status=="NOK"){
@@ -4969,7 +4996,7 @@ router.post("/payment",function(req,res){
   }
   else{
   if(req.body.choice==undefined){
-    res.redirect("/");
+    res.redirect("back")
     res.end();
   }
   else{
@@ -5033,7 +5060,7 @@ router.get("/paymenthandler",function(req,res){
     dbo.collection("TempReserves").findOne({authority:query.Authority},function(err,reserve){
       if(reserve==null){
         db.close();
-        res.redirect("/noaccess");
+        res.redirect("/paymentaccept2")
       }
       else{
         if(query.Status=="NOK"){

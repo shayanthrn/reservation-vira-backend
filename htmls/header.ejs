@@ -21,9 +21,10 @@
                                         <option value="HealthCenters">مراکز درمانی</option>
                                     </select>
                                 </span>
-                                <input type="text" name="query" id="gsearchsimple"
-                                    placeholder="نام کالا  و یا دسته مورد نظر خود را جستجو کنید…">
-                                <button type="submit" style="max-height: 53%;top: 47%"><img src="assets/img/search.png" alt=""></button>
+                                <input type="text" oninput
+                                ="checkempty()" name="query" id="gsearchsimple"
+                                    placeholder="نام دکتر  و یا دسته مورد نظر خود را جستجو کنید…">
+                                <button type="submit" id="searchbtn" style="max-height: 53%;top: 47%;" disabled><img src="assets/img/search.png" alt=""></button>
                             </form>
                         </div>
                     </div>
@@ -92,5 +93,13 @@
             </ul>
         </div>
     </nav>
+    <script>
+        function checkempty(){
+            if(document.getElementById("gsearchsimple").value!=""){
+                console.log("saf")
+                document.getElementById("searchbtn").disabled=false
+            }
+        }
+    </script>
 </header>
 <div class="overlay-search-box"></div>
