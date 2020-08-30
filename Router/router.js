@@ -3323,9 +3323,11 @@ router.get("/AdminPanel/users/:userid",function(req,res){
                 var promises=[];
                 if(result3!=null){
                   result3.reserves.forEach(function(doc){
+                    console.log("Here")
                    promises.push(dbo.collection("Doctors").findOne({_id:doc.doctor},{ projection: {name: 1} }));
                   });
                   Promise.all(promises).then(function(value){
+                      console.log("and hwerw")
                       res.render("AdminPanel/patients-profile.ejs",{user:result3,reservations:value});
                       db.close();
                       res.end();
@@ -5386,6 +5388,16 @@ router.get('/exit',function(req,res){
 
 
 router.get('*',function(req,res){
+  req.session.prevurl=req.session.currurl;
+  req.session.currurl=req.url;
+  categories().then(basiccategories=>{
+    res.render("404.ejs",{categories:basiccategories,user:""});
+    res.statusCode=404;
+    res.end();
+  })
+});
+
+router.post('*',function(req,res){
   req.session.prevurl=req.session.currurl;
   req.session.currurl=req.url;
   categories().then(basiccategories=>{
