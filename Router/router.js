@@ -3326,6 +3326,7 @@ router.get("/AdminPanel/users/:userid",function(req,res){
                    promises.push(dbo.collection("Doctors").findOne({_id:doc.doctor},{ projection: {name: 1} }));
                   });
                   Promise.all(promises).then(function(value){
+                    console.log(value)
                       res.render("AdminPanel/patients-profile.ejs",{user:result3,reservations:value});
                       db.close();
                      // res.end();
