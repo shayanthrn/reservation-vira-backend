@@ -10,28 +10,23 @@
             </div>
             <div class="col-lg-6 col-md-5 col-sm-8 col-7">
                 <div class="search-area default">
-                    <form action="/search" class="search">
-                        <table>
-                            <tr>
-                                <td>
-                                    <label for="filter" >جستجو در:</label>
-                                    <select id="filter" name="filter">
+                    <div class="row">
+                        <div class="col-md-9">
+                            <form action="/search" class="search form-inline">
+                                <span>
+                                    <label for="filter" class="d-inline ml-1">جستجو در:</label>
+                                    <select id="filter" class="form-control d-inline">
                                         <option value="Doctors">دکتر ها</option>
                                         <option value="category">تخصص</option>
                                         <option value="HealthCenters">مراکز درمانی</option>
                                     </select>
-                                </td>
-                                <td>
-                                    <input type="text" name="query" id="gsearchsimple"
-                                    placeholder="نام تخصص ، دکتر یا مرکز درمانی مورد نظر خود را وارد کنید..." style="min-width: 558px;">
-                                </td>
-                            </tr>
-                        </table>
-                        
-                        <div class="localSearchSimple">
+                                </span>
+                                <input type="text" name="query" id="gsearchsimple"
+                                    placeholder="نام کالا  و یا دسته مورد نظر خود را جستجو کنید…">
+                                <button type="submit" style="max-height: 53%;top: 47%"><img src="assets/img/search.png" alt=""></button>
+                            </form>
                         </div>
-                        <button type="submit" style="max-height: 44px;top: 8px;"><img src="assets/img/search.png" alt=""></button>
-                    </form>
+                    </div>
                 </div>
             </div>
             <div class="col-md-4 col-sm-12">

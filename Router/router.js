@@ -2830,6 +2830,7 @@ router.get("/doctorpanel/telereserve",function(req,res){
               }
             }
           })
+          console.log(visittimes[0].times)
           res.render("DoctorPanel/telereserve.ejs",{visittimes:visittimes,doctor:result});
           db.close()
           res.end()
