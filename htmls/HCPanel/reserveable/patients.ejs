@@ -102,8 +102,8 @@
                     <% for(let i = 0;i<patients.length;i++) { %>
                     <tr>
                       <th scope="row"><%=i+1%></th>
-                      <td><a href="<%= "AdminPanel/users/" + patients[i]._id %>"><%=patients[i].firstname + " " +  patients[i].lastname%></a></td>
-                      <td><%= patients[i].phone %></td>
+                      <td><a style="color:#212529;" href="<%= "HCpanel/users/" + patients[i]._id %>"><%=patients[i].firstname + " " +  patients[i].lastname%></a></td>
+                      <td><%= patients[i].phonenumber %></td>
                     </tr>
                     <% } %>
                   </tbody>

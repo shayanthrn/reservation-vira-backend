@@ -131,7 +131,7 @@
                   </div>
                   <div class="card-body p-1 d-flex flex-wrap">
                     <% for(let j=0;j<visittimes[i].times.length;j++) { %>
-                    <a href="<%="AdminPanel/reserves/" +visittimes[i].times[j]._id%>" class="cursor-pointer badge badge-secondary p-1 m-1"><%= visittimes[i].times[j].timeinfo.time.start +"-"+ visittimes[i].times[j].timeinfo.time.end %></a>
+                    <a href="<%="DoctorPanel/telereserves/" +visittimes[i].times[j]._id%>" class="cursor-pointer badge badge-secondary p-1 m-1"><%= visittimes[i].times[j].timeinfo.time.start +"-"+ visittimes[i].times[j].timeinfo.time.end %></a>
                     <% } %>
                   </div>
                 </div>

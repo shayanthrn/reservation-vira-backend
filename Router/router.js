@@ -2057,6 +2057,69 @@ router.get("/HCpanel/patients",function(req,res){
 })
 
 
+router.get("/HCPanel/users/:userid",function(req,res){
+  userid=ObjectID(req.params.userid);
+  if(req.cookies.HCtoken==undefined){
+    res.redirect('/noaccess');
+  }
+  else{
+    MongoClient.connect(dburl,function(err,db){
+      var dbo=db.db("mydb");
+      dbo.collection('HealthCenters').findOne({token:req.cookies.HCtoken},function(err,result){
+        if(result==null || result.systype=="C" ){
+          db.close();
+          res.redirect('noaccess');
+        }
+        else{
+          dbo.collection("Users").findOne({_id:userid},async function(err,user){
+            if(user==null){
+              db.close();
+              res.redirect('noaccess');
+            }
+            else{
+              user.reserves=await dbo.collection("Reservations").find({user:user._id,HC:result._id}).toArray();
+              res.render('HCPanel/reserveable/patient-status.ejs',{user:user});
+              db.close();
+              res.end();
+            }
+          })
+        }
+      })
+    })
+  }
+})
+
+router.get("/HCpanel/reserves/:resid",function(req,res){
+  resid=ObjectID(req.params.resid);
+  if(req.cookies.HCtoken==undefined){
+    res.redirect('/noaccess');
+  }
+  else{
+    MongoClient.connect(dburl,function(err,db){
+      var dbo=db.db("mydb");
+      dbo.collection('HealthCenters').findOne({token:req.cookies.HCtoken},function(err,result){
+        if(result==null || result.systype=="C" ){
+          db.close();
+          res.redirect('noaccess');
+        }
+        else{
+          dbo.collection("Reservations").findOne({_id:resid,HC:result._id},async function(err,reserve){
+            if(reserve==null){
+              res.redirect("/noaccess");
+            }
+            else{
+              reserve.user=await dbo.collection("Users").findOne({_id:reserve.user});
+              res.render('HCPanel/reserveable/reserve-status.ejs',{reserve:reserve});
+              db.close();
+              res.end();
+            }
+          })
+        }
+      })
+    })
+  }
+})
+
 
 router.get("/HCpanel/visittimes",function(req,res){
   if(req.cookies.HCtoken==undefined){
@@ -2357,6 +2420,102 @@ router.get('/doctorpanel/patients',function(req,res){
               db.close();
               res.end();
             })
+          })
+        }
+      })
+    })
+  }
+})
+
+
+router.get("/doctorpanel/patients/:userid",function(req,res){
+  userid=ObjectID(req.params.userid);
+  if(req.cookies.doctortoken==undefined){
+    res.redirect('/noaccess');
+  }
+  else{
+    MongoClient.connect(dburl,function(err,db){
+      var dbo=db.db("mydb");
+      dbo.collection('Doctors').findOne({token:req.cookies.doctortoken},function(err,doctor){
+        if(doctor==null ){
+          db.close();
+          res.redirect('/noaccess');
+        }
+        else{
+          dbo.collection("Users").findOne({_id:userid},async function(err,user){
+            if(user==null){
+              db.close();
+              res.redirect('/noaccess');
+            }
+            else{
+              user.reserves=await dbo.collection("Reservations").find({user:user._id,doctor:doctor._id}).toArray();
+              res.render('DoctorPanel/patient-status.ejs',{user:user,doctor:doctor});
+              db.close();
+              res.end();
+            }
+          })
+        }
+      })
+    })
+  }
+})
+
+router.get("/DoctorPanel/reserves/:resid",function(req,res){
+  resid=ObjectID(req.params.resid);
+  if(req.cookies.doctortoken==undefined){
+    res.redirect('/noaccess');
+  }
+  else{
+    MongoClient.connect(dburl,function(err,db){
+      var dbo=db.db("mydb");
+      dbo.collection('Doctors').findOne({token:req.cookies.doctortoken},function(err,result){
+        if(result==null){
+          db.close();
+          res.redirect('noaccess');
+        }
+        else{
+          dbo.collection("Reservations").findOne({_id:resid,doctor:result._id},async function(err,reserve){
+            if(reserve==null){
+              res.redirect("/noaccess");
+            }
+            else{
+              reserve.user=await dbo.collection("Users").findOne({_id:reserve.user});
+              res.render('DoctorPanel/reserve-status.ejs',{reserve:reserve,doctor:result});
+              db.close();
+              res.end();
+            }
+          })
+        }
+      })
+    })
+  }
+})
+
+
+router.get("/DoctorPanel/telereserves/:resid",function(req,res){
+  resid=ObjectID(req.params.resid);
+  if(req.cookies.doctortoken==undefined){
+    res.redirect('/noaccess');
+  }
+  else{
+    MongoClient.connect(dburl,function(err,db){
+      var dbo=db.db("mydb");
+      dbo.collection('Doctors').findOne({token:req.cookies.doctortoken},function(err,result){
+        if(result==null){
+          db.close();
+          res.redirect('noaccess');
+        }
+        else{
+          dbo.collection("teleReservations").findOne({_id:resid,doctor:result._id},async function(err,reserve){
+            if(reserve==null){
+              res.redirect("/noaccess");
+            }
+            else{
+              reserve.user=await dbo.collection("Users").findOne({_id:reserve.user});
+              res.render('DoctorPanel/telereserve-status.ejs',{reserve:reserve,doctor:result});
+              db.close();
+              res.end();
+            }
           })
         }
       })
@@ -3305,7 +3464,7 @@ router.get("/AdminPanel/patients",function(req,res){
 router.get("/AdminPanel/users/:userid",function(req,res){
   userid=req.params.userid;
   userid=ObjectID(userid);
-  if(req.cookies.doctortoken==undefined&&req.cookies.admintoken==undefined){
+  if(req.cookies.admintoken==undefined){
     res.redirect('/noaccess');
   }
   else{
@@ -3314,7 +3473,7 @@ router.get("/AdminPanel/users/:userid",function(req,res){
       dbo.collection('Admins').findOne({token:req.cookies.admintoken},function(err,result2){
         if(result2==null){
           db.close();
-          res.redirect('noaccess');
+          res.redirect('/noaccess');
         }
         else{
           dbo.collection("Users").findOne({_id:userid},async function(err,result3){
