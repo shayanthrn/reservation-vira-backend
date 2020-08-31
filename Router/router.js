@@ -955,15 +955,49 @@ router.post("/changeHCinfo",function(req,res){
           res.redirect('noaccess');
         }
         else{
-          dbo.collection('HealthCenters').updateOne({token:req.cookies.HCtoken},{$set:{codeofHC:req.body.codeofHC,codemeli:req.body.codemeli,city:req.body.city,phonenumber:req.body.phonenumber,directphonenumber:req.body.directphonenumber,background:req.body.background,address:req.body.address,medicalnumber:req.body.medicalnumber}},function(err,res2){
-            if(req.files!=null){
-              mv(req.files.image.tempFilePath,"public"+HC.image,function(err){
-                console.log("public"+HC.image)
-              })
-            }
-            db.close();
-            res.redirect('/HCpanel/profile');
-          })
+          var cats=[]
+          if(typeof req.body.categories=="string"){
+            cats.push(req.body.categories);
+          }
+          else{
+            cats=req.body.categories;
+          }
+          if(HC.systype=="A"){
+            HC.categories.forEach(function(item, index, object){
+              if(!req.body.categories.includes(item.name)){
+                object.splice(index, 1);
+              }
+            })
+            hccatnames=[];
+            HC.categories.forEach(function(item, index, object){
+              hccatnames.push(item.name);
+            })
+            cats.forEach(function(doc){
+              if(!hccatnames.includes(doc)){
+                HC.categories.push({name:doc,unavailabletimes:[],reservations:[],visitduration:30,visitcost:3000})
+              }
+            })
+            dbo.collection('HealthCenters').updateOne({token:req.cookies.HCtoken},{$set:{codeofHC:req.body.codeofHC,categories:HC.categories,codemeli:req.body.codemeli,city:req.body.city,phonenumber:req.body.phonenumber,directphonenumber:req.body.directphonenumber,background:req.body.background,address:req.body.address,medicalnumber:req.body.medicalnumber}},function(err,res2){
+              if(req.files!=null){
+                mv(req.files.image.tempFilePath,"public"+HC.image,function(err){
+                  console.log("public"+HC.image)
+                })
+              }
+              db.close();
+              res.redirect('/HCpanel/profile');
+            })
+          }
+          else{
+            dbo.collection('HealthCenters').updateOne({token:req.cookies.HCtoken},{$set:{codeofHC:req.body.codeofHC,codemeli:req.body.codemeli,city:req.body.city,phonenumber:req.body.phonenumber,directphonenumber:req.body.directphonenumber,background:req.body.background,address:req.body.address,medicalnumber:req.body.medicalnumber}},function(err,res2){
+              if(req.files!=null){
+                mv(req.files.image.tempFilePath,"public"+HC.image,function(err){
+                  console.log("public"+HC.image)
+                })
+              }
+              db.close();
+              res.redirect('/HCpanel/profile');
+            })
+          }
         }
       })
     })
@@ -1852,50 +1886,42 @@ function checkinterval(reservedata){       //must be implemented
 }
 
 
-function sendSMSforres(reservation){
+function sendSMS(template,id,type,token,token2,token3){
+  console.log(token);
+  console.log(token2)
+  console.log(token3)
+  var id=ObjectID(id);
   MongoClient.connect(dburl,function(err,db){
     var dbo=db.db("mydb");
-    dbo.collection("Doctors").findOne({_id:reservation.doctor},function(err,doctor){
-      dbo.collection("Users").findOne({_id:reservation.user},function(err,user){
-        var date=reservation.time.date.year+"/"+reservation.time.date.month+'/'+reservation.time.day+" "+reservation.time.start.hour+":"+reservation.time.start.min;
-        apikave.VerifyLookup({
-          token: reservation.refid,
-          token2: doctor.name,
-          token3: date,
-          template : "reserveACK",
-          receptor:user.phonenumber
-        },
-        function(response, status) {
-          console.log(response);
-          console.log(status);
-          if(status==200){
-            apikave.VerifyLookup({
-              token: reservation.refid,
-              token2: user.firstname+" "+user.lastname,
-              token3: date,
-              template : "reserveACKdoc",
-              receptor: doctor.phonenumber
-            },function(respones,status){
-                if(status==200){
-                  console.log("ok");
-                  db.close();
-                }
-                else{
-                  db.close();
-                  console.log("nok");
-                }
-            })
-            db.close();
-          }
-          else{
-            db.close();
-            console.log("nok");
-          }
-        });
-      })
+    dbo.collection(type).findOne({_id:id},function(err,obj){
+      apikave.VerifyLookup({
+        token: token,
+        token10: token2,
+        token3: token3,
+        template : template,
+        receptor:obj.phonenumber
+      },
+      function(response, status) {
+        console.log(response);
+        console.log(status);
+        if(status==200){
+          console.log("success")
+        }
+      });
     })
   })
 }
+
+router.get("/test",function(req,res){
+  MongoClient.connect(dburl,function(err,db){
+    var dbo=db.db("mydb");
+    dbo.collection("Reservations").findOne({refid:"345345"},async function(err,reservation){
+      var doctor=await dbo.collection("Doctors").findOne({})
+      sendSMS("reserveACK",reservation.user.toString(),"Users",reservation.refid,doctor.name,new persianDate([reservation.time.date.year,reservation.time.date.month,reservation.time.date.day]).format("L"))
+      res.end();
+    })
+  })
+})
 
 //-----------------------functions--------------------------//
 //-----------------------HCpanel-----------------------------//
@@ -2467,6 +2493,73 @@ router.post("/removevisittimes",function(req,res){
     })
   }
 })
+
+router.post("/removevisittimesHC",function(req,res){
+  if(req.cookies.HCtoken==undefined){
+    res.redirect('/noaccess');
+  }
+  else{
+    MongoClient.connect(dburl,function(err,db){
+      var dbo=db.db("mydb");
+      dbo.collection('HealthCenters').findOne({token:req.cookies.HCtoken},function(err,result){
+        if(result==null){
+          db.close();
+          res.redirect('noaccess');
+        }
+        else{
+          if(req.body.choice==undefined){
+            res.redirect("/HCpanel/removevisittimes");
+          }
+          else{
+            choices=[]
+            if(typeof req.body.choice=="string"){
+              choices.push(req.body.choice);
+            }
+            else{
+              choices=req.body.choice;
+            }
+            var flag=0;
+            choices.forEach(function(doc){
+                reservedata=doc.split(":");
+                date=new myDate(Number(reservedata[4]),Number(reservedata[3]),Number(reservedata[2]));
+                start={hour:Number(reservedata[0]),min:Number(reservedata[1])};
+                temp=(start.hour*60)+start.min+result.visitduration;
+                end={hour:Math.floor(temp/60),min:temp%60}
+                unavb={start:start,end:end,date:date,dayofweek:new persianDate([Number(reservedata[2]),Number(reservedata[3]),Number(reservedata[4])]).format("dddd")};
+                if(result.systype=="B"){
+                  dbo.collection("HealthCenters").updateOne({token:req.cookies.HCtoken},{$addToSet:{unavailabletimes:unavb}});
+                }
+                else if(result.systype=="A"){
+                  var catobj=null;
+                  console.log(result.categories);
+                  console.log("========")
+                  result.categories.forEach(function(doc){
+                    if(doc.name==req.body.category){
+                    doc.unavailabletimes.push(unavb);
+                    }
+                  })
+                  console.log(result.categories)
+                  dbo.collection("HealthCenters").updateOne({token:req.cookies.HCtoken},{$set:{categories:result.categories}})
+                }
+                else{
+                  flag=2;
+                  res.redirect("/noaccess");
+                  res.end();
+                  db.close();
+                }
+            })
+            setTimeout(function(){
+              if(flag!=2){
+                res.redirect("/HCpanel/removevisittimes")
+              }
+            },100)
+          }
+        }
+      })
+    })
+  }
+})
+
 
 router.get('/doctorpanel/profile',function(req,res){
   if(req.cookies.doctortoken==undefined){
@@ -3138,6 +3231,114 @@ router.get("/nightmode",function(req,res){
   }
 })
 
+router.get("/nightmodeHC",function(req,res){
+  var query=url.parse(req.url,true).query;
+  if(req.cookies.HCtoken==undefined){
+    res.redirect('/noaccess');
+  }
+  else{
+    MongoClient.connect(dburl,function(err,db){
+      var dbo=db.db("mydb");
+      dbo.collection('HealthCenters').findOne({token:req.cookies.HCtoken},function(err,result){
+        if(result==null){
+          db.close();
+          res.redirect('/noaccess');
+        }
+        else{
+          if(result.systype=="B"){
+            var flag=0;
+            var flag1=0;
+            newunavb={date:"*",dayofweek:"*",start:{hour:20,min:0},end:{hour:23,min:59}}
+            newunavb2={date:"*",dayofweek:"*",start:{hour:0,min:1},end:{hour:8,min:0}}
+            try {
+              result.unavailabletimes.forEach(function(doc){
+                if(lodash.isEqual(doc,newunavb)){
+                  flag=1;
+                }
+                if(lodash.isEqual(doc,newunavb2)){
+                  flag1=1;
+                }
+                if(flag1==1&&flag==1){
+                  throw BreakException;
+                }
+              })
+            } catch (error) {
+              console.log("found it") 
+            }
+            if(flag==1&&flag1==1){
+              db.close()
+              res.redirect("/HCpanel/removevisittimes");
+            }
+            else{
+              dbo.collection("HealthCenters").updateOne({token:req.cookies.HCtoken},{$addToSet:{unavailabletimes:newunavb}},function(err,asf){
+                dbo.collection("HealthCenters").updateOne({token:req.cookies.HCtoken},{$addToSet:{unavailabletimes:newunavb2}},function(err,asdfa){
+                  db.close();
+                  res.redirect("/HCpanel/removevisittimes");
+                })
+              })
+            }
+          }
+          else if(result.systype=="A"){
+            if(query.category==undefined){
+              res.redirect("/noaccess");
+            }
+            else{
+              var catobj=null;
+              result.categories.forEach(function(doc){
+                if(doc.name==query.category){
+                  catobj=doc;
+                }
+              })
+              if(catobj==null){
+                res.redirect("/noaccess");
+              }
+              var flag=0;
+              var flag1=0;
+              newunavb={date:"*",dayofweek:"*",start:{hour:20,min:0},end:{hour:23,min:59}}
+              newunavb2={date:"*",dayofweek:"*",start:{hour:0,min:1},end:{hour:8,min:0}}
+              try {
+                  myunavailabletimes=catobj.unavailabletimes;
+                  myunavailabletimes.forEach(function(doc){
+                  if(lodash.isEqual(doc,newunavb)){
+                    flag=1;
+                  }
+                  if(lodash.isEqual(doc,newunavb2)){
+                    flag1=1;
+                  }
+                  if(flag1==1&&flag==1){
+                    throw BreakException;
+                  }
+                })
+              } catch (error) {
+                console.log("found it") 
+              }
+              if(flag==1&&flag1==1){
+                db.close()
+                res.redirect("/HCpanel/removevisittimes");
+              }
+              else{
+                result.categories.forEach(function(doc){
+                  if(doc.name==query.category){
+                    doc.unavailabletimes.push(newunavb);
+                    doc.unavailabletimes.push(newunavb2);
+                  }
+                })
+                dbo.collection("HealthCenters").updateOne({token:req.cookies.HCtoken},{$set:{categories:result.categories}},function(err,asf){
+                  res.redirect("/HCpanel/removevisittimes");
+                  db.close();
+                })
+              }
+            }
+          }
+          else{
+            res.redirect("/noaccess");
+            db.close();
+          }
+        }
+      })
+    })
+  }
+})
 
 router.get("/doctorpanel/telereserve",function(req,res){
   if(req.cookies.doctortoken==undefined){
@@ -5385,7 +5586,7 @@ router.get("/paymenthandler",function(req,res){
                     strtime=reservation.time.start.hour+":"+reservation.time.start.min;
                     dbo.collection("Doctors").findOne({_id:reservation.doctor},function(err,doctor){
                       res.render("paymentaccept.ejs",{doctor:doctor,time:strtime,resid:reservation.refid});
-                      //sendSMSforres(reservation);
+                      sendSMS("reserveACK",reservation.user.toString(),"Users",reservation.refid,doctor.name,new persianDate([reservation.time.date.year,reservation.time.date.month,reservation.time.date.day]).format("L"))
                       res.end();
                     })  
                   })
