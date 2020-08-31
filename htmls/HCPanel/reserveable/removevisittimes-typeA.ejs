@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html dir="rtl" class="fa-events-icons-ready" lang="en"><head>
+  <meta charset="utf-8">
+  <base id="base">
+  <script src="/assets/js/config.js"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="">
+  <meta name="author" content="">
+  <title>حذف زمان - دکتر تجویز</title>
+  <link rel="icon" href="favicon.ico">
+
+  <title></title>
+
+  <link rel="stylesheet" href="https://cdn.rtlcss.com/bootstrap/v4.1.3/css/bootstrap.min.css" integrity="sha384-Jt6Tol1A2P9JBesGeCxNrxkmRFSjWCBW1Af7CSQSKsfMVQCqnUVWhZzG0puJMCK6" crossorigin="anonymous">
+  <link href="assets/panelassests/dashboard.rtl.css" rel="stylesheet">
+  <script src="https://use.fontawesome.com/6d68f18b97.js"></script>
+  <link href="https://use.fontawesome.com/6d68f18b97.css" media="all" rel="stylesheet">
+  <link rel="stylesheet" href="assets/fonts/font-awesome/css/font-awesome.min.css" />
+    <!-- CSS Files -->
+    <link href="assets/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="assets/css/now-ui-kit.css" rel="stylesheet" />
+    <link href="assets/css/plugins/owl.carousel.css" rel="stylesheet" />
+    <link href="assets/css/plugins/owl.theme.default.min.css" rel="stylesheet" />
+    <link href="assets/css/main.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://unpkg.com/flickity@2/dist/flickity.min.css">
+    <link rel="stylesheet" href="styleres.css">
+    
+    <style>
+        .reserve-time {
+        border-radius: 5px !important;
+        }
+        .reserve-time.active {
+        background-color: #ef5661 !important;
+        border-color: #ef5661 !important;
+        }
+        .carousel-cell.active .card {
+        background-color: #ef5661;
+        color: white !important;
+        }
+        .reserve-time:hover {
+        border-color: #ef5661 !important;
+        background-color: #ef5661 !important;
+        color: white !important;
+        }
+    </style>
+</head>
+
+<body>
+
+  <nav class="navbar fixed-top navbar-expand-lg nav-dark">
+    <a class="navbar-brand mr-2" href="#">داشبورد برند</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarTogglerDemo" aria-controls="navbarTogglerDemo" aria-expanded="false" aria-label="Toggle navigation">
+      <i class="fa fa-bars menu-icon"></i>
+    </button>
+  </nav>
+
+
+  <div class="container-fluid">
+    <div class="row">
+      
+        <nav class="col-lg-3 col-xl-2 d-lg-block sidebar collapse" id="navbarTogglerDemo">
+            <div class="sidebar-sticky">
+              <ul class="nav flex-column">       
+                <li class="nav-item">
+                  <a class="nav-link" href="/HCpanel/dashboard">
+                    <i class="fa fa-tachometer"></i>
+                    داشبورد
+                  </a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="/HCpanel/profile">
+                    <i class="fa fa-user-md"></i>
+                    پروفایل
+                  </a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link  " href="/HCpanel/patients">
+                    <i class="fa fa-users"></i>
+                    بیماران
+                  </a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link active" href="/HCpanel/removevisittimes">
+                    <i class="fa fa-calendar"></i>
+                    حذف زمانبندی
+                  </a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="/HCpanel/visittimes">
+                    <i class="fa fa-calendar"></i>
+                    تعیین زمانبندی
+                  </a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="/HCpanel/addexp">
+                    <i class="fa fa-calendar"></i>
+                    ارسال جواب آزمایش
+                  </a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="/HCpanel/systemicinfo">
+                    <i class="fa fa-cog"></i>
+                    اطلاعات سیستم
+                  </a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="/exit">
+                    <i class="fa fa-sign-out"></i>
+                    خروج
+                  </a>
+                </li>
+              </ul>
+    
+              </div>
+          </nav>
+
+      <main role="main" class=" ml-sm-auto col-lg-9 col-xl-10 px-4" id="profile">
+        <div class="container-fluid">
+            <div class="cart-page-content col-xl-9 col-lg-8 col-md-12 order-1">
+                <div class="cart-page-title">
+                    <h1>انتخاب دسته بندی</h1>
+                </div>
+                
+                <section class="page-content default">
+                    <div class="checkout-shipment">
+                       <form action="HCPanel/removevisittimes/step2" method="POST">
+                            <div class="row">
+                              <div class="col-12">
+                                  دسته بندی مورد نظر خود را انتخاب کنید
+                                <select name="category">
+                                    <% for ( i = 0 ; i < categories.length ; i ++ ) { %>s
+                                    <option value="<%= categories[i].name %>">
+                                       <%= categories[i].name %>
+                                    </option>
+                                    <% } %>
+                                </select>
+                              </div>
+                            </div>
+                            <button class="btn btn-info">انتخاب</button>
+                        </form>
+                    </div>
+                </section>
+            </div>
+        </div>
+      </main>
+
+    </div>
+  </div>
+  
+
+<!--   Core JS Files   -->
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/flickity@2/dist/flickity.pkgd.min.js"></script>
+<script src="scriptres.js"></script>
+<script src="assets/js/core/popper.min.js" type="text/javascript"></script>
+<script src="assets/js/core/bootstrap.min.js" type="text/javascript"></script>
+<!--  Plugin for Switches, full documentation here: http://www.jque.re/plugins/version3/bootstrap.switch/ -->
+<script src="assets/js/plugins/bootstrap-switch.js"></script>
+<!--  Plugin for the Sliders, full documentation here: http://refreshless.com/nouislider/ -->
+<script src="assets/js/plugins/nouislider.min.js" type="text/javascript"></script>
+<!--  Plugin for the DatePicker, full documentation here: https://github.com/uxsolutions/bootstrap-datepicker -->
+<script src="assets/js/plugins/bootstrap-datepicker.js" type="text/javascript"></script>
+<!-- Share Library etc -->
+<script src="assets/js/plugins/jquery.sharrre.js" type="text/javascript"></script>
+<!-- Control Center for Now Ui Kit: parallax effects, scripts for the example pages etc -->
+<script src="assets/js/now-ui-kit.js" type="text/javascript"></script>
+<!--  CountDown -->
+<script src="assets/js/plugins/countdown.min.js" type="text/javascript"></script>
+<!--  Plugin for Sliders -->
+<script src="assets/js/plugins/owl.carousel.min.js" type="text/javascript"></script>
+<!--  Jquery easing -->
+<script src="assets/js/plugins/jquery.easing.1.3.min.js" type="text/javascript"></script>
+<!-- Main Js -->
+<script src="assets/js/main.js" type="text/javascript"></script>
+  <script src="scriptres.js"></script>
+  <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+  <script>window.jQuery || document.write('<script src="assets/panelassests/jquery-slim.min.js"><\/script>')</script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+  <script src="https://cdn.rtlcss.com/bootstrap/v4.1.3/js/bootstrap.min.js" integrity="sha384-C/pvytx0t5v9BEbkMlBAGSPnI1TQU1IrTJ6DJbC8GBHqdMnChcb6U4xg4uRkIQCV" crossorigin="anonymous"></script>
+
+  <script>
+    
+    $(".checkbox").change(function() {
+        if(this.checked) {
+          this.parentElement.className="reserve-time btn btn-outline-secondary float-right ml-2 active"
+        }
+        else{
+          this.parentElement.className="reserve-time btn btn-outline-secondary float-right ml-2"
+        }
+      });
+  </script>
+</body>
+
+
+</html>

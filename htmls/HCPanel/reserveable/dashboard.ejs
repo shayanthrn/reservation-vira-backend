@@ -52,6 +52,12 @@
               </a>
             </li>
             <li class="nav-item">
+              <a class="nav-link" href="/HCpanel/removevisittimes">
+                <i class="fa fa-calendar"></i>
+                حذف زمانبندی
+              </a>
+            </li>
+            <li class="nav-item">
               <a class="nav-link" href="/HCpanel/visittimes">
                 <i class="fa fa-calendar"></i>
                 تعیین زمانبندی
@@ -94,7 +100,7 @@
                 </div>
                 <div class="card-body p-1 d-flex flex-wrap">
                   <% for(let j=0;j<visittimes[i].times.length;j++) { %>
-                  <a href="<%="AdminPanel/reserves/" +visittimes[i].times[j]._id%>" class="cursor-pointer badge badge-secondary p-1 m-1"><%=visittimes[i].times[j].time.start.hour +":"+visittimes[i].times[j].time.start.min + "-" + visittimes[i].times[j].time.end.hour+":"+visittimes[i].times[j].time.end.min %></a>
+                  <a href="<%="HCpanel/reserves/" +visittimes[i].times[j]._id%>" class="cursor-pointer badge badge-secondary p-1 m-1"><%=visittimes[i].times[j].time.start.hour +":"+visittimes[i].times[j].time.start.min + "-" + visittimes[i].times[j].time.end.hour+":"+visittimes[i].times[j].time.end.min %></a>
                   <% } %>
                 </div>
               </div>

@@ -165,11 +165,11 @@ router.get("/api/getTimeslotsHC",function(req,res){
       else{
         currentday=new persianDate();
         days.push(currentday);
-        freetimes.push(getDoctimeslots(catobj,new myDate(currentday.toArray()[2],currentday.toArray()[1],currentday.toArray()[0])));
+        freetimes.push(getDoctimeslots(catobj,new myDate(currentday.toArray()[2],currentday.toArray()[1],currentday.toArray()[0]),1));
         for(let i=0;i<14;i++){
           currentday=currentday.add("d",1);
           days.push(currentday);
-          freetimes.push(getDoctimeslots(catobj,new myDate(currentday.toArray()[2],currentday.toArray()[1],currentday.toArray()[0])));
+          freetimes.push(getDoctimeslots(catobj,new myDate(currentday.toArray()[2],currentday.toArray()[1],currentday.toArray()[0]),0));
         }
         res.json({days:createDayboxobj(days),freetimes:freetimes});
         res.end();
@@ -703,11 +703,11 @@ router.get("/api/getTimeSlots",function(req,res){
       }
       currentday=new persianDate();
       days.push(currentday);
-      freetimes.push(getDoctimeslots(result,new myDate(currentday.toArray()[2],currentday.toArray()[1],currentday.toArray()[0])));
+      freetimes.push(getDoctimeslots(result,new myDate(currentday.toArray()[2],currentday.toArray()[1],currentday.toArray()[0]),1));
       for(let i=0;i<14;i++){
         currentday=currentday.add("d",1);
         days.push(currentday);
-        freetimes.push(getDoctimeslots(result,new myDate(currentday.toArray()[2],currentday.toArray()[1],currentday.toArray()[0])));
+        freetimes.push(getDoctimeslots(result,new myDate(currentday.toArray()[2],currentday.toArray()[1],currentday.toArray()[0]),0));
       }
       res.json({days:createDayboxobj(days),freetimes:freetimes});
       db.close();
@@ -1741,7 +1741,7 @@ function createinterval(start,end){
 }
 
 
-function getDoctimeslots(doctor,date){
+function getDoctimeslots(doctor,date,flag){
   duration=doctor.visitduration;
   unavb=doctor.unavailabletimes;
   dayofweek=new persianDate([date.year,date.month,date.day]).format('dddd');
@@ -1749,14 +1749,24 @@ function getDoctimeslots(doctor,date){
   timeslots=[];
   now=new persianDate().toArray();
   nowinmin=now[3]*60+now[4];
-  while(mintime+duration<=1440){
-    if(mintime+duration>nowinmin){
-      interval=createinterval(mintime,mintime+duration);
-      mintime+=duration;
-      timeslots.push(interval);
+  if(flag==1){
+    while(mintime+duration<=1440){
+      if(mintime+duration>nowinmin){
+        interval=createinterval(mintime,mintime+duration);
+        mintime+=duration;
+        timeslots.push(interval);
+      }
+      else{
+        mintime+=duration;
+      }
     }
-    else{
-      mintime+=duration;
+    
+  }
+  else{
+    while(mintime+duration<=1440){
+        interval=createinterval(mintime,mintime+duration);
+        mintime+=duration;
+        timeslots.push(interval);
     }
   }
   
@@ -2120,6 +2130,95 @@ router.get("/HCpanel/reserves/:resid",function(req,res){
   }
 })
 
+router.get("/HCpanel/removevisittimes",function(req,res){
+
+  if(req.cookies.HCtoken==undefined){
+    res.redirect('/noaccess');
+  }
+  else{
+    MongoClient.connect(dburl,function(err,db){
+      var dbo=db.db("mydb");
+      dbo.collection('HealthCenters').findOne({token:req.cookies.HCtoken},function(err,result){
+        if(result==null){
+          db.close();
+          res.redirect('noaccess');
+        }
+        else{
+          //-------
+          
+          //----------
+          if(result.systype=="A"){
+            res.render('HCPanel/reserveable/removevisittimes-typeA.ejs',{categories:result.categories});
+          }
+          else{
+            var days=[];
+            var freetimes=[];
+            currentday=new persianDate();
+            days.push(currentday);
+            freetimes.push(getDoctimeslots(result,new myDate(currentday.toArray()[2],currentday.toArray()[1],currentday.toArray()[0]),1));
+            for(let i=0;i<14;i++){
+              currentday=currentday.add("d",1);
+              days.push(currentday);
+              freetimes.push(getDoctimeslots(result,new myDate(currentday.toArray()[2],currentday.toArray()[1],currentday.toArray()[0]),0));
+            }
+            res.render('HCPanel/reserveable/removevisittimes-typeB.ejs',{days:createDayboxobj(days),freetimes:freetimes});
+          }
+          db.close();
+          res.end();
+        }
+      })
+    })
+  }
+})
+
+router.post("/HCpanel/removevisittimes/step2",function(req,res){
+  if(req.cookies.HCtoken==undefined){
+    res.redirect('/noaccess');
+  }
+  else{
+    MongoClient.connect(dburl,function(err,db){
+      var dbo=db.db("mydb");
+      dbo.collection('HealthCenters').findOne({token:req.cookies.HCtoken},function(err,result){
+        if(result==null){
+          db.close();
+          res.redirect('noaccess');
+        }
+        else{
+          if(result.systype=="A"){
+            var catobj=null;
+            result.categories.forEach(function(doc){
+              if(doc.name==req.body.category){
+                catobj=doc;
+              }
+            })
+            if(catobj==null){
+              res.redirect("/noaccess");
+            }
+            else{
+              var days=[];
+              var freetimes=[];
+              currentday=new persianDate();
+              days.push(currentday);
+              freetimes.push(getDoctimeslots(catobj,new myDate(currentday.toArray()[2],currentday.toArray()[1],currentday.toArray()[0]),1));
+              for(let i=0;i<14;i++){
+                currentday=currentday.add("d",1);
+                days.push(currentday);
+                freetimes.push(getDoctimeslots(catobj,new myDate(currentday.toArray()[2],currentday.toArray()[1],currentday.toArray()[0]),0));
+              }
+              res.render('HCPanel/reserveable/removevisittimes-typeA-2.ejs',{days:createDayboxobj(days),freetimes:freetimes,category:req.body.category});
+            }
+          }
+          else{
+            res.redirect("/noaccess")
+          }
+          db.close();
+          res.end();
+        }
+      })
+    })
+  }
+})
+
 
 router.get("/HCpanel/visittimes",function(req,res){
   if(req.cookies.HCtoken==undefined){
@@ -2311,11 +2410,11 @@ router.get("/doctorpanel/removevisittimes",function(req,res){
           var freetimes=[];
           currentday=new persianDate();
           days.push(currentday);
-          freetimes.push(getDoctimeslots(result,new myDate(currentday.toArray()[2],currentday.toArray()[1],currentday.toArray()[0])));
+          freetimes.push(getDoctimeslots(result,new myDate(currentday.toArray()[2],currentday.toArray()[1],currentday.toArray()[0]),1));
           for(let i=0;i<14;i++){
             currentday=currentday.add("d",1);
             days.push(currentday);
-            freetimes.push(getDoctimeslots(result,new myDate(currentday.toArray()[2],currentday.toArray()[1],currentday.toArray()[0])));
+            freetimes.push(getDoctimeslots(result,new myDate(currentday.toArray()[2],currentday.toArray()[1],currentday.toArray()[0]),0));
           }
           res.render("DoctorPanel/removevisittimes.ejs",{doctor:result,days:createDayboxobj(days),freetimes:freetimes});
           db.close();
@@ -2902,12 +3001,13 @@ router.get("/resetunavb",function(req,res){
   else{
     MongoClient.connect(dburl,function(err,db){
       var dbo=db.db("mydb");
-      dbo.collection('Doctors').findOne({token:req.cookies.doctortoken},function(err,result){
+      dbo.collection('Doctors').findOne({token:req.cookies.doctortoken},async function(err,result){
         if(result==null){
           db.close();
           res.redirect('noaccess');
         }
         else{
+          result.reservations=await dbo.collection("Reservations").find({doctor:result._id}).toArray();
           newunavb=[]
           result.reservations.forEach(function(doc){
             newunavb.push(doc.time);
@@ -2916,6 +3016,72 @@ router.get("/resetunavb",function(req,res){
             db.close();
             res.redirect("/doctorpanel/removevisittimes");
           })
+        }
+      })
+    })
+  }
+})
+
+router.get("/resetunavbHC",function(req,res){
+  var query=url.parse(req.url,true).query;
+  if(req.cookies.HCtoken==undefined){
+    res.redirect("/noaccess")
+  }
+  else{
+    MongoClient.connect(dburl,function(err,db){
+      var dbo=db.db("mydb");
+      dbo.collection("HealthCenters").findOne({token:req.cookies.HCtoken},async function(err,HC){
+        if(HC==null){
+          res.redirect("/noaccess");
+          db.close();
+        }
+        else{
+          if(HC.systype=="B"){
+            //=============
+            HC.reservations=await dbo.collection("Reservations").find({HC:HC._id}).toArray();
+            newunavb=[]
+            HC.reservations.forEach(function(doc){
+              newunavb.push(doc.time);
+            })
+            dbo.collection("HealthCenters").updateOne({token:req.cookies.HCtoken},{$set:{unavailabletimes:newunavb}},function(err,asf){
+              db.close();
+              res.redirect("/HCpanel/removevisittimes");
+            })
+            //=============
+          }
+          else if(HC.systype=="A"){
+            var catobj=null;
+            HC.categories.forEach(function(doc){
+              if(doc.name==query.category){
+                catobj=doc;
+              }
+            })
+            if(catobj==null){
+              res.redirect("/noaccess");
+            }
+            else{
+              //============
+              myreservations=await dbo.collection("Reservations").find({HC:HC._id,catname:catobj.name}).toArray();
+              newunavb=[]
+              myreservations.forEach(function(doc){
+                newunavb.push(doc.time);
+              })
+              HC.categories.forEach(function(doc){
+                if(doc.name==query.category){
+                  doc.unavailabletimes=newunavb;
+                }
+              })
+              dbo.collection("HealthCenters").updateOne({token:req.cookies.HCtoken},{$set:{categories:HC.categories}},function(err,asf){
+                db.close();
+                res.redirect("/HCpanel/removevisittimes");
+              })
+              //=============
+            }
+          }
+          else{
+            res.redirect("/noaccess");
+            db.close();
+          }
         }
       })
     })
@@ -4438,11 +4604,11 @@ router.get("/reservation/:type/:HCname/:category",function(req,res){
     else{
       currentday=new persianDate();
       days.push(currentday);
-      freetimes.push(getDoctimeslots(catobj,new myDate(currentday.toArray()[2],currentday.toArray()[1],currentday.toArray()[0])));
+      freetimes.push(getDoctimeslots(catobj,new myDate(currentday.toArray()[2],currentday.toArray()[1],currentday.toArray()[0]),1));
       for(let i=0;i<14;i++){
         currentday=currentday.add("d",1);
         days.push(currentday);
-        freetimes.push(getDoctimeslots(catobj,new myDate(currentday.toArray()[2],currentday.toArray()[1],currentday.toArray()[0])));
+        freetimes.push(getDoctimeslots(catobj,new myDate(currentday.toArray()[2],currentday.toArray()[1],currentday.toArray()[0]),0));
       }
       res.render("reservehc.ejs",{HC:result,cat:catobj,days:createDayboxobj(days),freetimes:freetimes});
       res.end();
@@ -4466,11 +4632,11 @@ router.get("/reservation/:type/:HCname",function(req,res){
     else{
       currentday=new persianDate();
       days.push(currentday);
-      freetimes.push(getDoctimeslots(HC,new myDate(currentday.toArray()[2],currentday.toArray()[1],currentday.toArray()[0])));
+      freetimes.push(getDoctimeslots(HC,new myDate(currentday.toArray()[2],currentday.toArray()[1],currentday.toArray()[0]),1));
       for(let i=0;i<14;i++){
         currentday=currentday.add("d",1);
         days.push(currentday);
-        freetimes.push(getDoctimeslots(HC,new myDate(currentday.toArray()[2],currentday.toArray()[1],currentday.toArray()[0])));
+        freetimes.push(getDoctimeslots(HC,new myDate(currentday.toArray()[2],currentday.toArray()[1],currentday.toArray()[0]),0));
       }
       res.render("reservehc.ejs",{HC:HC,cat:HC,days:createDayboxobj(days),freetimes:freetimes});
       res.end();
@@ -5030,11 +5196,11 @@ router.get("/reserve/:Doctor",function(req,res){
       else{
       currentday=new persianDate();
       days.push(currentday);
-      freetimes.push(getDoctimeslots(result,new myDate(currentday.toArray()[2],currentday.toArray()[1],currentday.toArray()[0])));
+      freetimes.push(getDoctimeslots(result,new myDate(currentday.toArray()[2],currentday.toArray()[1],currentday.toArray()[0]),1));
       for(let i=0;i<14;i++){
         currentday=currentday.add("d",1);
         days.push(currentday);
-        freetimes.push(getDoctimeslots(result,new myDate(currentday.toArray()[2],currentday.toArray()[1],currentday.toArray()[0])));
+        freetimes.push(getDoctimeslots(result,new myDate(currentday.toArray()[2],currentday.toArray()[1],currentday.toArray()[0]),0));
       }
       categories().then(basiccategories=>{
         res.render("reserve.ejs",{doctor:result,days:createDayboxobj(days),freetimes:freetimes,categories:basiccategories});
