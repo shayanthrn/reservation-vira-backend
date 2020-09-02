@@ -5012,7 +5012,7 @@ router.get("/ticketpaymenthandler",function(req,res){
               }
               doctor.visitcost=doctor.chatcost;
               changestatustransaction(query.Authority,"ناموفق");
-              res.render("paymentfail.ejs",{doctor:doctor,time:"-",href:0});
+              res.render("paymentfail.ejs",{doctor:doctor,time:"-",resid:0});
               db.close();
               res.end();
             })
@@ -5058,7 +5058,7 @@ router.get("/ticketpaymenthandler",function(req,res){
                   }
                   doctor.visitcost=doctor.chatcost;
                   changestatustransaction(query.Authority,"ناموفق");
-                  res.render("paymentfail.ejs",{doctor:doctor,time:"-",href:0});
+                  res.render("paymentfail.ejs",{doctor:doctor,time:"-",resid:0});
                   db.close();
                   res.end();
                 })
@@ -5144,7 +5144,7 @@ router.get("/telepaymenthandler",function(req,res){
           dbo.collection("Doctors").findOne({_id:reserve.doctor},function(err,doctor){
             dbo.collection("TempteleReserves").deleteOne({authority:query.Authority},function(err,result){
               changestatustransaction(query.Authority,"ناموفق");
-              res.render("paymentfail.ejs",{doctor:doctor,time:strtime,href:0});
+              res.render("paymentfail.ejs",{doctor:doctor,time:strtime,resid:0});
               db.close();
               res.end();
             })
@@ -5179,7 +5179,7 @@ router.get("/telepaymenthandler",function(req,res){
               dbo.collection("Doctors").findOne({_id:reserve.doctor},function(err,doctor){
               dbo.collection("TempteleReserves").deleteOne({authority:query.Authority},function(err,result){
               changestatustransaction(query.Authority,"ناموفق");
-              res.render("paymentfail.ejs",{doctor:doctor,time:strtime,href:0});
+              res.render("paymentfail.ejs",{doctor:doctor,time:strtime,resid:0});
               res.end();
             })
           })
@@ -5293,7 +5293,7 @@ router.get("/paymenthandlerHC",function(req,res){
           dbo.collection("HealthCenters").findOne({_id:reserve.HC},function(err,HC){
             dbo.collection("TempReservesHC").deleteOne({authority:query.Authority},function(err,result){
               changestatustransaction(query.Authority,"ناموفق");
-              res.render("paymentfail.ejs",{doctor:HC,time:strtime,href:0});
+              res.render("paymentfail.ejs",{doctor:HC,time:strtime,resid:0});
               db.close();
               res.end();
             })
@@ -5345,7 +5345,7 @@ router.get("/paymenthandlerHC",function(req,res){
               dbo.collection("HealthCenters").findOne({_id:reserve.HC},function(err,HC){
               dbo.collection("TempReservesHC").deleteOne({authority:query.Authority},function(err,result){
                 changestatustransaction(query.Authority,"ناموفق");
-              res.render("paymentfail.ejs",{doctor:HC,time:strtime,href:0});
+              res.render("paymentfail.ejs",{doctor:HC,time:strtime,resid:0});
               res.end();
             })
           })
@@ -5617,7 +5617,7 @@ router.get("/paymenthandler",function(req,res){
           dbo.collection("Doctors").findOne({_id:reserve.doctor},function(err,doctor){
             dbo.collection("TempReserves").deleteOne({authority:query.Authority},function(err,result){
               changestatustransaction(query.Authority,"ناموفق");
-              res.render("paymentfail.ejs",{doctor:doctor,time:strtime,href:0});
+              res.render("paymentfail.ejs",{doctor:doctor,time:strtime,resid:0});
               db.close();
               res.end();
             })
@@ -5651,7 +5651,7 @@ router.get("/paymenthandler",function(req,res){
               dbo.collection("Doctors").findOne({_id:reserve.doctor},function(err,doctor){
               dbo.collection("TempReserves").deleteOne({authority:query.Authority},function(err,result){
                 changestatustransaction(query.Authority,"ناموفق");
-              res.render("paymentfail.ejs",{doctor:doctor,time:strtime,href:0});
+              res.render("paymentfail.ejs",{doctor:doctor,time:strtime,resid:0});
               res.end();
             })
           })
