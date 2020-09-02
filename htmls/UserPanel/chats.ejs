@@ -80,6 +80,7 @@
             <h1 class="h2">گفتگو ها</h1>
           </div>
           <div class='row'>
+            <% if(chats.length!=0) { %>
             <% for(let i = 0; i<chats.length;i++) { %>
             <div class="col-sm-12 col-md-6 col-lg-4 mb-3" >
               <div class="card shadow">
@@ -99,7 +100,10 @@
               <a href="<%= "/UserPanel/chats/" + chats[i]._id %>" class="btn btn-info">ورود</a>
               </div>
             </div> 
-            <% } %>  
+            <% } %>
+            <% } else { %>
+              موردی جهت نمایش وجود ندارد
+            <% } %> 
           </div>
         </div>
       </main>

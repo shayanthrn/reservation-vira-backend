@@ -463,6 +463,7 @@ router.post("/api/downloadfile",function(req,res){
     res.end();
   }
   else{
+    console.log(req.body)
     res.download(req.body.path);
     res.end();
   }
@@ -3570,11 +3571,27 @@ router.post("/AdminPanel/dashboard",function(req,res){
 })
 
 router.get("/adminpanel/transactions",function(req,res){
-  MongoClient.connect(dburl,async function(err,db){
-    var dbo=db.db("mydb");
-    var transactions=await dbo.collection("Transactions").find({}).toArray();
-    res.render("AdminPanel/transactions.ejs",{transactions:transactions})
-  })
+  if(req.cookies.admintoken==undefined){
+    res.redirect('/noaccess');
+  }
+  else{
+    MongoClient.connect(dburl,async function(err,db){
+      var dbo=db.db("mydb");
+      dbo.collection("Admins").findOne({token:req.cookies.admintoken},async function(err,result){
+        if(result==null){
+          db.close();
+          res.redirect('/noaccess');
+        }
+        else{
+          var transactions=await dbo.collection("Transactions").find({}).toArray();
+          transactions=transactions.reverse();
+          res.render("AdminPanel/transactions.ejs",{transactions:transactions})
+          db.close();
+          res.end();
+        }
+      })
+    })
+  }
 })
 
 router.get("/AdminPanel/doctors",function(req,res){
@@ -4340,12 +4357,13 @@ router.get("/UserPanel/chats",function(req,res){   //buggggggg
   else{
     MongoClient.connect(dburl,function(err,db){
       var dbo=db.db("mydb");
-      dbo.collection("Users").findOne({token:req.cookies.usertoken},function(err,user){
+      dbo.collection("Users").findOne({token:req.cookies.usertoken},async function(err,user){
         if(user==null){
           res.redirect("noaccess");
           db.close();
         }
         else{
+          user.chats= await dbo.collection("Chats").find({userphone:user.phonenumber}).toArray();
           user.chats.forEach(function(doc){
             doc.datecreated=new persianDate(doc.tickets[doc.tickets.length-1].datecreated).format("L")
           })
@@ -5019,7 +5037,6 @@ router.get("/ticketpaymenthandler",function(req,res){
           })
         }
         else{
-          console.log("injayim?:|")
           zarinpal.PaymentVerification({
           Amount: chat.cost, // In Tomans
           Authority: chat.authority,

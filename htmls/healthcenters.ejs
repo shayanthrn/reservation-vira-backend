@@ -52,6 +52,7 @@
                                 <div class="tab-pane active" id="related" role="tabpanel" aria-expanded="true">
                                     <div class="container no-padding-right">
                                         <ul class="row listing-items">
+                                            <% if(Objects.length!=0) { %>
                                             <% for(let i =0 ;i < Objects.length ; i++) { %>
                                             <li>
                                                 <a
@@ -85,6 +86,14 @@
                                                     </div>
                                                 </a>
                                             </li>
+                                            <% } %>
+                                            <% } else { %>
+                                                <div class="c-message-light c-message-light--info c-listing-not-found__message">
+                                                    <div class="c-message-light__justify">
+                                                        <p>
+                                                            موردی جهت نمایش وجود ندارد.</p>
+                                                    </div>
+                                                </div>
                                             <% } %>
                                         </ul>
                                     </div>
