@@ -5637,7 +5637,7 @@ router.get("/paymenthandler",function(req,res){
                   dbo.collection("Users").updateOne({_id:reservation.user},{$addToSet:{reserves:reservation}},function(err,ad){
                     strtime=reservation.time.start.hour+":"+reservation.time.start.min;
                     dbo.collection("Doctors").findOne({_id:reservation.doctor},function(err,doctor){
-                      changestatustransaction(query.Authority,"ناموفق");
+                      changestatustransaction(query.Authority,"موفق");
                       res.render("paymentaccept.ejs",{doctor:doctor,time:strtime,resid:reservation.refid});
                       sendSMS("reserveACK",reservation.user.toString(),"Users",reservation.refid,doctor.name,new persianDate([reservation.time.date.year,reservation.time.date.month,reservation.time.date.day]).format("L"))
                       res.end();
