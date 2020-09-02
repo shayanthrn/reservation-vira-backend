@@ -465,7 +465,6 @@ router.get("/api/downloadfile",function(req,res){
   else{
     console.log(query)
     res.download(query.path);
-    res.end();
   }
 })
 
