@@ -76,7 +76,11 @@
                                                         </div>
                                                         <p class="card-text text-slate font-weight-bold text-14 mt-4"
                                                             style="color: #1e3e72;">
+                                                            <% if(Objects[i].name=="آزمایشگاه") { %>
+                                                                آزمایشگاه و سونوگرافی
+                                                            <% } else { %>
                                                             <%= Objects[i].name %>
+                                                            <% } %>
                                                         </p>
                                                     </div>
                                                 </a>

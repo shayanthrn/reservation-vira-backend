@@ -51,12 +51,17 @@
                                 <div class="icon-success">
                                     <i class="fa fa-check"></i>
                                 </div>
-                                <h1>قرار ملاقات شما با شماره <a><%= resid %></a>با موفقیت در سیستم ثبت شد.</h1>
+                                <h1> پرداخت شما با شماره <a><%= resid %></a>با موفقیت در سیستم ثبت شد.</h1>
                             </div>
                             <div class="order-info default">
                                 <a href="/" class="btn-primary">
                                     بازگشت به خانه
                                 </a>
+                                <% if(chat==1) { %>
+                                <a href="/UserPanel/chats" class="btn-primary">
+                                    ادامه گفتگو 
+                                </a>
+                                <% } %>
                                 <a href="mychat://CompleteReserve/<%= resid %>" class="btn-primary backtoapp">
                                     بازگشت به اپلیکشین
                                 </a>
@@ -66,13 +71,24 @@
                                     <table class="table">
                                         <thead>
                                             <tr>
+                                                <% if(doc==1) {  %>
                                                 <th scope="col">نام دکتر : <%= doctor.name %> </th>
+                                                <th scope="col">شماره تماس : <%= doctor.workphone %></th>
+                                                <% } else { %>
+                                                <th scope="col">نام مرکز : <%= doctor.name %> </th>
                                                 <th scope="col">شماره تماس : <%= doctor.phonenumber %></th>
+                                                <% } %>
                                             </tr>
                                         </thead>
                                         <tbody>
                                             <tr>
+                                                <% if(chat==1){ %>
+                                                <td>مبلغ کل : <%= doctor.chatcost %> </td>
+                                                <% } else if(chat==2) { %>
+                                                <td>مبلغ کل : <%= doctor.televisitcost %> </td>
+                                                <% } else {  %>
                                                 <td>مبلغ کل : <%= doctor.visitcost %> </td>
+                                                <% } %>
                                                 <td>وضعیت پرداخت: موفق</td>
                                             </tr>
                                             <tr>

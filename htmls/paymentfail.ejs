@@ -65,13 +65,24 @@
                                     <table class="table">
                                         <thead>
                                             <tr>
-                                                <th scope="col">نام دکتر : <%= doctor.name %> </th>
-                                                <th scope="col">شماره تماس : <%= doctor.phonenumber %></th>
+                                                <% if(doc==1) {  %>
+                                                    <th scope="col">نام دکتر : <%= doctor.name %> </th>
+                                                    <th scope="col">شماره تماس : <%= doctor.workphone %></th>
+                                                    <% } else { %>
+                                                    <th scope="col">نام مرکز : <%= doctor.name %> </th>
+                                                    <th scope="col">شماره تماس : <%= doctor.phonenumber %></th>
+                                                <% } %>
                                             </tr>
                                         </thead>
                                         <tbody>
                                             <tr>
-                                                <td>مبلغ کل : <%= doctor.visitcost %> </td>
+                                                <% if(chat==1){ %>
+                                                    <td>مبلغ کل : <%= doctor.chatcost %> </td>
+                                                    <% } else if(chat==2) { %>
+                                                    <td>مبلغ کل : <%= doctor.televisitcost %> </td>
+                                                    <% } else {  %>
+                                                    <td>مبلغ کل : <%= doctor.visitcost %> </td>
+                                                <% } %>
                                                 <td>وضعیت پرداخت: ناموفق</td>
                                             </tr>
                                             <tr>

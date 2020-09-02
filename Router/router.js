@@ -5012,7 +5012,7 @@ router.get("/ticketpaymenthandler",function(req,res){
               }
               doctor.visitcost=doctor.chatcost;
               changestatustransaction(query.Authority,"ناموفق");
-              res.render("paymentfail.ejs",{doctor:doctor,time:"-",resid:0});
+              res.render("paymentfail.ejs",{doctor:doctor,time:"-",resid:0,chat:1,doc:1});
               db.close();
               res.end();
             })
@@ -5033,7 +5033,7 @@ router.get("/ticketpaymenthandler",function(req,res){
                     dbo.collection("Doctors").findOne({name:mychat.doctor},function(err,doctor){
                         dbo.collection("Doctors").updateOne({name:mychat.doctor},{$addToSet:{chats:mychat}},function(err,sas){
                           changestatustransaction(query.Authority,"موفق");
-                          res.render("paymentaccept.ejs",{doctor:doctor,time:"-",resid:mychat.refid});
+                          res.render("paymentaccept.ejs",{doctor:doctor,time:"-",resid:mychat.refid,chat:1,doc:1});
                           //sendSMSforres(reservation);
                           res.end();
                         })
@@ -5058,7 +5058,7 @@ router.get("/ticketpaymenthandler",function(req,res){
                   }
                   doctor.visitcost=doctor.chatcost;
                   changestatustransaction(query.Authority,"ناموفق");
-                  res.render("paymentfail.ejs",{doctor:doctor,time:"-",resid:0});
+                  res.render("paymentfail.ejs",{doctor:doctor,time:"-",resid:0,chat:1,doc:1});
                   db.close();
                   res.end();
                 })
@@ -5144,7 +5144,7 @@ router.get("/telepaymenthandler",function(req,res){
           dbo.collection("Doctors").findOne({_id:reserve.doctor},function(err,doctor){
             dbo.collection("TempteleReserves").deleteOne({authority:query.Authority},function(err,result){
               changestatustransaction(query.Authority,"ناموفق");
-              res.render("paymentfail.ejs",{doctor:doctor,time:strtime,resid:0});
+              res.render("paymentfail.ejs",{doctor:doctor,time:strtime,resid:0,chat:2,doc:1});
               db.close();
               res.end();
             })
@@ -5165,7 +5165,7 @@ router.get("/telepaymenthandler",function(req,res){
                         dbo.collection("Doctors").updateOne({_id:reservation.doctor},{$addToSet:{telereservations:reservation}},function(err,sas){
                           strtime=reserve.timeinfo.time.start+"-"+reserve.timeinfo.time.end;
                           changestatustransaction(query.Authority,"موفق");
-                          res.render("paymentaccept.ejs",{doctor:doctor,time:strtime,resid:reservation.refid});
+                          res.render("paymentaccept.ejs",{doctor:doctor,time:strtime,resid:reservation.refid,chat:2,doc:1});
                           //sendSMSforres(reservation);
                           res.end();
                         })
@@ -5179,7 +5179,7 @@ router.get("/telepaymenthandler",function(req,res){
               dbo.collection("Doctors").findOne({_id:reserve.doctor},function(err,doctor){
               dbo.collection("TempteleReserves").deleteOne({authority:query.Authority},function(err,result){
               changestatustransaction(query.Authority,"ناموفق");
-              res.render("paymentfail.ejs",{doctor:doctor,time:strtime,resid:0});
+              res.render("paymentfail.ejs",{doctor:doctor,time:strtime,resid:0,chat:2,doc:1});
               res.end();
             })
           })
@@ -5293,7 +5293,7 @@ router.get("/paymenthandlerHC",function(req,res){
           dbo.collection("HealthCenters").findOne({_id:reserve.HC},function(err,HC){
             dbo.collection("TempReservesHC").deleteOne({authority:query.Authority},function(err,result){
               changestatustransaction(query.Authority,"ناموفق");
-              res.render("paymentfail.ejs",{doctor:HC,time:strtime,resid:0});
+              res.render("paymentfail.ejs",{doctor:HC,time:strtime,resid:0,chat:0,doc:0});
               db.close();
               res.end();
             })
@@ -5315,7 +5315,7 @@ router.get("/paymenthandlerHC",function(req,res){
                         dbo.collection("HealthCenters").updateOne({_id:reservation.HC},{$addToSet:{reservations:reservation,unavailabletimes:reservation.time}},function(err,sas){
                           strtime=reservation.time.start.hour+":"+reservation.time.start.min;
                           changestatustransaction(query.Authority,"موفق");
-                          res.render("paymentaccept.ejs",{doctor:HC,time:strtime,resid:reservation.refid});
+                          res.render("paymentaccept.ejs",{doctor:HC,time:strtime,resid:reservation.refid,chat:0,doc:0});
                           //sendSMSforres(reservation);
                           res.end();
                         })
@@ -5331,7 +5331,7 @@ router.get("/paymenthandlerHC",function(req,res){
                         dbo.collection("HealthCenters").updateOne({_id:reservation.HC},{$set:{categories:HC.categories}},function(err,sdf){
                           strtime=reservation.time.start.hour+":"+reservation.time.start.min;
                           changestatustransaction(query.Authority,"موفق");
-                          res.render("paymentaccept.ejs",{doctor:HC,time:strtime,resid:reservation.refid});
+                          res.render("paymentaccept.ejs",{doctor:HC,time:strtime,resid:reservation.refid,chat:0,doc:0});
                           //sendSMSforres(reservation);
                           res.end();
                         })
@@ -5345,7 +5345,7 @@ router.get("/paymenthandlerHC",function(req,res){
               dbo.collection("HealthCenters").findOne({_id:reserve.HC},function(err,HC){
               dbo.collection("TempReservesHC").deleteOne({authority:query.Authority},function(err,result){
                 changestatustransaction(query.Authority,"ناموفق");
-              res.render("paymentfail.ejs",{doctor:HC,time:strtime,resid:0});
+              res.render("paymentfail.ejs",{doctor:HC,time:strtime,resid:0,chat:0,doc:0});
               res.end();
             })
           })
@@ -5617,7 +5617,7 @@ router.get("/paymenthandler",function(req,res){
           dbo.collection("Doctors").findOne({_id:reserve.doctor},function(err,doctor){
             dbo.collection("TempReserves").deleteOne({authority:query.Authority},function(err,result){
               changestatustransaction(query.Authority,"ناموفق");
-              res.render("paymentfail.ejs",{doctor:doctor,time:strtime,resid:0});
+              res.render("paymentfail.ejs",{doctor:doctor,time:strtime,resid:0,chat:0,doc:1});
               db.close();
               res.end();
             })
@@ -5638,7 +5638,7 @@ router.get("/paymenthandler",function(req,res){
                     strtime=reservation.time.start.hour+":"+reservation.time.start.min;
                     dbo.collection("Doctors").findOne({_id:reservation.doctor},function(err,doctor){
                       changestatustransaction(query.Authority,"موفق");
-                      res.render("paymentaccept.ejs",{doctor:doctor,time:strtime,resid:reservation.refid});
+                      res.render("paymentaccept.ejs",{doctor:doctor,time:strtime,resid:reservation.refid,chat:0,doc:1});
                       sendSMS("reserveACK",reservation.user.toString(),"Users",reservation.refid,doctor.name,new persianDate([reservation.time.date.year,reservation.time.date.month,reservation.time.date.day]).format("L"))
                       res.end();
                     })  
@@ -5651,7 +5651,7 @@ router.get("/paymenthandler",function(req,res){
               dbo.collection("Doctors").findOne({_id:reserve.doctor},function(err,doctor){
               dbo.collection("TempReserves").deleteOne({authority:query.Authority},function(err,result){
                 changestatustransaction(query.Authority,"ناموفق");
-              res.render("paymentfail.ejs",{doctor:doctor,time:strtime,resid:0});
+              res.render("paymentfail.ejs",{doctor:doctor,time:strtime,resid:0,chat:0,doc:1});
               res.end();
             })
           })
