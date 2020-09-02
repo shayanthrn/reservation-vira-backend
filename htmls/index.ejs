@@ -87,10 +87,12 @@
                         <p id="select-category">لطفا دکتر خود را از لیست زیر انتخاب کنید</p>
                         <% } else{ %>
                         <p id="select-category">لطفا تخصص مورد نیاز خود را از لیست زیر انتخاب کنید</p>
+                        <input class="form-control" type="text" name="searchinput" id="searchinput" style="max-width: 30%;border-width: 2px;border-color: black;background-color: white;" placeholder="جتسجو سریع...">
                         <% } %>
                         <div class="listing default">
                             <div class="tab-content default text-center">
                                 <div class="tab-pane active" id="related" role="tabpanel" aria-expanded="true">
+                                    
                                     <div class="container">
                                         <ul class="row listing-items">
                                             <% if(Objects.length!=0) { %>
