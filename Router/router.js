@@ -456,7 +456,7 @@ router.get('/api/getAlltickets',function(req,res){
   }
 })
 
-router.post("/api/downloadfile",function(req,res){
+router.get("/api/downloadfile",function(req,res){
   var query=url.parse(req.url,true).query;
   if(query.key!="pouyarahmati"){
     res.json({data:"noaccess"});
