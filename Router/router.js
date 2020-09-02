@@ -463,8 +463,8 @@ router.post("/api/downloadfile",function(req,res){
     res.end();
   }
   else{
-    console.log(req.body)
-    res.download(req.body.path);
+    console.log(query)
+    res.download(query.path);
     res.end();
   }
 })
