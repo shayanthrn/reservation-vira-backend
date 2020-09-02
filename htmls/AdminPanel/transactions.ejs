@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html dir="rtl" class="fa-events-icons-ready" lang="en"><head>
+  <meta charset="utf-8">
+  <base id="base">
+  <script src="/assets/js/config.js"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="">
+  <meta name="author" content="">
+  <title>تعیین زمانبندی - دکتر تجویز</title>
+  <link rel="icon" href="favicon.ico">
+
+
+  <title></title>
+
+  <link rel="stylesheet" href="https://cdn.rtlcss.com/bootstrap/v4.1.3/css/bootstrap.min.css" integrity="sha384-Jt6Tol1A2P9JBesGeCxNrxkmRFSjWCBW1Af7CSQSKsfMVQCqnUVWhZzG0puJMCK6" crossorigin="anonymous">
+  <link href="assets/panelassests/dashboard.rtl.css" rel="stylesheet">
+  <script src="https://use.fontawesome.com/6d68f18b97.js"></script><link href="https://use.fontawesome.com/6d68f18b97.css" media="all" rel="stylesheet">
+
+  <link rel="stylesheet" href="https://unpkg.com/persian-datepicker@latest/dist/css/persian-datepicker.min.css">
+  <link href="assets/css/main.css" rel="stylesheet" />
+  
+</head>
+
+<body>
+
+  <nav class="navbar fixed-top navbar-expand-lg nav-dark">
+    <a class="navbar-brand mr-2" href="#">داشبورد برند</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarTogglerDemo" aria-controls="navbarTogglerDemo" aria-expanded="false" aria-label="Toggle navigation">
+      <i class="fa fa-bars menu-icon"></i>
+    </button>
+  </nav>
+
+
+  <div class="container-fluid">
+    <div class="row">
+      
+      <nav class="col-lg-3 col-xl-2 d-lg-block sidebar collapse" id="navbarTogglerDemo">
+        <div class="sidebar-sticky">
+          <ul class="nav flex-column">
+            
+            <li class="nav-item">
+              <a class="nav-link" href="/adminpanel/dashboard" >
+                <i class="fa fa-tachometer"></i>
+                داشبورد
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link " href="/adminpanel/chats" >
+                <i class="fa fa-commenting"></i>
+                گفتگو های متنی
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/AdminPanel/telereserves" >
+                <i class="fa fa-phone"></i>
+                رزرو های تلفنی
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/adminpanel/doctors" >
+                <i class="fa fa-user-md"></i>
+                دکتر ها
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/adminpanel/healthcenters" >
+                <i class="fa fa-heartbeat"></i>
+                مراکز درمانی
+              </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/adminpanel/visittimes">
+                  <i class="fa fa-calendar"></i>
+                  تعیین زمانبندی
+                </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link " href="/adminpanel/costmanage">
+                <i class="fa fa-calendar"></i>
+                تعیین هزینه ها
+              </a>
+          </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/adminpanel/categories" >
+                <i class="fa fa-book"></i>
+                تخصص ها
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/adminpanel/patients" >
+                <i class="fa fa-users"></i>
+                بیماران
+              </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link active" href="/adminpanel/transactions" >
+                  <i class="fa fa-money"></i>
+                  تراکنش های مالی
+                </a>
+              </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/exit" >
+                <i class="fa fa-sign-out"></i>
+                خروج
+              </a>
+            </li>
+          </ul>
+
+          </div>
+      </nav>
+
+
+      
+      <main role="main" class=" ml-sm-auto col-lg-9 col-xl-10 px-4" id="reserve-list">
+        <div class="container-fluid">
+          <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+            <h1 class="h2">تراکنش های مالی</h1>
+          </div>
+          <div class="row">
+            <div class="col">
+              <div class="table-responsive">
+                <table class="table table-bordered">
+                  <thead>
+                    <tr>
+                      <th scope="col">#</th>
+                      <th scope="col">کاربر</th>
+                      <th scope="col">مبلغ</th>
+                      <th scope="col">شناسه پرداخت</th>
+                      <th scope="col">وضعیت</th>
+                      <th scope="col">زمان</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <% for(let i = 0 ; i < transactions.length ; i++) { %>
+                    <tr>
+                      <th scope="row"><%= i+1 %></th>
+                      <td><%= transactions[i].username %></td>
+                      <td>
+                        <%= transactions[i].amount %>
+                      </td>
+                      <td>
+                        <%= transactions[i].authority %>
+                      </td>
+                      <td>
+                        <%= transactions[i].status %>
+                      </td>
+                      <td>
+                        <%= transactions[i].time %>
+                      </td>
+                    </tr>
+                    <% } %>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+      
+    </div>
+  </div>
+  
+
+
+  
+  <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+  <script>window.jQuery || document.write('<script src="assets/panelassests/jquery-slim.min.js"><\/script>')</script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+  <script src="https://cdn.rtlcss.com/bootstrap/v4.1.3/js/bootstrap.min.js" integrity="sha384-C/pvytx0t5v9BEbkMlBAGSPnI1TQU1IrTJ6DJbC8GBHqdMnChcb6U4xg4uRkIQCV" crossorigin="anonymous"></script>
+
+  <script src="https://unpkg.com/persian-date@latest/dist/persian-date.min.js"></script>
+  <script src="https://unpkg.com/persian-datepicker@latest/dist/js/persian-datepicker.min.js"></script>
+
+<script>
+
+  let datePickerOptions = {
+    autoClose: true,
+    initialValue: false,
+    format: 'dddd YYYY/MM/DD',
+    altField: "#datePickerTimeStamp"
+  }
+  function changetype(){
+    if(document.getElementById("type").value=="doctor"){
+      document.getElementById("type-list").innerHTML="";
+      let temp=document.getElementById("doclist").innerHTML;
+      document.getElementById("type-list").innerHTML=temp;
+    }
+    if(document.getElementById("type").value=="HC"){
+      document.getElementById("type-list").innerHTML="";
+      let temp=document.getElementById("hclist").innerHTML;
+      document.getElementById("type-list").innerHTML=temp;
+    }
+  }
+
+  $(document).ready(function() {
+    let datePicker = $("#datePicker").persianDatepicker(datePickerOptions)
+  })
+
+</script>
+
+</body>
+
+</html>

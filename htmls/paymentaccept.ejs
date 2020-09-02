@@ -19,6 +19,19 @@
     <link href="assets/css/plugins/owl.carousel.css" rel="stylesheet" />
     <link href="assets/css/plugins/owl.theme.default.min.css" rel="stylesheet" />
     <link href="assets/css/main.css" rel="stylesheet" />
+    <style>
+        @media screen and (max-width:1920px) {
+            .backtoapp {
+                visibility: hidden;
+            }
+        }
+
+        @media screen and (max-width : 800px) {
+            .backtoapp {
+                visibility: visible;
+            }
+        }
+    </style>
 </head>
 
 <body>
@@ -41,14 +54,14 @@
                                 <h1>قرار ملاقات شما با شماره <a><%= resid %></a>با موفقیت در سیستم ثبت شد.</h1>
                             </div>
                             <div class="order-info default">
-                                
                                 <a href="/" class="btn-primary">
                                     بازگشت به خانه
                                 </a>
-                                <a href="mychat://CompleteReserve/<%= href %>" class="btn-primary backtoapp">
+                                <a href="mychat://CompleteReserve/<%= resid %>" class="btn-primary backtoapp">
                                     بازگشت به اپلیکشین
                                 </a>
-                                <h3>کد رزرو: <span><%= resid %></span></h3>
+                                <h3 style="top: 20px;
+                                position: relative;">کد رزرو: <span><%= resid %></span></h3>
                                 <div class="table-responsive default mt-3 mb-3">
                                     <table class="table">
                                         <thead>

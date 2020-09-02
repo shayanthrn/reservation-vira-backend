@@ -16,6 +16,7 @@ var Reservation = require('../coreapp/Reservation.js');
 var ReservationHC = require('../coreapp/ReservationHC.js');
 var teleReservation = require('../coreapp/teleReservation.js');
 var Category = require('../coreapp/Category.js');
+var Transaction = require('../coreapp/Transaction.js');
 var dburl="mongodb://localhost:27017/";          //url of database            auth o doros kon 
 var lodash =require('lodash');
 var HealthCenter= require('../coreapp/HealthCenter.js');
@@ -239,6 +240,7 @@ router.post("/api/paymentHC",function(req,res){
               }).then(response => {
                 if (response.status === 100) {
                   reservation = new ReservationHC(user._id,HC._id,req.body.cat,unavb,response.authority,req.body.cost);
+                  addtransaction(user._id,req.body.cost,response.authority);
                   dbo.collection("TempReservesHC").insertOne(reservation,function(err,reserve){
                     res.json({data:response.url})
                   })
@@ -674,6 +676,8 @@ router.get("/api/getCurUser",function(req,res){
         }
         else{
           user.chats=await dbo.collection("Chats").find({userphone:user.phonenumber}).toArray()
+          user.reserves=await dbo.collection("Reservations").find({user:user._id}).toArray();
+          user.teleReservations=await dbo.collection("teleReservations").find({user:user._id}).toArray();
           res.json({user:user});
           db.close();
           res.end();
@@ -763,6 +767,7 @@ router.post("/api/payment",function(req,res){
               }).then(response => {
                 if (response.status === 100) {
                   reservation = new Reservation(user._id,doctor._id,unavb,response.authority,req.body.cost);
+                  addtransaction(user._id,req.body.cost,response.authority);
                   dbo.collection("TempReserves").insertOne(reservation,function(err,reserve){
                     res.json({url:response.url})
                   })
@@ -807,6 +812,7 @@ router.post("/api/ticketpayment",function(req,res){
               if (response.status === 100) {
                 var newchat = new Chat(req.body.doctor,user.phonenumber);
                 newchat.authority=response.authority;
+                addtransaction(user._id,req.body.cost,response.authority);
                 var now=new Date();
                 var newticket;
                 if(req.files==null){
@@ -882,6 +888,7 @@ router.post("/api/telepayment",function(req,res){
               }).then(response => {
                 if (response.status === 100) {
                   reservation = new teleReservation(user._id,doctor._id,timeinfo,response.authority,req.body.cost);
+                  addtransaction(user._id,req.body.cost,response.authority);
                   dbo.collection("TempteleReserves").insertOne(reservation,function(err,reserve){
                     res.json({url:response.url})
                   })
@@ -1767,6 +1774,27 @@ router.post("/test2",function(req,res){
 
 //-----------------------functions--------------------------//
 
+function addtransaction(userid,amount,authority){
+  MongoClient.connect(dburl,function(err,db){
+    var dbo=db.db("mydb");
+    dbo.collection("Users").findOne({_id:userid},function(err,user){
+      var transaction=new Transaction(authority,amount,"پاسخی از بانک دریافت نشده است.",user.firstname+" "+user.lastname);
+      dbo.collection("Transactions").insertOne(transaction,function(err,asd){
+        console.log("added");
+      })
+    })
+  })
+}
+
+function changestatustransaction(authority,status){
+  MongoClient.connect(dburl,function(err,db){
+    var dbo=db.db("mydb");
+    dbo.collection("Transactions").updateOne({authority:authority},{$set:{status:status}},function(err,asd){
+      console.log("changed");
+    })
+  })
+}
+
 
 function createinterval(start,end){
   st={hour:Math.floor(start/60),min:start%60};
@@ -1917,7 +1945,9 @@ router.get("/test",function(req,res){
     var dbo=db.db("mydb");
     dbo.collection("Reservations").findOne({refid:"345345"},async function(err,reservation){
       var doctor=await dbo.collection("Doctors").findOne({})
+      res.render("paymentaccept.ejs",{doctor:doctor,time:"123",resid:reservation.refid});
       sendSMS("reserveACK",reservation.user.toString(),"Users",reservation.refid,doctor.name,new persianDate([reservation.time.date.year,reservation.time.date.month,reservation.time.date.day]).format("L"))
+      
       res.end();
     })
   })
@@ -3539,7 +3569,13 @@ router.post("/AdminPanel/dashboard",function(req,res){
   }
 })
 
-
+router.get("/adminpanel/transactions",function(req,res){
+  MongoClient.connect(dburl,async function(err,db){
+    var dbo=db.db("mydb");
+    var transactions=await dbo.collection("Transactions").find({}).toArray();
+    res.render("AdminPanel/transactions.ejs",{transactions:transactions})
+  })
+})
 
 router.get("/AdminPanel/doctors",function(req,res){
   if(req.cookies.admintoken==undefined){
@@ -4890,11 +4926,13 @@ router.post("/ticketpayment",function(req,res){
             }).then(response => {
               if (response.status === 100) {
                 var newchat = new Chat(req.body.doctor,user.phonenumber,doctor.chatcost);
+                addtransaction(user._id,req.body.cost,response.authority);
                 newchat.authority=response.authority;
                 var now=new Date();
                 var newticket;
                 if(req.files==null){
                   newticket=new Ticket(req.body.subject,req.body.text,null,now,"patient");
+                  
                   newchat.tickets.push(newticket);
                   dbo.collection("TempChats").insertOne(newchat,function(err,as){
                     res.redirect(response.url);
@@ -4973,6 +5011,7 @@ router.get("/ticketpaymenthandler",function(req,res){
                 });
               }
               doctor.visitcost=doctor.chatcost;
+              changestatustransaction(query.Authority,"ناموفق");
               res.render("paymentfail.ejs",{doctor:doctor,time:"-",href:0});
               db.close();
               res.end();
@@ -4993,6 +5032,7 @@ router.get("/ticketpaymenthandler",function(req,res){
                   dbo.collection("Users").updateOne({phonenumber:mychat.userphone},{$addToSet:{chats:mychat}},function(err,ad){
                     dbo.collection("Doctors").findOne({name:mychat.doctor},function(err,doctor){
                         dbo.collection("Doctors").updateOne({name:mychat.doctor},{$addToSet:{chats:mychat}},function(err,sas){
+                          changestatustransaction(query.Authority,"موفق");
                           res.render("paymentaccept.ejs",{doctor:doctor,time:"-",resid:mychat.refid});
                           //sendSMSforres(reservation);
                           res.end();
@@ -5017,6 +5057,7 @@ router.get("/ticketpaymenthandler",function(req,res){
                     });
                   }
                   doctor.visitcost=doctor.chatcost;
+                  changestatustransaction(query.Authority,"ناموفق");
                   res.render("paymentfail.ejs",{doctor:doctor,time:"-",href:0});
                   db.close();
                   res.end();
@@ -5068,6 +5109,7 @@ router.post("/telepayment",function(req,res){
               }).then(response => {
                 if (response.status === 100) {
                   reservation = new teleReservation(user._id,doctor._id,timeinfo,response.authority,req.body.cost);
+                  addtransaction(user._id,req.body.cost,response.authority);
                   dbo.collection("TempteleReserves").insertOne(reservation,function(err,reserve){
                     res.redirect(response.url)
                   })
@@ -5101,6 +5143,7 @@ router.get("/telepaymenthandler",function(req,res){
           strtime=reserve.timeinfo.time.start+"-"+reserve.timeinfo.time.end;
           dbo.collection("Doctors").findOne({_id:reserve.doctor},function(err,doctor){
             dbo.collection("TempteleReserves").deleteOne({authority:query.Authority},function(err,result){
+              changestatustransaction(query.Authority,"ناموفق");
               res.render("paymentfail.ejs",{doctor:doctor,time:strtime,href:0});
               db.close();
               res.end();
@@ -5121,6 +5164,7 @@ router.get("/telepaymenthandler",function(req,res){
                     dbo.collection("Doctors").findOne({_id:reservation.doctor},function(err,doctor){
                         dbo.collection("Doctors").updateOne({_id:reservation.doctor},{$addToSet:{telereservations:reservation}},function(err,sas){
                           strtime=reserve.timeinfo.time.start+"-"+reserve.timeinfo.time.end;
+                          changestatustransaction(query.Authority,"موفق");
                           res.render("paymentaccept.ejs",{doctor:doctor,time:strtime,resid:reservation.refid});
                           //sendSMSforres(reservation);
                           res.end();
@@ -5134,6 +5178,7 @@ router.get("/telepaymenthandler",function(req,res){
             strtime=reserve.timeinfo.time.start+"-"+reserve.timeinfo.time.end;
               dbo.collection("Doctors").findOne({_id:reserve.doctor},function(err,doctor){
               dbo.collection("TempteleReserves").deleteOne({authority:query.Authority},function(err,result){
+              changestatustransaction(query.Authority,"ناموفق");
               res.render("paymentfail.ejs",{doctor:doctor,time:strtime,href:0});
               res.end();
             })
@@ -5210,6 +5255,7 @@ router.post("/paymentHC",function(req,res){
                 }).then(response => {
                   if (response.status === 100) {
                     reservation = new ReservationHC(user._id,HC._id,req.body.cat,unavb,response.authority,req.body.cost);
+                    addtransaction(user._id,req.body.cost,response.authority);
                     dbo.collection("TempReservesHC").insertOne(reservation,function(err,reserve){
                       res.redirect(response.url)
                     })
@@ -5246,6 +5292,7 @@ router.get("/paymenthandlerHC",function(req,res){
           strtime=reserve.time.start.hour+":"+reserve.time.start.min;
           dbo.collection("HealthCenters").findOne({_id:reserve.HC},function(err,HC){
             dbo.collection("TempReservesHC").deleteOne({authority:query.Authority},function(err,result){
+              changestatustransaction(query.Authority,"ناموفق");
               res.render("paymentfail.ejs",{doctor:HC,time:strtime,href:0});
               db.close();
               res.end();
@@ -5267,6 +5314,7 @@ router.get("/paymenthandlerHC",function(req,res){
                       if(HC.systype=="B"){
                         dbo.collection("HealthCenters").updateOne({_id:reservation.HC},{$addToSet:{reservations:reservation,unavailabletimes:reservation.time}},function(err,sas){
                           strtime=reservation.time.start.hour+":"+reservation.time.start.min;
+                          changestatustransaction(query.Authority,"موفق");
                           res.render("paymentaccept.ejs",{doctor:HC,time:strtime,resid:reservation.refid});
                           //sendSMSforres(reservation);
                           res.end();
@@ -5282,6 +5330,7 @@ router.get("/paymenthandlerHC",function(req,res){
                         })
                         dbo.collection("HealthCenters").updateOne({_id:reservation.HC},{$set:{categories:HC.categories}},function(err,sdf){
                           strtime=reservation.time.start.hour+":"+reservation.time.start.min;
+                          changestatustransaction(query.Authority,"موفق");
                           res.render("paymentaccept.ejs",{doctor:HC,time:strtime,resid:reservation.refid});
                           //sendSMSforres(reservation);
                           res.end();
@@ -5295,6 +5344,7 @@ router.get("/paymenthandlerHC",function(req,res){
               strtime=reserve.time.start.hour+":"+reserve.time.start.min;
               dbo.collection("HealthCenters").findOne({_id:reserve.HC},function(err,HC){
               dbo.collection("TempReservesHC").deleteOne({authority:query.Authority},function(err,result){
+                changestatustransaction(query.Authority,"ناموفق");
               res.render("paymentfail.ejs",{doctor:HC,time:strtime,href:0});
               res.end();
             })
@@ -5530,6 +5580,7 @@ router.post("/payment",function(req,res){
                 }).then(response => {
                   if (response.status === 100) {
                     reservation = new Reservation(user._id,doctor._id,unavb,response.authority,req.body.cost);
+                    addtransaction(user._id,req.body.cost,response.authority);
                     dbo.collection("TempReserves").insertOne(reservation,function(err,reserve){
                       res.redirect(response.url)
                     })
@@ -5565,6 +5616,7 @@ router.get("/paymenthandler",function(req,res){
           strtime=reserve.time.start.hour+":"+reserve.time.start.min;
           dbo.collection("Doctors").findOne({_id:reserve.doctor},function(err,doctor){
             dbo.collection("TempReserves").deleteOne({authority:query.Authority},function(err,result){
+              changestatustransaction(query.Authority,"ناموفق");
               res.render("paymentfail.ejs",{doctor:doctor,time:strtime,href:0});
               db.close();
               res.end();
@@ -5585,6 +5637,7 @@ router.get("/paymenthandler",function(req,res){
                   dbo.collection("Users").updateOne({_id:reservation.user},{$addToSet:{reserves:reservation}},function(err,ad){
                     strtime=reservation.time.start.hour+":"+reservation.time.start.min;
                     dbo.collection("Doctors").findOne({_id:reservation.doctor},function(err,doctor){
+                      changestatustransaction(query.Authority,"ناموفق");
                       res.render("paymentaccept.ejs",{doctor:doctor,time:strtime,resid:reservation.refid});
                       sendSMS("reserveACK",reservation.user.toString(),"Users",reservation.refid,doctor.name,new persianDate([reservation.time.date.year,reservation.time.date.month,reservation.time.date.day]).format("L"))
                       res.end();
@@ -5597,6 +5650,7 @@ router.get("/paymenthandler",function(req,res){
               strtime=reserve.time.start.hour+":"+reserve.time.start.min;
               dbo.collection("Doctors").findOne({_id:reserve.doctor},function(err,doctor){
               dbo.collection("TempReserves").deleteOne({authority:query.Authority},function(err,result){
+                changestatustransaction(query.Authority,"ناموفق");
               res.render("paymentfail.ejs",{doctor:doctor,time:strtime,href:0});
               res.end();
             })
