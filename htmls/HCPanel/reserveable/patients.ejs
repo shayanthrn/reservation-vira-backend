@@ -20,10 +20,7 @@
 <body>
 
   <nav class="navbar fixed-top navbar-expand-lg nav-dark">
-    <a class="navbar-brand mr-2" href="#">داشبورد برند</a>
-    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarTogglerDemo" aria-controls="navbarTogglerDemo" aria-expanded="false" aria-label="Toggle navigation">
-      <i class="fa fa-bars menu-icon"></i>
-    </button>
+    <a class="navbar-brand mr-2" style="color: white;"> دکتر تجویز</a>
   </nav>
 
 
@@ -96,6 +93,7 @@
           <div class="row">
             <div class="col">
               <div class="table-responsive">
+                <% if(patients.length!=0) { %>
                 <table class="table table-bordered">
                   <thead>
                     <tr>
@@ -114,26 +112,13 @@
                     <% } %>
                   </tbody>
                 </table>
+                <% } else { %>
+                  موردی جهت نمایش وجود ندارد
+                <% } %>
               </div>
             </div>
           </div>
-          <div class="row justify-content-center">
-            <ul class="pagination">
-              <li class="page-item">
-                <a class="page-link" href="#">
-                  <i class="fa fa-arrow-right"></i>
-                </a>
-              </li>
-              <li class="page-item active"><a class="page-link" href="#">1</a></li>
-              <li class="page-item"><a class="page-link" href="#">2</a></li>
-              <li class="page-item"><a class="page-link" href="#">3</a></li>
-              <li class="page-item">
-                <a class="page-link" href="#">
-                  <i class="fa fa-arrow-left"></i>
-                </a>
-              </li>
-            </ul>
-          </div>
+          
         </div>
       </main>
 

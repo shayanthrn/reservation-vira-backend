@@ -20,12 +20,8 @@
 <body>
 
   <nav class="navbar fixed-top navbar-expand-lg nav-dark">
-    <a class="navbar-brand mr-2" href="#">داشبورد برند</a>
-    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarTogglerDemo" aria-controls="navbarTogglerDemo" aria-expanded="false" aria-label="Toggle navigation">
-      <i class="fa fa-bars menu-icon"></i>
-    </button>
+    <a class="navbar-brand mr-2" style="color: white;"> دکتر تجویز</a>
   </nav>
-
 
   <div class="container-fluid">
     <div class="row">
@@ -99,8 +95,12 @@
                   <%= visittimes[i].dayofweek +" " + visittimes[i].date1.day + " " + visittimes[i].date1.month %>
                 </div>
                 <div class="card-body p-1 d-flex flex-wrap">
+                  <% if ( visittimes[i].times.length!=0) { %>
                   <% for(let j=0;j<visittimes[i].times.length;j++) { %>
                   <a href="<%="HCpanel/reserves/" +visittimes[i].times[j]._id%>" class="cursor-pointer badge badge-secondary p-1 m-1"><%=visittimes[i].times[j].time.start.hour +":"+visittimes[i].times[j].time.start.min + "-" + visittimes[i].times[j].time.end.hour+":"+visittimes[i].times[j].time.end.min %></a>
+                  <% } %>
+                  <% } else {  %>
+                    موردی جهت نمایش وجود ندارد
                   <% } %>
                 </div>
               </div>

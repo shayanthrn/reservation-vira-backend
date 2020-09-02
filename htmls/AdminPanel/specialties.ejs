@@ -23,11 +23,7 @@
 <body>
 
   <nav class="navbar fixed-top navbar-expand-lg nav-dark">
-    <a class="navbar-brand mr-2" href="#">داشبورد برند</a>
-    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarTogglerDemo" aria-controls="navbarTogglerDemo" aria-expanded="false" aria-label="Toggle navigation">
-      <i class="fa fa-bars menu-icon"></i>
-    </button>
-    
+    <a class="navbar-brand mr-2" style="color: white;"> دکتر تجویز</a>
   </nav>
 
 
@@ -121,6 +117,7 @@
           </div>
 
           <div class="row">
+            <% if(categories.length != 0 ) { %>
             <% for( let i=0 ; i< categories.length ; i++) { %>
             <!-- for loop here -->
             <div class="col-xl-4 col-sm-6 col-xs-12">
@@ -150,6 +147,9 @@
                 </div>
               </div>
             </div>
+            <% } %>
+            <% } else {  %>
+              موردی جهت نمایش وجود ندارد
             <% } %>
             <!-- end for -->
           </div>

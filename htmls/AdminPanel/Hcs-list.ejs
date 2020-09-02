@@ -28,11 +28,7 @@
 <body>
 
   <nav class="navbar fixed-top navbar-expand-lg nav-dark">
-    <a class="navbar-brand mr-2" >داشبورد برند</a>
-    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarTogglerDemo" aria-controls="navbarTogglerDemo" aria-expanded="false" aria-label="Toggle navigation">
-      <i class="fa fa-bars menu-icon"></i>
-    </button>
-    
+    <a class="navbar-brand mr-2" style="color: white;"> دکتر تجویز</a>
   </nav>
 
 
@@ -128,6 +124,7 @@
           <div class="row">
             <div class="col">
               <div class="table-responsive">
+                <% if(HCs.length!=0) { %>
                 <table class="table table-bordered">
                   <thead>
                     <tr>
@@ -163,6 +160,9 @@
                     <% } %>
                   </tbody>
                 </table>
+                <% } else {  %>
+                  موردی جهت نمایش وجود ندارد
+                <% } %>
               </div>
             </div>
           </div>

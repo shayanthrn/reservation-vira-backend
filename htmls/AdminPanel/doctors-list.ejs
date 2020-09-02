@@ -28,11 +28,7 @@
 <body>
 
   <nav class="navbar fixed-top navbar-expand-lg nav-dark">
-    <a class="navbar-brand mr-2" >داشبورد برند</a>
-    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarTogglerDemo" aria-controls="navbarTogglerDemo" aria-expanded="false" aria-label="Toggle navigation">
-      <i class="fa fa-bars menu-icon"></i>
-    </button>
-    
+    <a class="navbar-brand mr-2" style="color: white;"> دکتر تجویز</a>
   </nav>
 
 
@@ -129,6 +125,7 @@
           <div class="row">
             <div class="col">
               <div class="table-responsive">
+                <% if(doctors.length!=0) { %>
                 <table class="table table-bordered">
                   <thead>
                     <tr>
@@ -145,7 +142,7 @@
                     <tr>
                       <th scope="row"><%= i+1 %></th>
                       <td>
-                        <img src="<%= doctors[i].image %>" onerror="this.src='assets/img/altimage.png'">
+                        <img src="<%= doctors[i].image %>" onerror="this.src='assets/img/altimage.png'"  style="max-height: 50px; max-width: 50px;min-width: 50px;min-height:50px;">
                       </td>
                       <td><%= doctors[i].name %></td>
                       <td>
@@ -170,6 +167,9 @@
                     <% } %>
                   </tbody>
                 </table>
+                <% } else {  %>
+                  موردی جهت نمایش وجود ندارد
+                <% } %>
               </div>
             </div>
           </div>
