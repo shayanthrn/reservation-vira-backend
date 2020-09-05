@@ -1922,9 +1922,6 @@ function checkinterval(reservedata){       //must be implemented
 
 
 function sendSMS(template,id,type,token,token2,token3){
-  console.log(token);
-  console.log(token2)
-  console.log(token3)
   var id=ObjectID(id);
   MongoClient.connect(dburl,function(err,db){
     var dbo=db.db("mydb");
@@ -1932,7 +1929,7 @@ function sendSMS(template,id,type,token,token2,token3){
       apikave.VerifyLookup({
         token: token,
         token10: token2,
-        token3: token3,
+        token20: token3,
         template : template,
         receptor:obj.phonenumber
       },
