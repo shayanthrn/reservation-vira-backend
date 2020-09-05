@@ -1,3 +1,3 @@
-// document.getElementById("base").setAttribute("href","http://reservation.drtajviz.com");
-document.getElementById("base").setAttribute("href","https://localhost");
+document.getElementById("base").setAttribute("href","http://reservation.drtajviz.com");
+// document.getElementById("base").setAttribute("href","https://localhost");
 
