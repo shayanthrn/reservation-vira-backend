@@ -115,6 +115,7 @@
         <div class="container-fluid">
           <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
             <h1 class="h2">دکتر ها</h1>
+            <input oninput="fastsearch()" class="form-control" type="text"  name="searchinput" id="searchinput" style="max-width: 30%;border-width: 2px;border-color: black;background-color: white;" placeholder="جتسجو سریع...">
             <a href="/AdminPanel/addDoctor" class="btn btn-success text-white">
               <i class="fa fa-plus"></i>
               اضافه کردن دکتر
@@ -139,7 +140,7 @@
                   </thead>
                   <tbody>
                     <% for(let i = 0 ; i < doctors.length ; i++) { %>
-                    <tr>
+                    <tr name="objects" data-name="<%= doctors[i].name %>">
                       <th scope="row"><%= i+1 %></th>
                       <td>
                         <img src="<%= doctors[i].image %>" onerror="this.src='assets/img/altimage.png'"  style="max-height: 50px; max-width: 50px;min-width: 50px;min-height:50px;">
@@ -173,23 +174,6 @@
               </div>
             </div>
           </div>
-          <div class="row justify-content-center">
-            <ul class="pagination">
-              <li class="page-item">
-                <a class="page-link" href="#">
-                  <i class="fa fa-arrow-right"></i>
-                </a>
-              </li>
-              <li class="page-item active"><a class="page-link" href="#">1</a></li>
-              <li class="page-item"><a class="page-link" href="#">2</a></li>
-              <li class="page-item"><a class="page-link" href="#">3</a></li>
-              <li class="page-item">
-                <a class="page-link" href="#">
-                  <i class="fa fa-arrow-left"></i>
-                </a>
-              </li>
-            </ul>
-          </div>
         </div>
       </main>
 
@@ -205,6 +189,19 @@
 
   <script src="https://unpkg.com/persian-date@latest/dist/persian-date.min.js"></script>
   <script src="https://unpkg.com/persian-datepicker@latest/dist/js/persian-datepicker.min.js"></script>
+  <script>
+    function fastsearch(){
+        value=document.getElementById("searchinput").value;
+        document.getElementsByName("objects").forEach(function(doc){
+            if(!doc.dataset.name.includes(value)){
+                doc.style.display="none"
+            }
+            else{
+                doc.style.display=""
+            }
+        })
+    }
+</script>
 
 </body>
 </html>

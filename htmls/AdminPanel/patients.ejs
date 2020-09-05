@@ -106,6 +106,8 @@
         <div class="container-fluid">
           <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
             <h1 class="h2">بیماران</h1>
+            <input oninput="fastsearch()" class="form-control" type="text"  name="searchinput" id="searchinput" style="max-width: 30%;border-width: 2px;border-color: black;background-color: white;" placeholder="جتسجو سریع...">
+            <a class="btn btn-inf" style="visibility: hidden;">test</a>
           </div>
           
 
@@ -123,7 +125,7 @@
                   </thead>
                   <tbody>
                     <% for(let i = 0;i<patients.length;i++) { %>
-                    <tr>
+                    <tr name="objects" data-name="<%= patients[i].firstname +" "+ patients[i].lastname %>">
                       <th scope="row"><%=i+1%></th>
                       <td><a href="<%= "AdminPanel/users/" + patients[i]._id %>"><%=patients[i].firstname + " " +  patients[i].lastname%></a></td>
                       <td><%= patients[i].phonenumber %></td>
@@ -137,23 +139,6 @@
               </div>
             </div>
           </div>
-          <div class="row justify-content-center">
-            <ul class="pagination">
-              <li class="page-item">
-                <a class="page-link" href="#">
-                  <i class="fa fa-arrow-right"></i>
-                </a>
-              </li>
-              <li class="page-item active"><a class="page-link" href="#">1</a></li>
-              <li class="page-item"><a class="page-link" href="#">2</a></li>
-              <li class="page-item"><a class="page-link" href="#">3</a></li>
-              <li class="page-item">
-                <a class="page-link" href="#">
-                  <i class="fa fa-arrow-left"></i>
-                </a>
-              </li>
-            </ul>
-          </div>
         </div>
       </main>
 
@@ -166,6 +151,19 @@
   <script>window.jQuery || document.write('<script src="assets/panelassests/jquery-slim.min.js"><\/script>')</script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
   <script src="https://cdn.rtlcss.com/bootstrap/v4.1.3/js/bootstrap.min.js" integrity="sha384-C/pvytx0t5v9BEbkMlBAGSPnI1TQU1IrTJ6DJbC8GBHqdMnChcb6U4xg4uRkIQCV" crossorigin="anonymous"></script>
+  <script>
+    function fastsearch(){
+        value=document.getElementById("searchinput").value;
+        document.getElementsByName("objects").forEach(function(doc){
+            if(!doc.dataset.name.includes(value)){
+                doc.style.display="none"
+            }
+            else{
+                doc.style.display=""
+            }
+        })
+    }
+  </script>
 
 </body>
 
