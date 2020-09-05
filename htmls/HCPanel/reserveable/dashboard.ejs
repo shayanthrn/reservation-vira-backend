@@ -95,9 +95,12 @@
                   <%= visittimes[i].dayofweek +" " + visittimes[i].date1.day + " " + visittimes[i].date1.month %>
                 </div>
                 <div class="card-body p-1 d-flex flex-wrap">
+                  <% function n(n){
+                    return n > 9 ? "" + n: "0" + n;
+                    } %>
                   <% if ( visittimes[i].times.length!=0) { %>
                   <% for(let j=0;j<visittimes[i].times.length;j++) { %>
-                  <a href="<%="HCpanel/reserves/" +visittimes[i].times[j]._id%>" class="cursor-pointer badge badge-secondary p-1 m-1"><%=visittimes[i].times[j].time.start.hour +":"+visittimes[i].times[j].time.start.min + "-" + visittimes[i].times[j].time.end.hour+":"+visittimes[i].times[j].time.end.min %></a>
+                  <a href="<%="HCpanel/reserves/" +visittimes[i].times[j]._id%>" class="cursor-pointer badge badge-secondary p-1 m-1"><%= n(visittimes[i].times[j].time.start.hour) +":"+ n(visittimes[i].times[j].time.start.min) + "-" + n(visittimes[i].times[j].time.end.hour) +":"+n(visittimes[i].times[j].time.end.min) %></a>
                   <% } %>
                   <% } else {  %>
                     موردی جهت نمایش وجود ندارد

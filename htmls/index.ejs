@@ -86,19 +86,29 @@
                         <% if(type=="doc") { %>
                         <p id="select-category">لطفا دکتر خود را از لیست زیر انتخاب کنید</p>
                         <% } else{ %>
-                        <p id="select-category">لطفا تخصص مورد نیاز خود را از لیست زیر انتخاب کنید</p>
-                        <input class="form-control" type="text" name="searchinput" id="searchinput" style="max-width: 30%;border-width: 2px;border-color: black;background-color: white;" placeholder="جتسجو سریع...">
+                        <div class="row">
+                            <div class="col">
+                                <p id="select-category">لطفا تخصص مورد نیاز خود را از لیست زیر انتخاب کنید</p>
+                                <input oninput="fastsearch()" class="form-control" type="text"  name="searchinput" id="searchinput" style="max-width: 30%;border-width: 2px;border-color: black;background-color: white;" placeholder="جتسجو سریع...">
+                            </div>
+                            <div class="col">
+                               
+                                
+                            </div>
+                            
+                        </div>
                         <% } %>
                         <div class="listing default">
                             <div class="tab-content default text-center">
                                 <div class="tab-pane active" id="related" role="tabpanel" aria-expanded="true">
                                     
                                     <div class="container">
-                                        <ul class="row listing-items">
+                                        <ul id="uilist" class="row listing-items">
                                             <% if(Objects.length!=0) { %>
                                             <% for(let i =0 ;i < Objects.length ; i++) { %>
-                                            <li class="box hvr-grow-shadow">
                                                 <% if(category=="") { %>
+                                            <li name="objects" data-name="<%= Objects[i].name %>" class="box hvr-grow-shadow">
+                                               
                                                 <a
                                                     href="<%= "category"+  category.split(' ').join('-') + "/" + Objects[i].name.split(' ').join('-') +"?city=all" %>">
                                                     <div style="border-width: 2px;
@@ -125,7 +135,9 @@
                                                         </p>
                                                     </div>
                                                 </a>
+                                            </li>
                                                 <% } else {  %>
+                                                    <li class="box hvr-grow-shadow">
                                                 <a
                                                     href="<%= "category/"+ category.split(' ').join('-') + "/" + Objects[i].name.split(' ').join('-') %>">
                                                     <div style="border-width: 2px;
@@ -152,8 +164,9 @@
                                                         </p>
                                                     </div>
                                                 </a>
-                                                <% } %>
+                                               
                                             </li>
+                                            <% } %>
                                             <% } %>
                                             <% } else { %>
                                                 <div class="c-message-light c-message-light--info c-listing-not-found__message">
@@ -211,6 +224,18 @@
 <!-- Main Js -->
 <script src="assets/js/main.js" type="text/javascript"></script>
 
-
+<script>
+    function fastsearch(){
+        value=document.getElementById("searchinput").value;
+        document.getElementsByName("objects").forEach(function(doc){
+            if(!doc.dataset.name.includes(value)){
+                doc.style.display="none"
+            }
+            else{
+                doc.style.display=""
+            }
+        })
+    }
+</script>
 
 </html>

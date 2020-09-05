@@ -676,7 +676,7 @@ router.get("/api/getCurUser",function(req,res){
         }
         else{
           user.chats=await dbo.collection("Chats").find({userphone:user.phonenumber}).toArray()
-          user.reserves=await dbo.collection("Reservations").find({user:user._id}).toArray();
+          user.reserves=await dbo.collection("Reservations").aggregate([{$match:{user:user._id}},{$lookup:{from:"Doctors", localField: "doctor", foreignField: "_id", as: "doctor"}}]).toArray();
           user.teleReservations=await dbo.collection("teleReservations").find({user:user._id}).toArray();
           res.json({user:user});
           db.close();
@@ -1773,6 +1773,13 @@ router.post("/test2",function(req,res){
 //-----------------------test route--------------------------//
 
 //-----------------------functions--------------------------//
+
+function n(n){
+  if(typeof n=="string"){
+    n=parseInt(n)
+  }
+  return n > 9 ? "" + n: "0" + n;
+  }
 
 function addtransaction(userid,amount,authority){
   MongoClient.connect(dburl,function(err,db){
@@ -3759,6 +3766,9 @@ router.get("/AdminPanel/Chats/:chatid",function(req,res){
         }
         else{
           dbo.collection("Chats").findOne({_id:chatid},function(err,chat){
+            chat.tickets.forEach(function(doc){
+              doc.datecreated=new persianDate(doc.datecreated).format()
+            })
             res.render("AdminPanel/chatpage.ejs",{chat:chat});
             db.close();
             res.end();
@@ -4168,34 +4178,34 @@ router.get("/Adminpanel/editcategory",function(req,res){
 })
 
 
-router.post("/editcategory",function(req,res){
-  var query= url.parse(req.url,true).query;
-  if(req.cookies.admintoken==undefined){
-    res.redirect('/noaccess');
-  }
-  else{
-    MongoClient.connect(dburl,function(err,db){
-      var dbo=db.db("mydb");
-      dbo.collection("Admins").findOne({token:req.cookies.admintoken},function(err,result){
-        if(result==null){
-          db.close();
-          res.redirect('/noaccess');
-        }
-        else{
-          dbo.collection("Categories").updateOne({name:query.name},{$set:{name:req.body.name,image:"/catphotos/"+req.body.name.split(' ').join('-')+".png"}},function(err,update){
-            if(req.files!=null){
-              mv(req.files.image.tempFilePath,"public"+"/catphotos/"+req.body.name.split(' ').join('-')+".png",function(err){
-                console.log("public"+"/catphotos/"+req.body.name.split(' ').join('-')+".png")
-              })
-            }
-            db.close();
-            res.redirect('/Adminpanel/categories');
-          })
-        }
-      })
-    })
-  }
-})
+// router.post("/editcategory",function(req,res){
+//   var query= url.parse(req.url,true).query;
+//   if(req.cookies.admintoken==undefined){
+//     res.redirect('/noaccess');
+//   }
+//   else{
+//     MongoClient.connect(dburl,function(err,db){
+//       var dbo=db.db("mydb");
+//       dbo.collection("Admins").findOne({token:req.cookies.admintoken},function(err,result){
+//         if(result==null){
+//           db.close();
+//           res.redirect('/noaccess');
+//         }
+//         else{
+//           dbo.collection("Categories").updateOne({name:query.name},{$set:{name:req.body.name,image:"/catphotos/"+req.body.name.split(' ').join('-')+".png"}},function(err,update){
+//             if(req.files!=null){
+//               mv(req.files.image.tempFilePath,"public"+"/catphotos/"+req.body.name.split(' ').join('-')+".png",function(err){
+//                 console.log("public"+"/catphotos/"+req.body.name.split(' ').join('-')+".png")
+//               })
+//             }
+//             db.close();
+//             res.redirect('/Adminpanel/categories');
+//           })
+//         }
+//       })
+//     })
+//   }
+// })
 
 router.get("/Adminpanel/categories",function(req,res){
   if(req.cookies.admintoken==undefined){
@@ -5156,7 +5166,7 @@ router.get("/telepaymenthandler",function(req,res){
       }
       else{
         if(query.Status=="NOK"){
-          strtime=reserve.timeinfo.time.start+"-"+reserve.timeinfo.time.end;
+          strtime=n(reserve.timeinfo.time.start)+"-"+n(reserve.timeinfo.time.end);
           dbo.collection("Doctors").findOne({_id:reserve.doctor},function(err,doctor){
             dbo.collection("TempteleReserves").deleteOne({authority:query.Authority},function(err,result){
               changestatustransaction(query.Authority,"ناموفق");
@@ -5179,7 +5189,7 @@ router.get("/telepaymenthandler",function(req,res){
                   dbo.collection("Users").updateOne({_id:reservation.user},{$addToSet:{telereservations:reservation}},function(err,ad){
                     dbo.collection("Doctors").findOne({_id:reservation.doctor},function(err,doctor){
                         dbo.collection("Doctors").updateOne({_id:reservation.doctor},{$addToSet:{telereservations:reservation}},function(err,sas){
-                          strtime=reserve.timeinfo.time.start+"-"+reserve.timeinfo.time.end;
+                          strtime=n(reserve.timeinfo.time.start)+"-"+n(reserve.timeinfo.time.end);
                           changestatustransaction(query.Authority,"موفق");
                           res.render("paymentaccept.ejs",{doctor:doctor,time:strtime,resid:reservation.refid,chat:2,doc:1});
                           //sendSMSforres(reservation);
@@ -5191,7 +5201,7 @@ router.get("/telepaymenthandler",function(req,res){
             })
           } 
           else {
-            strtime=reserve.timeinfo.time.start+"-"+reserve.timeinfo.time.end;
+            strtime=n(reserve.timeinfo.time.start)+"-"+n(reserve.timeinfo.time.end);
               dbo.collection("Doctors").findOne({_id:reserve.doctor},function(err,doctor){
               dbo.collection("TempteleReserves").deleteOne({authority:query.Authority},function(err,result){
               changestatustransaction(query.Authority,"ناموفق");
@@ -5305,7 +5315,7 @@ router.get("/paymenthandlerHC",function(req,res){
       }
       else{
         if(query.Status=="NOK"){
-          strtime=reserve.time.start.hour+":"+reserve.time.start.min;
+          strtime=n(reserve.time.start.hour)+":"+n(reserve.time.start.min);
           dbo.collection("HealthCenters").findOne({_id:reserve.HC},function(err,HC){
             dbo.collection("TempReservesHC").deleteOne({authority:query.Authority},function(err,result){
               changestatustransaction(query.Authority,"ناموفق");
@@ -5329,7 +5339,7 @@ router.get("/paymenthandlerHC",function(req,res){
                     dbo.collection("HealthCenters").findOne({_id:reservation.HC},function(err,HC){
                       if(HC.systype=="B"){
                         dbo.collection("HealthCenters").updateOne({_id:reservation.HC},{$addToSet:{reservations:reservation,unavailabletimes:reservation.time}},function(err,sas){
-                          strtime=reservation.time.start.hour+":"+reservation.time.start.min;
+                          strtime=n(reservation.time.start.hour)+":"+n(reservation.time.start.min);
                           changestatustransaction(query.Authority,"موفق");
                           res.render("paymentaccept.ejs",{doctor:HC,time:strtime,resid:reservation.refid,chat:0,doc:0});
                           //sendSMSforres(reservation);
@@ -5345,7 +5355,7 @@ router.get("/paymenthandlerHC",function(req,res){
                         }
                         })
                         dbo.collection("HealthCenters").updateOne({_id:reservation.HC},{$set:{categories:HC.categories}},function(err,sdf){
-                          strtime=reservation.time.start.hour+":"+reservation.time.start.min;
+                          strtime=n(reservation.time.start.hour)+":"+n(reservation.time.start.min);
                           changestatustransaction(query.Authority,"موفق");
                           res.render("paymentaccept.ejs",{doctor:HC,time:strtime,resid:reservation.refid,chat:0,doc:0});
                           //sendSMSforres(reservation);
@@ -5357,7 +5367,7 @@ router.get("/paymenthandlerHC",function(req,res){
               })
             })
           } else {
-              strtime=reserve.time.start.hour+":"+reserve.time.start.min;
+              strtime=n(reserve.time.start.hour)+":"+n(reserve.time.start.min);
               dbo.collection("HealthCenters").findOne({_id:reserve.HC},function(err,HC){
               dbo.collection("TempReservesHC").deleteOne({authority:query.Authority},function(err,result){
                 changestatustransaction(query.Authority,"ناموفق");
@@ -5629,7 +5639,7 @@ router.get("/paymenthandler",function(req,res){
       }
       else{
         if(query.Status=="NOK"){
-          strtime=reserve.time.start.hour+":"+reserve.time.start.min;
+          strtime=n(reserve.time.start.hour)+":"+n(reserve.time.start.min);
           dbo.collection("Doctors").findOne({_id:reserve.doctor},function(err,doctor){
             dbo.collection("TempReserves").deleteOne({authority:query.Authority},function(err,result){
               changestatustransaction(query.Authority,"ناموفق");
@@ -5651,7 +5661,7 @@ router.get("/paymenthandler",function(req,res){
               dbo.collection("TempReserves").deleteOne({authority:query.Authority},function(err,aa){
                 dbo.collection("Doctors").updateOne({_id:reservation.doctor},{$addToSet:{reservations:reservation,unavailabletimes:reservation.time}},function(err,ss){
                   dbo.collection("Users").updateOne({_id:reservation.user},{$addToSet:{reserves:reservation}},function(err,ad){
-                    strtime=reservation.time.start.hour+":"+reservation.time.start.min;
+                    strtime=n(reservation.time.start.hour)+":"+n(reservation.time.start.min);
                     dbo.collection("Doctors").findOne({_id:reservation.doctor},function(err,doctor){
                       changestatustransaction(query.Authority,"موفق");
                       res.render("paymentaccept.ejs",{doctor:doctor,time:strtime,resid:reservation.refid,chat:0,doc:1});
@@ -5663,7 +5673,7 @@ router.get("/paymenthandler",function(req,res){
               })
             })
           } else {
-              strtime=reserve.time.start.hour+":"+reserve.time.start.min;
+              strtime=n(reserve.time.start.hour)+":"+n(reserve.time.start.min);
               dbo.collection("Doctors").findOne({_id:reserve.doctor},function(err,doctor){
               dbo.collection("TempReserves").deleteOne({authority:query.Authority},function(err,result){
                 changestatustransaction(query.Authority,"ناموفق");

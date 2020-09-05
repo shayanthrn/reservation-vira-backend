@@ -105,10 +105,13 @@
                 <div class="card-header bg-site-primary text-white p-2">
                   <%= visittimes[i].dayofweek +" " + visittimes[i].date1.day + " " + visittimes[i].date1.month %>
                 </div>
+                <% function n(n){
+                  return n > 9 ? "" + n: "0" + n;
+                  } %>
                 <div class="card-body p-1 d-flex flex-wrap">
                   <% if(visittimes[i].times.length!=0) {  %>
                   <% for(let j=0;j<visittimes[i].times.length;j++) { %>
-                  <a href="<%="DoctorPanel/reserves/" +visittimes[i].times[j]._id%>" class="cursor-pointer badge badge-secondary p-1 m-1"><%=visittimes[i].times[j].time.start.hour +":"+visittimes[i].times[j].time.start.min + "-" + visittimes[i].times[j].time.end.hour+":"+visittimes[i].times[j].time.end.min %></a>
+                  <a href="<%="DoctorPanel/reserves/" +visittimes[i].times[j]._id%>" class="cursor-pointer badge badge-secondary p-1 m-1"><%= n(visittimes[i].times[j].time.start.hour) +":"+ n(visittimes[i].times[j].time.start.min) + "-" + n(visittimes[i].times[j].time.end.hour) +":"+n(visittimes[i].times[j].time.end.min)  %></a>
                   <% } %>
                   <% } else { %>
                     موردی جهت نمایش وجود ندارد

@@ -183,12 +183,15 @@
                     </tr>
                   </thead>
                   <tbody id="patients-list">
+                    <% function n(n){
+                      return n > 9 ? "" + n: "0" + n;
+                      } %>
                     <% for( let i=0 ; i < reserves.length ; i++ ) { %>
                     <tr>
                       <th scope="row"><%= i+1 %></th>
                       <td><a href="<%= "/AdminPanel/reserves/" + reserves[i]._id %>" class="btn btn-info" >مشاهده جزئیات</a></td>
                       <td><%= reserves[i].time.date.year + "/" + reserves[i].time.date.month + "/" + reserves[i].time.date.day %></td>
-                      <td><%= reserves[i].time.start.hour + ":" + reserves[i].time.start.min + "-" + reserves[i].time.end.hour + ":" + reserves[i].time.end.min %></td>
+                      <td><%= n(reserves[i].time.start.hour) + ":" + n(reserves[i].time.start.min) + "-" + n(reserves[i].time.end.hour) + ":" + n(reserves[i].time.end.min) %></td>
                     </tr>
                     <% } %>
                   </tbody>
