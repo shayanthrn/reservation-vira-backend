@@ -5,6 +5,7 @@ const bodyParser = require('body-parser');   //for parsing and getting data from
 var cookieParser = require('cookie-parser');
 const fileUpload = require('express-fileupload');
 const session = require('express-session');
+var http = require('http');
 const https = require('https');
 var fs = require('fs');
 
