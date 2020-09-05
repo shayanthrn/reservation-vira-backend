@@ -676,7 +676,7 @@ router.get("/api/getCurUser",function(req,res){
         }
         else{
           user.chats=await dbo.collection("Chats").find({userphone:user.phonenumber}).toArray()
-          user.reserves=await dbo.collection("Reservations").aggregate([{$match:{user:user._id}},{$lookup:{from:"Doctors", localField: "doctor", foreignField: "_id", as: "doctor"}},{$project:{"doctor.name":1,"time":1,"refid":1}}]).toArray();
+          user.reserves=await dbo.collection("Reservations").aggregate([{$match:{user:user._id}},{$lookup:{from:"Doctors", localField: "doctor", foreignField: "_id", as: "doctor"}},{$lookup:{from:"HealthCenters", localField: "HC", foreignField: "_id", as: "HC"}},{$project:{"doctor.name":1,"time":1,"refid":1,"HC.name":1}}]).toArray();
           user.teleReservations=await dbo.collection("teleReservations").aggregate([{$match:{user:user._id}},{$lookup:{from:"Doctors", localField: "doctor", foreignField: "_id", as: "doctor"}},{$project:{"doctor.name":1,"timeinfo":1,"refid":1}}]).toArray()
           res.json({user:user});
           db.close();
