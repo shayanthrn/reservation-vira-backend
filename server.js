@@ -29,8 +29,8 @@ var credentials = {key: privateKey, cert: certificate};
 var httpServer = http.createServer(app);
 var httpsServer = https.createServer(credentials, app);
 
-httpServer.listen(80);
-console.log("http started")
+// httpServer.listen(80);
+// console.log("http started")
 httpsServer.listen(443);
 console.log("https started")
 
