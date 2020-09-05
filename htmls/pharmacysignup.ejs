@@ -45,7 +45,7 @@
             <h1 class="h2">عضویت داروخانه</h1>
           </div>
 
-          <form class="" action="addHC?type=داروخانه" enctype="multipart/form-data" method="POST">
+          <form class="" action="addHC?type=داروخانه" onsubmit="makehash()" enctype="multipart/form-data" method="POST">
             <div class="row">
               <div class="col-sm-12 col-md-10">
                 <div class="row">
@@ -206,5 +206,12 @@
   </div>
 
 </body>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.9-1/core.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.9-1/md5.js"></script>
+<script>
+    function makehash(){
+        document.getElementById("password").value=CryptoJS.MD5(document.getElementById("password").value).toString()
+    }
+</script>
 
 </html>

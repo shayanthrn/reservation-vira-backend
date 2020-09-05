@@ -1664,11 +1664,11 @@ router.post("/addDoctor",function(req,res){
                   if(typeof req.body.membershiptypes=="string"){
                     memtype.push(req.body.membershiptypes)
                   }
-                  else[
+                  else{
                     req.body.membershiptypes.forEach(function(doc2){
                       memtype.push(doc2);
                     })
-                  ]
+                  }
                   dbo.collection('Doctors').insertOne(new Doctor(req.body.username,req.body.pass,req.body.name,cats,req.body.medicalnumber,req.body.codemeli,req.body.workphone,req.body.phonenumber,req.body.address,req.body.city,"/docphotos/"+req.body.name.trim()+".png",req.body.background,req.body.description,memtype,req.body.appknowledge),function(err,res2){
                     if(req.files!=null){
                     mv(req.files.image.tempFilePath,"public/docphotos/"+req.body.name+".png",function(err){
@@ -5913,6 +5913,7 @@ router.get("/loginAdmin",function(req,res){
 router.post('/loginAdmin',function(req,res){
   req.session.prevurl=req.session.currurl;
   req.session.currurl=req.url;
+  console.log(req.body)
   MongoClient.connect(dburl,function(err,db){
     var dbo=db.db("mydb");
     dbo.collection("Admins").findOne({username:req.body.username},function(err,result){

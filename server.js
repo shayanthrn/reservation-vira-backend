@@ -26,7 +26,6 @@ var privateKey  = fs.readFileSync('ssl/keys/server.key', 'utf8');
 var certificate = fs.readFileSync('ssl/certs/server.crt', 'utf8');
 
 var credentials = {key: privateKey, cert: certificate};
-console.log(credentials)
 var httpServer = http.createServer(app);
 var httpsServer = https.createServer(credentials, app);
 
