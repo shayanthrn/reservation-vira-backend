@@ -30,7 +30,7 @@ var privateKey  = fs.readFileSync('/etc/letsencrypt/live/reservation.drtajviz.co
 var certificate = fs.readFileSync('/etc/letsencrypt/live/reservation.drtajviz.com/fullchain.pem', 'utf8');
 
 var credentials = {key: privateKey, cert: certificate};
-var httpServer = http.createServer(app2);
+var httpServer = http.createServer(apphttp);
 var httpsServer = https.createServer(credentials, app);
 
 
