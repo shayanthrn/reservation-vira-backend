@@ -676,7 +676,7 @@ router.get("/api/getCurUser",function(req,res){
         }
         else{
           user.chats=await dbo.collection("Chats").find({userphone:user.phonenumber}).toArray()
-          user.reserves=await dbo.collection("Reservations").aggregate([{$match:{user:user._id}},{$lookup:{from:"Doctors", localField: "doctor", foreignField: "_id", as: "doctor"}},{$lookup:{from:"HealthCenters", localField: "HC", foreignField: "_id", as: "HC"}},{$project:{"doctor.name":1,"time":1,"refid":1,"HC.name":1}}]).toArray();
+          user.reserves=await dbo.collection("Reservations").aggregate([{$match:{user:user._id}},{$lookup:{from:"Doctors", localField: "doctor", foreignField: "_id", as: "doctor"}},{$lookup:{from:"HealthCenters", localField: "HC", foreignField: "_id", as: "HC"}},{$project:{"doctor.name":1,"time":1,"refid":1,"HC.name":1,"catname":1}}]).toArray();
           user.teleReservations=await dbo.collection("teleReservations").aggregate([{$match:{user:user._id}},{$lookup:{from:"Doctors", localField: "doctor", foreignField: "_id", as: "doctor"}},{$project:{"doctor.name":1,"timeinfo":1,"refid":1}}]).toArray()
           res.json({user:user});
           db.close();
@@ -5315,7 +5315,7 @@ router.get("/paymenthandlerHC",function(req,res){
       }
       else{
         if(query.Status=="NOK"){
-          strtime=n(reserve.time.start.hour)+":"+n(reserve.time.start.min);
+          strtime=n(reserve.time.start.hour)+":"+n(reserve.time.start.min)+"-"+n(reserve.time.end.hour)+":"+n(reserve.time.end.min);
           dbo.collection("HealthCenters").findOne({_id:reserve.HC},function(err,HC){
             dbo.collection("TempReservesHC").deleteOne({authority:query.Authority},function(err,result){
               changestatustransaction(query.Authority,"ناموفق");
@@ -5339,7 +5339,7 @@ router.get("/paymenthandlerHC",function(req,res){
                     dbo.collection("HealthCenters").findOne({_id:reservation.HC},function(err,HC){
                       if(HC.systype=="B"){
                         dbo.collection("HealthCenters").updateOne({_id:reservation.HC},{$addToSet:{reservations:reservation,unavailabletimes:reservation.time}},function(err,sas){
-                          strtime=n(reservation.time.start.hour)+":"+n(reservation.time.start.min);
+                          strtime=n(reserve.time.start.hour)+":"+n(reserve.time.start.min)+"-"+n(reserve.time.end.hour)+":"+n(reserve.time.end.min);
                           changestatustransaction(query.Authority,"موفق");
                           res.render("paymentaccept.ejs",{doctor:HC,time:strtime,resid:reservation.refid,chat:0,doc:0});
                           //sendSMSforres(reservation);
@@ -5355,7 +5355,7 @@ router.get("/paymenthandlerHC",function(req,res){
                         }
                         })
                         dbo.collection("HealthCenters").updateOne({_id:reservation.HC},{$set:{categories:HC.categories}},function(err,sdf){
-                          strtime=n(reservation.time.start.hour)+":"+n(reservation.time.start.min);
+                          strtime=n(reserve.time.start.hour)+":"+n(reserve.time.start.min)+"-"+n(reserve.time.end.hour)+":"+n(reserve.time.end.min);
                           changestatustransaction(query.Authority,"موفق");
                           res.render("paymentaccept.ejs",{doctor:HC,time:strtime,resid:reservation.refid,chat:0,doc:0});
                           //sendSMSforres(reservation);
@@ -5367,7 +5367,7 @@ router.get("/paymenthandlerHC",function(req,res){
               })
             })
           } else {
-              strtime=n(reserve.time.start.hour)+":"+n(reserve.time.start.min);
+              strtime=n(reserve.time.start.hour)+":"+n(reserve.time.start.min)+"-"+n(reserve.time.end.hour)+":"+n(reserve.time.end.min);
               dbo.collection("HealthCenters").findOne({_id:reserve.HC},function(err,HC){
               dbo.collection("TempReservesHC").deleteOne({authority:query.Authority},function(err,result){
                 changestatustransaction(query.Authority,"ناموفق");
@@ -5639,7 +5639,7 @@ router.get("/paymenthandler",function(req,res){
       }
       else{
         if(query.Status=="NOK"){
-          strtime=n(reserve.time.start.hour)+":"+n(reserve.time.start.min);
+          strtime=n(reserve.time.start.hour)+":"+n(reserve.time.start.min)+"-"+n(reserve.time.end.hour)+":"+n(reserve.time.end.min);
           dbo.collection("Doctors").findOne({_id:reserve.doctor},function(err,doctor){
             dbo.collection("TempReserves").deleteOne({authority:query.Authority},function(err,result){
               changestatustransaction(query.Authority,"ناموفق");
@@ -5661,7 +5661,7 @@ router.get("/paymenthandler",function(req,res){
               dbo.collection("TempReserves").deleteOne({authority:query.Authority},function(err,aa){
                 dbo.collection("Doctors").updateOne({_id:reservation.doctor},{$addToSet:{reservations:reservation,unavailabletimes:reservation.time}},function(err,ss){
                   dbo.collection("Users").updateOne({_id:reservation.user},{$addToSet:{reserves:reservation}},function(err,ad){
-                    strtime=n(reservation.time.start.hour)+":"+n(reservation.time.start.min);
+                    strtime=n(reserve.time.start.hour)+":"+n(reserve.time.start.min)+"-"+n(reserve.time.end.hour)+":"+n(reserve.time.end.min);
                     dbo.collection("Doctors").findOne({_id:reservation.doctor},function(err,doctor){
                       changestatustransaction(query.Authority,"موفق");
                       res.render("paymentaccept.ejs",{doctor:doctor,time:strtime,resid:reservation.refid,chat:0,doc:1});
@@ -5673,7 +5673,7 @@ router.get("/paymenthandler",function(req,res){
               })
             })
           } else {
-              strtime=n(reserve.time.start.hour)+":"+n(reserve.time.start.min);
+            strtime=n(reserve.time.start.hour)+":"+n(reserve.time.start.min)+"-"+n(reserve.time.end.hour)+":"+n(reserve.time.end.min);
               dbo.collection("Doctors").findOne({_id:reserve.doctor},function(err,doctor){
               dbo.collection("TempReserves").deleteOne({authority:query.Authority},function(err,result){
                 changestatustransaction(query.Authority,"ناموفق");
