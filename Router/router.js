@@ -668,7 +668,7 @@ router.get("/api/getCurUser",function(req,res){
   else{
     MongoClient.connect(dburl,function(err,db){
       var dbo=db.db("mydb");
-      dbo.collection("Users").findOne({token:query.token},async function(err,user){
+      dbo.collection("Users").findOne({token:query.token},{projection:{reservations:0}},async function(err,user){
         if(user==null){
           res.json({data:"not found"});
           db.close();
@@ -676,8 +676,8 @@ router.get("/api/getCurUser",function(req,res){
         }
         else{
           user.chats=await dbo.collection("Chats").find({userphone:user.phonenumber}).toArray()
-          user.reserves=await dbo.collection("Reservations").aggregate([{$match:{user:user._id}},{$lookup:{from:"Doctors", localField: "doctor", foreignField: "_id", as: "doctor"}}]).toArray();
-          user.teleReservations=await dbo.collection("teleReservations").find({user:user._id}).toArray();
+          user.reserves=await dbo.collection("Reservations").aggregate([{$match:{user:user._id}},{$lookup:{from:"Doctors", localField: "doctor", foreignField: "_id", as: "doctor"}},{$project:{"doctor.name":1,"time":1,"refid":1}}]).toArray();
+          user.teleReservations=await dbo.collection("teleReservations").aggregate([{$match:{user:user._id}},{$lookup:{from:"Doctors", localField: "doctor", foreignField: "_id", as: "doctor"}},{$project:{"doctor.name":1,"timeinfo":1,"refid":1}}]).toArray()
           res.json({user:user});
           db.close();
           res.end();
