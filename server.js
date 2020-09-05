@@ -21,13 +21,17 @@ app.set('views','./htmls');
 app.engine('html', require('ejs').renderFile);
 app.use('/',router);
 
-const httpsServer = https.createServer({
-    key: fs.readFileSync('server.key'),
-    cert: fs.readFileSync('server.cert')
-}, app);
+var privateKey  = fs.readFileSync('server.key', 'utf8');
+var certificate = fs.readFileSync('server.cert', 'utf8');
+var credentials = {key: privateKey, cert: certificate};
+var httpServer = http.createServer(app);
+var httpsServer = https.createServer(credentials, app);
 
+httpServer.listen(80);
+console.log("http started")
+httpsServer.listen(443);
+console.log("https started")
 
-httpsServer.listen(443, () => console.log(`HTTPS server listening: https://localhost`));
 
 // const port = process.env.port || 80;   // server port for listen
 // app.listen(port, () => console.log(`Run on port ${port}`));   //listen
