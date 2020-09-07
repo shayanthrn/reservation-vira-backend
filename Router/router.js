@@ -1926,20 +1926,181 @@ function sendSMS(template,id,type,token,token2,token3){
   MongoClient.connect(dburl,function(err,db){
     var dbo=db.db("mydb");
     dbo.collection(type).findOne({_id:id},function(err,obj){
-      apikave.VerifyLookup({
-        token: token,
-        token10: token2,
-        token20: token3,
-        template : template,
-        receptor:obj.phonenumber
-      },
-      function(response, status) {
-        console.log(response);
-        console.log(status);
-        if(status==200){
-          console.log("success")
-        }
-      });
+      switch (template) {
+        case "addexp":
+          apikave.VerifyLookup({
+            token: token,
+            token10: token2,
+            template : template,
+            receptor:obj.phonenumber
+          },
+          function(response, status) {
+            console.log(response);
+            console.log(status);
+            if(status==200){
+              console.log("success")
+            }
+          });
+          break;
+          case "chatdoc":
+            apikave.VerifyLookup({
+              token: token,
+              token10: token2,
+              template : template,
+              receptor:obj.phonenumber
+            },
+            function(response, status) {
+              console.log(response);
+              console.log(status);
+              if(status==200){
+                console.log("success")
+              }
+            });
+            break;
+            case "chatuser":
+          apikave.VerifyLookup({
+            token: token,
+            token10: token2,
+            template : template,
+            receptor:obj.phonenumber
+          },
+          function(response, status) {
+            console.log(response);
+            console.log(status);
+            if(status==200){
+              console.log("success")
+            }
+          });
+          break;
+          case "docsignup":
+          apikave.VerifyLookup({
+            token: token,
+            token2: token2,
+            template : template,
+            receptor:obj.phonenumber
+          },
+          function(response, status) {
+            console.log(response);
+            console.log(status);
+            if(status==200){
+              console.log("success")
+            }
+          });
+          break;
+          case "HCsingup":
+          apikave.VerifyLookup({
+            token: token,
+            token2: token2,
+            template : template,
+            receptor:obj.phonenumber
+          },
+          function(response, status) {
+            console.log(response);
+            console.log(status);
+            if(status==200){
+              console.log("success")
+            }
+          });
+          break;
+          case "reserveACK":
+          apikave.VerifyLookup({
+            token: token,
+            token10: token2,
+            token3: token3,
+            template : template,
+            receptor:obj.phonenumber
+          },
+          function(response, status) {
+            console.log(response);
+            console.log(status);
+            if(status==200){
+              console.log("success")
+            }
+          });
+          break;
+          case "reserveACKdoc":
+          apikave.VerifyLookup({
+            token: token,
+            token10: token2,
+            token3: token3,
+            template : template,
+            receptor:obj.phonenumber
+          },
+          function(response, status) {
+            console.log(response);
+            console.log(status);
+            if(status==200){
+              console.log("success")
+            }
+          });
+          break;
+          case "resHC":
+          apikave.VerifyLookup({
+            token: token,
+            token2: token2,
+            token10: token3,
+            template : template,
+            receptor:obj.phonenumber
+          },
+          function(response, status) {
+            console.log(response);
+            console.log(status);
+            if(status==200){
+              console.log("success")
+            }
+          });
+          break;
+          case "resHCuser":
+          apikave.VerifyLookup({
+            token: token,
+            token2: token2,
+            token10: token3,
+            template : template,
+            receptor:obj.phonenumber
+          },
+          function(response, status) {
+            console.log(response);
+            console.log(status);
+            if(status==200){
+              console.log("success")
+            }
+          });
+          break;
+          case "teleresdoc":
+          apikave.VerifyLookup({
+            token: token,
+            token2: token2,
+            token10: token3,
+            template : template,
+            receptor:obj.phonenumber
+          },
+          function(response, status) {
+            console.log(response);
+            console.log(status);
+            if(status==200){
+              console.log("success")
+            }
+          });
+          break;
+          case "teleresuser":
+          apikave.VerifyLookup({
+            token: token,
+            token2: token2,
+            token10: token3,
+            template : template,
+            receptor:obj.phonenumber
+          },
+          function(response, status) {
+            console.log(response);
+            console.log(status);
+            if(status==200){
+              console.log("success")
+            }
+          });
+          break;
+        default:
+          break;
+      }
     })
   })
 }
@@ -2381,6 +2542,7 @@ router.post("/addexp",function(req,res){
               path="data/Experiments/"+now.getTime()+".zip";
               dbo.collection("Experiments").insertOne({userid:user._id,hcid:HC._id,dateuploaded:now,description:req.body.description,path:path},function(err,result){
                 mv(req.files.file.tempFilePath,path,{mkdirp:true},function(err){
+                  sendSMS("addexp",user._id,"Users",new persianDate().format("L"),HC.name,null)
                   res.redirect("/HCpanel/addexp");
                   db.close();
                 })
@@ -2881,7 +3043,9 @@ router.post("/sendticket",function(req,res){
               if(req.files==null){
                 newticket=new Ticket(req.body.subject,req.body.text,null,now,req.body.sender);
                 chat.tickets.push(newticket);
-                dbo.collection("Chats").updateOne({doctor:req.body.dname,userphone:req.body.uphone,_id:chatid},{$set:{tickets:chat.tickets}},function(err,asd){
+                dbo.collection("Chats").updateOne({doctor:req.body.dname,userphone:req.body.uphone,_id:chatid},{$set:{tickets:chat.tickets}},async function(err,asd){
+                  user=await dbo.collection("Users").findOne({phonenumber:req.body.uphone})
+                  sendSMS("chatdoc",result._id,"Doctors",new persianDate().format("L"),user.firstname+" "+user.lastname,null);
                   res.redirect(req.body.from);
                   db.close();
                 })
