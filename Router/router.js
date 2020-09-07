@@ -33,7 +33,7 @@ const { ObjectID } = require('mongodb');
 const ZarinpalCheckout = require('zarinpal-checkout');
 const { debugPort } = require('process');
 const { Buffer } = require('buffer');
-const { query } = require('express');
+const { query, json } = require('express');
 const fileUpload = require('express-fileupload');
 const Ticket = require('../coreapp/Ticket.js');
 const e = require('express');
@@ -5888,7 +5888,8 @@ router.post("/test3",function(req,res){
       body:{
         secret:"6Lce7sgZAAAAABlVY5VbfAHr589PRWY-ZgtPRXt9",
         response:req.body.captcha
-      }
+      },
+      json:true
   }, (error, response, body) => {
     if (error) {
       console.error(error)
