@@ -1720,6 +1720,8 @@ router.post('/addHC',function(req,res){
                   else{
                     dbo.collection("HCtypes").findOne({name:query.type},function(err,type){
                       var img= "/"+query.type +"photos/"+req.body.name+".png";
+                      unhashed=req.body.password;
+                      req.body.password=md5(req.body.password);
                       var newHC=new HealthCenter(query.type,type.systype,req.body.name,type.systype=="B" || type.systype=="A",req.body.codemeli,req.body.codeofHC,req.body.city,req.body.phonenumber,req.body.address,req.body.directphonenumber,req.body.background,req.body.medicalnumber,req.body.appknowledge,req.body.username,req.body.password,img);
                       try {
                         mv(req.files.image.tempFilePath,"public"+img,{mkdirp: true},function(err){
@@ -1729,6 +1731,7 @@ router.post('/addHC',function(req,res){
                         console.log("no image");
                       }
                       dbo.collection("HealthCenters").insertOne(newHC,function(err,result){
+                        sendSMS("HCsingup",result.insertedId,"HealthCenters",req.body.username,)
                         if(type.systype=="A"){
                           var cats=[]
                           if(typeof req.body.categories=="string"){
