@@ -130,8 +130,9 @@
 <script>
 $(document).ready(function(){
     $("#myform").on('submit',function(e){
-        var recaptcha=$("#g-recaptcha-respone").val();
-        if(recaptcha==""){
+        var recaptcha=$("#g-recaptcha-response").val();
+        console.log(recaptcha)
+        if(recaptcha===""){
             e.preventDefault();
             alert("فرم را تکمیل کنید.")
         }
