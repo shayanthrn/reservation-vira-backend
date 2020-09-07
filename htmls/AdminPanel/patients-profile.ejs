@@ -193,13 +193,11 @@
             <div class="col-xl-3 col-lg-6">
               <div class="list-group">
                 <% for(i=0;i<user.telereserves.length;i++) { %>
-                <a href="" class="list-group-item list-group-item-action flex-column align-items-start">
+                <a href="<%= "/AdminPanel/telereserves/"+ user.telereserves[i]._id %>" class="list-group-item list-group-item-action flex-column align-items-start">
                   <div class="d-flex w-100 justify-content-between">
-                    <h5 class="mb-1"></h5>
+                    <h5 class="mb-1"><%=user.telereserves[i].timeinfo.date.year +"/"+user.telereserves[i].timeinfo.date.month +"/"+user.telereserves[i].timeinfo.date.day  %></h5>
                     <small class="text-muted">
-                      <% function n(n){
-                        return n > 9 ? "" + n: "0" + n;
-                        } %>
+                      <%=user.telereserves[i].timeinfo.time.start +"-"+user.telereserves[i].timeinfo.time.end %>
                     </small>
                   </div>
                 </a>
@@ -218,9 +216,8 @@
                 <% for(i=0;i<user.chats.length;i++) { %>
                 <a href="<%= "/AdminPanel/chats/"+ user.chats[i]._id %>" class="list-group-item list-group-item-action flex-column align-items-start">
                   <div class="d-flex w-100 justify-content-between">
-                    <h5 class="mb-1"><%= user.chats[i].tickets[0].datecreated %></h5>
+                    <h5 class="mb-1"><%= user.chats[i].doctor %></h5>
                     <small class="text-muted">
-                      <%= user.chats[i].doctor %>
                     </small>
                   </div>
                 </a>
