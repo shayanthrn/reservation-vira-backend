@@ -20,7 +20,7 @@
     <link href="assets/css/plugins/owl.carousel.css" rel="stylesheet" />
     <link href="assets/css/plugins/owl.theme.default.min.css" rel="stylesheet" />
     <link href="assets/css/main.css" rel="stylesheet" />
-    <script src="https://www.google.com/recaptcha/api.js"></script>
+    <script src="https://www.google.com/recaptcha/api.js?render=6Lf_5MgZAAAAAKeGEQFkLxDm3JnUwkBOwMpwkpZ-"></script>
 </head>
 
 <body>
@@ -58,10 +58,7 @@
                                 <p style="color: crimson;"> <%= data %></p>
                                 <div class="form-account-row form-account-submit">
                                     <div class="parent-btn">
-                                        <button class="btn dk-btn-info g-recaptcha" 
-                                        data-sitekey="6Lf_5MgZAAAAAKeGEQFkLxDm3JnUwkBOwMpwkpZ-" 
-                                        data-callback='onSubmit' 
-                                        data-action='submit'>
+                                        <button class="btn dk-btn-info g-recaptcha" onclick="onClick()">
                                             ورود/ثبت نام در دکتر تجویز
                                             <i class="now-ui-icons users_circle-08"></i>
                                         </button>
@@ -130,10 +127,15 @@
 <!-- Main Js -->
 <script src="assets/js/main.js" type="text/javascript"></script>
 <script>
-    function onSubmit(token) {
-      document.getElementById("myform").submit();
+    function onClick(e) {
+      e.preventDefault();
+      grecaptcha.ready(function() {
+        grecaptcha.execute('6Lf_5MgZAAAAAKeGEQFkLxDm3JnUwkBOwMpwkpZ-', {action: 'submit'}).then(function(token) {
+            // Add your logic to submit to your backend server here.
+            console.log("hi");
+        });
+      });
     }
-  </script>
-
+</script>
 
 </html>
