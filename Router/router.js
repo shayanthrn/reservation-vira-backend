@@ -5887,7 +5887,8 @@ router.post("/test3",function(req,res){
   fetch("https://www.google.com/recaptcha/api/siteverify",{
     method:"POST",
     body:JSON.stringify({
-
+      secret:"6Lce7sgZAAAAABlVY5VbfAHr589PRWY-ZgtPRXt9",
+      response:req.body.captcha
     })
   }).then((response)=>{
     response=response.json();
