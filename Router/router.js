@@ -3045,7 +3045,7 @@ router.post("/sendticket",function(req,res){
                 chat.tickets.push(newticket);
                 dbo.collection("Chats").updateOne({doctor:req.body.dname,userphone:req.body.uphone,_id:chatid},{$set:{tickets:chat.tickets}},async function(err,asd){
                   user=await dbo.collection("Users").findOne({phonenumber:req.body.uphone})
-                  sendSMS("chatdoc",user._id,"Users",new persianDate().format("L"),result.name,null);
+                  sendSMS("chatuser",user._id,"Users",new persianDate().format("L"),result.name,null);
                   res.redirect(req.body.from);
                   db.close();
                 })
@@ -3130,7 +3130,9 @@ router.post("/sendticketuser",function(req,res){
                 newticket = new Ticket(req.body.subject,req.body.text,file,now,req.body.sender);
                 mv(req.files.file.tempFilePath,file.path,{mkdirp:true},function(err){
                   chat.tickets.push(newticket);
-                  dbo.collection("Chats").updateOne({doctor:req.body.dname,userphone:req.body.uphone,_id:chatid},{$set:{tickets:chat.tickets}},function(err,asd){
+                  dbo.collection("Chats").updateOne({doctor:req.body.dname,userphone:req.body.uphone,_id:chatid},{$set:{tickets:chat.tickets}},async function(err,asd){
+                    doctor=await dbo.collection("Doctors").findOne({name:req.body.dname});
+                    sendSMS("chatdoc",doctor._id,"Doctors",new persianDate().format("L"),result.firstname+" "+result.lastname,null);
                     res.redirect(req.body.from);
                     db.close();
                   })
