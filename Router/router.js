@@ -5882,6 +5882,11 @@ router.get("/signup",function(req,res){
   res.end();
 })
 
+
+router.post("/test3",function(req,res){
+  console.log(req.body);
+})
+
 router.post('/signup',function(req,res){
   req.session.prevurl=req.session.currurl;
   req.session.currurl=req.url;

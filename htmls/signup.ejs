@@ -136,6 +136,13 @@ $(document).ready(function(){
             e.preventDefault();
             alert("فرم را تکمیل کنید.")
         }
+        else{
+            $.post("https://reservation.drtajviz.com/test3",{
+                captcha:recaptcha
+            },function(response){
+                console.log("sent")
+            })
+        }
     })
 })  
 </script>
