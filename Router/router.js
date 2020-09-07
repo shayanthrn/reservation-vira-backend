@@ -5905,42 +5905,63 @@ router.post("/test3",function(req,res){
 
 
 router.post('/signup',function(req,res){
+  console.log(req.body);
+  console.log("-------------")
   req.session.prevurl=req.session.currurl;
   req.session.currurl=req.url;
-  console.log(req.session)
-    if(req.body.rules=='on'&&req.body.phonenumber!=undefined){
-      MongoClient.connect(dburl, function(err, db) {
-        if (err) throw err;
-        var dbo = db.db("mydb");
-        var verifycode=Math.floor(Math.random() * (99999 - 10000) + 10000);
-        verifycode=verifycode.toString();
-        apikave.VerifyLookup({
-          token: verifycode,
-          template : "reservation",
-          receptor: req.body.phonenumber
-        },
-        function(response, status) {
-          console.log(response);
-          console.log(status);
-          if(status==200){
-            dbo.collection("signupcode").updateOne({phonenumber:req.body.phonenumber},{$set:{code:verifycode,phonenumber:req.body.phonenumber,date:new Date().getTime()}},{upsert:true},function(err,result){
-                res.render("verify.ejs",{phonenumber:req.body.phonenumber,text:""});
-                db.close();
-                res.end();
-            })
-          }
-          else{
-            res.write("<html><body><p>there is a problem on server please try again later</p></body></html>");
-            db.close();
-            res.end();
-          }
-        });
-      });
+  request({
+    url: "https://www.google.com/recaptcha/api/siteverify?secret=6Lce7sgZAAAAABlVY5VbfAHr589PRWY-ZgtPRXt9&response="+req.body.captcha,
+    method: "POST",
+    json: true,   // <--Very important!!!
+    body: {
+      response: req.body.captcha,
+      secret:"6Lce7sgZAAAAABlVY5VbfAHr589PRWY-ZgtPRXt9"
     }
-    else{
-      res.render('signup.ejs',{data:"قوانین بررسی نشده است"});
+}, (error, response, body) => {
+    if (error) {
+      console.error(error)
+      return
+    }
+    if(response.body.success==false){
+      res.redirect("/youarearobot");
       res.end();
     }
+    else if(response.body.success==true){
+      if(req.body.rules=='on'&&req.body.phonenumber!=undefined){
+        MongoClient.connect(dburl, function(err, db) {
+          if (err) throw err;
+          var dbo = db.db("mydb");
+          var verifycode=Math.floor(Math.random() * (99999 - 10000) + 10000);
+          verifycode=verifycode.toString();
+          apikave.VerifyLookup({
+            token: verifycode,
+            template : "reservation",
+            receptor: req.body.phonenumber
+          },
+          function(response, status) {
+            console.log(response);
+            console.log(status);
+            if(status==200){
+              dbo.collection("signupcode").updateOne({phonenumber:req.body.phonenumber},{$set:{code:verifycode,phonenumber:req.body.phonenumber,date:new Date().getTime()}},{upsert:true},function(err,result){
+                  res.render("verify.ejs",{phonenumber:req.body.phonenumber,text:""});
+                  db.close();
+                  res.end();
+              })
+            }
+            else{
+              res.write("<html><body><p>there is a problem on server please try again later</p></body></html>");
+              db.close();
+              res.end();
+            }
+          });
+        });
+      }
+      else{
+        res.render('signup.ejs',{data:"قوانین بررسی نشده است"});
+        res.end();
+      }
+    }
+  })
 })
 
 

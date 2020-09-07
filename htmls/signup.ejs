@@ -131,17 +131,16 @@
 $(document).ready(function(){
     $("#myform").on('submit',function(e){
         var recaptcha=$("#g-recaptcha-response").val();
-        console.log(recaptcha)
         if(recaptcha===""){
             e.preventDefault();
             alert("فرم را تکمیل کنید.")
         }
         else{
-            $.post("https://reservation.drtajviz.com/test3",{
-                captcha:recaptcha
-            },function(response){
-                console.log("sent")
-            })
+            a=document.createElement("input");
+            a.setAttribute("type", "text");
+            a.setAttribute("name", "captcha");
+            a.setAttribute("value",recaptcha);
+            document.getElementById("myform").append(a);
         }
     })
 })  
