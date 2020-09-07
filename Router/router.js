@@ -3036,16 +3036,14 @@ router.post("/sendticket",function(req,res){
         }
         else{
           var chatid=new ObjectID(req.body.chatid)
-          dbo.collection("Chats").findOne({doctor:req.body.dname,userphone:req.body.uphone,_id:chatid},function(err,chat){
+          dbo.collection("Chats").findOne({doctor:req.body.dname,userphone:req.body.uphone,_id:chatid},async function(err,chat){
             if(chat!=null){
               var now=new Date();
               var newticket;
               if(req.files==null){
                 newticket=new Ticket(req.body.subject,req.body.text,null,now,req.body.sender);
                 chat.tickets.push(newticket);
-                dbo.collection("Chats").updateOne({doctor:req.body.dname,userphone:req.body.uphone,_id:chatid},{$set:{tickets:chat.tickets}},async function(err,asd){
-                  user=await dbo.collection("Users").findOne({phonenumber:req.body.uphone})
-                  sendSMS("chatuser",user._id,"Users",new persianDate().format("L"),result.name,null);
+                dbo.collection("Chats").updateOne({doctor:req.body.dname,userphone:req.body.uphone,_id:chatid},{$set:{tickets:chat.tickets}},function(err,asd){
                   res.redirect(req.body.from);
                   db.close();
                 })
@@ -3090,6 +3088,8 @@ router.post("/sendticket",function(req,res){
                 })
               } 
             }
+            user=await dbo.collection("Users").findOne({phonenumber:req.body.uphone})
+            sendSMS("chatuser",user._id,"Users",new persianDate().format("L"),result.name,null);
           })
         }
       })
@@ -3111,7 +3111,7 @@ router.post("/sendticketuser",function(req,res){
         }
         else{
           var chatid=new ObjectID(req.body.chatid)
-          dbo.collection("Chats").findOne({doctor:req.body.dname,userphone:req.body.uphone,_id:chatid},function(err,chat){
+          dbo.collection("Chats").findOne({doctor:req.body.dname,userphone:req.body.uphone,_id:chatid},async function(err,chat){
             if(chat!=null){
               var now=new Date();
               var newticket;
@@ -3131,9 +3131,6 @@ router.post("/sendticketuser",function(req,res){
                 mv(req.files.file.tempFilePath,file.path,{mkdirp:true},function(err){
                   chat.tickets.push(newticket);
                   dbo.collection("Chats").updateOne({doctor:req.body.dname,userphone:req.body.uphone,_id:chatid},{$set:{tickets:chat.tickets}},async function(err,asd){
-                    doctor=await dbo.collection("Doctors").findOne({name:req.body.dname});
-                    sendSMS("chatdoc",doctor._id,"Doctors",new persianDate().format("L"),result.firstname+" "+result.lastname,null);
-                    console.log("sms sent");
                     res.redirect(req.body.from);
                     db.close();
                   })
@@ -3166,6 +3163,8 @@ router.post("/sendticketuser",function(req,res){
                 })
               } 
             }
+            doctor=await dbo.collection("Doctors").findOne({name:req.body.dname});
+            sendSMS("chatdoc",doctor._id,"Doctors",new persianDate().format("L"),result.firstname+" "+result.lastname,null);
           })
         }
       })
