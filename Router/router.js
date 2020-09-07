@@ -1669,8 +1669,10 @@ router.post("/addDoctor",function(req,res){
                       memtype.push(doc2);
                     })
                   }
+                  unhashed=req.body.pass;
+                  req.body.pass=md5(req.body.pass)
                   dbo.collection('Doctors').insertOne(new Doctor(req.body.username,req.body.pass,req.body.name,cats,req.body.medicalnumber,req.body.codemeli,req.body.workphone,req.body.phonenumber,req.body.address,req.body.city,"/docphotos/"+req.body.name.trim()+".png",req.body.background,req.body.description,memtype,req.body.appknowledge),function(err,res2){
-                    console.log(res2);
+                    sendSMS("docsignup",res2.insertedId,"Doctors",req.body.username,unhashed,null);
                     if(req.files!=null){
                     mv(req.files.image.tempFilePath,"public/docphotos/"+req.body.name+".png",function(err){
                       console.log("public/docphotos/"+req.body.name+".png")
