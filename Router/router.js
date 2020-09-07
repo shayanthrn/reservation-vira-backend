@@ -2842,7 +2842,7 @@ router.get("/doctorpanel/patients/:userid",function(req,res){
             else{
               user.reserves=await dbo.collection("Reservations").find({user:userid,doctor:doctor._id}).toArray();
               user.telereserves=await dbo.collection("teleReservations").find({user:userid,doctor:doctor._id}).toArray();
-              user.chats=await dbo.collection("Chats").find({userphone:result3.phonenumber,doctor:doctor.name}).toArray();
+              user.chats=await dbo.collection("Chats").find({userphone:user.phonenumber,doctor:doctor.name}).toArray();
               res.render('DoctorPanel/patient-status.ejs',{user:user,doctor:doctor});
               db.close();
               res.end();
