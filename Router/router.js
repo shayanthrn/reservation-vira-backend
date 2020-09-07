@@ -5885,12 +5885,12 @@ router.get("/signup",function(req,res){
 
 router.post("/test3",function(req,res){
   request({
-    url: "https://reservation.drtajviz.com/test4",
+    url: "https://www.google.com/recaptcha/api/siteverify?secret=6Lce7sgZAAAAABlVY5VbfAHr589PRWY-ZgtPRXt9&response="+req.body.captcha,
     method: "POST",
     json: true,   // <--Very important!!!
     body: {
-      secret:"6Lce7sgZAAAAABlVY5VbfAHr589PRWY-ZgtPRXt9",
-      response: req.body.captcha
+      response: req.body.captcha,
+      secret:"6Lce7sgZAAAAABlVY5VbfAHr589PRWY-ZgtPRXt9"
     }
 }, (error, response, body) => {
     if (error) {
@@ -5903,10 +5903,6 @@ router.post("/test3",function(req,res){
   })
 })
 
-router.post("/test4",function(req,res){
-  console.log("/////////////test4")
-  console.log(req.body);
-})
 
 router.post('/signup',function(req,res){
   req.session.prevurl=req.session.currurl;
