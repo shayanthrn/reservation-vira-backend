@@ -34,7 +34,7 @@
                         </a>
                         <div class="account-box-title">ورود/ثبت نام</div>
                         <div class="account-box-content">
-                            <form id="myform" class="form-account" onsubmit="return myfunc()" action="/signup" method="POST">
+                            <form id="myform" class="form-account" action="/signup" method="POST">
                                 <div class="form-account-title">شماره تلفن</div>
                                 <div class="form-account-row">
                                     <label class="input-label"><i class="now-ui-icons users_single-02"></i></label>
@@ -128,7 +128,15 @@
 <!-- Main Js -->
 <script src="assets/js/main.js" type="text/javascript"></script>
 <script>
-    
+$(document).ready(function(){
+    $("#myform").on('submit',function(e){
+        var recaptcha=$("#g-recaptcha-respone").val();
+        if(recaptcha==""){
+            e.preventDefault();
+            alert("فرم را تکمیل کنید.")
+        }
+    })
+})  
 </script>
 
 </html>
