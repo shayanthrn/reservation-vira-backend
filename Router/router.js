@@ -3133,6 +3133,7 @@ router.post("/sendticketuser",function(req,res){
                   dbo.collection("Chats").updateOne({doctor:req.body.dname,userphone:req.body.uphone,_id:chatid},{$set:{tickets:chat.tickets}},async function(err,asd){
                     doctor=await dbo.collection("Doctors").findOne({name:req.body.dname});
                     sendSMS("chatdoc",doctor._id,"Doctors",new persianDate().format("L"),result.firstname+" "+result.lastname,null);
+                    console.log("sms sent");
                     res.redirect(req.body.from);
                     db.close();
                   })
