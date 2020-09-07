@@ -20,7 +20,7 @@
     <link href="assets/css/plugins/owl.carousel.css" rel="stylesheet" />
     <link href="assets/css/plugins/owl.theme.default.min.css" rel="stylesheet" />
     <link href="assets/css/main.css" rel="stylesheet" />
-    <script src="https://www.google.com/recaptcha/api.js?render=6Lf_5MgZAAAAAKeGEQFkLxDm3JnUwkBOwMpwkpZ-"></script>
+    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
 </head>
 
 <body>
@@ -54,6 +54,7 @@
                                         حریم خصوصی و
                                         شرایط و قوانین استفاده از سرویس های سایت
                                         دکتر تجویز را مطالعه نموده و با کلیه موارد آن موافقم.</label>
+                                    <div class="g-recaptcha" data-sitekey="your_site_key"></div>
                                 </div>
                                 <p style="color: crimson;"> <%= data %></p>
                                 <div class="form-account-row form-account-submit">
@@ -127,18 +128,7 @@
 <!-- Main Js -->
 <script src="assets/js/main.js" type="text/javascript"></script>
 <script>
-    function onClick(e) {
-      grecaptcha.ready(function() {
-        grecaptcha.execute('6Lf_5MgZAAAAAKeGEQFkLxDm3JnUwkBOwMpwkpZ-', {action: 'submit'}).then(function(token) {
-            // Add your logic to submit to your backend server here.
-            console.log("hi");
-        });
-      });
-    }
-
-    function myfunc(){
-        return false;
-    }
+    
 </script>
 
 </html>
