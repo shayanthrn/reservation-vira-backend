@@ -3045,7 +3045,7 @@ router.post("/sendticket",function(req,res){
                 chat.tickets.push(newticket);
                 dbo.collection("Chats").updateOne({doctor:req.body.dname,userphone:req.body.uphone,_id:chatid},{$set:{tickets:chat.tickets}},async function(err,asd){
                   user=await dbo.collection("Users").findOne({phonenumber:req.body.uphone})
-                  sendSMS("chatdoc",result._id,"Doctors",new persianDate().format("L"),user.firstname+" "+user.lastname,null);
+                  sendSMS("chatdoc",user._id,"Users",new persianDate().format("L"),result.name,null);
                   res.redirect(req.body.from);
                   db.close();
                 })
