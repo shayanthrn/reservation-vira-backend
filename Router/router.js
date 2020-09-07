@@ -676,8 +676,8 @@ router.get("/api/getCurUser",function(req,res){
         }
         else{
           user.chats=await dbo.collection("Chats").find({userphone:user.phonenumber}).toArray()
-          user.reserves=await dbo.collection("Reservations").aggregate([{$match:{user:user._id}},{$lookup:{from:"Doctors", localField: "doctor", foreignField: "_id", as: "doctor"}},{$lookup:{from:"HealthCenters", localField: "HC", foreignField: "_id", as: "HC"}},{$project:{"doctor.name":1,"time":1,"refid":1,"HC.name":1,"catname":1}}]).toArray();
-          user.teleReservations=await dbo.collection("teleReservations").aggregate([{$match:{user:user._id}},{$lookup:{from:"Doctors", localField: "doctor", foreignField: "_id", as: "doctor"}},{$project:{"doctor.name":1,"timeinfo":1,"refid":1}}]).toArray()
+          user.reserves=await dbo.collection("Reservations").aggregate([{$match:{user:user._id}},{$lookup:{from:"Doctors", localField: "doctor", foreignField: "_id", as: "doctor"}},{$lookup:{from:"HealthCenters", localField: "HC", foreignField: "_id", as: "HC"}},{$project:{"doctor.name":1,"time":1,"refid":1,"HC.name":1,"catname":1,"doctor.image":1,"HC.image":1}}]).toArray();
+          user.teleReservations=await dbo.collection("teleReservations").aggregate([{$match:{user:user._id}},{$lookup:{from:"Doctors", localField: "doctor", foreignField: "_id", as: "doctor"}},{$project:{"doctor.name":1,"timeinfo":1,"refid":1,"doctor.image":1}}]).toArray()
           res.json({user:user});
           db.close();
           res.end();
@@ -4075,6 +4075,8 @@ router.get("/AdminPanel/users/:userid",function(req,res){
           dbo.collection("Users").findOne({_id:userid},async function(err,result3){
             if(result3!=null){
                   result3.reserves=await dbo.collection("Reservations").find({user:userid}).toArray();
+                  result3.telereserves=await dbo.collection("teleReservations").find({user:userid}).toArray();
+                  result3.chats=await dbo.collection("Chats").find({userphone:result3.phonenumber}).toArray();
                   res.render("AdminPanel/patients-profile.ejs",{user:result3,reservations:result3.reserves});
                   db.close();
                   res.end();
