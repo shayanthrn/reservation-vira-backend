@@ -5892,7 +5892,6 @@ router.post("/test3",function(req,res){
       console.error(error)
       return
     }
-    response=response.json();
     console.log("[[[[[[[[[[[[[[[[[[[[[[[[[")
     console.log(response);
     console.log("[[[[[[[[[[[[[[[[[[[[[[[[[")
