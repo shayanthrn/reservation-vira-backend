@@ -5884,13 +5884,14 @@ router.get("/signup",function(req,res){
 
 
 router.post("/test3",function(req,res){
-  fetch("https://www.google.com/recaptcha/api/siteverify",{
-    method:"POST",
-    body:JSON.stringify({
+  request.post('https://www.google.com/recaptcha/api/siteverify', {
       secret:"6Lce7sgZAAAAABlVY5VbfAHr589PRWY-ZgtPRXt9",
       response:req.body.captcha
-    })
-  }).then((response)=>{
+  }, (error, response, body) => {
+    if (error) {
+      console.error(error)
+      return
+    }
     response=response.json();
     console.log("[[[[[[[[[[[[[[[[[[[[[[[[[")
     console.log(response);
