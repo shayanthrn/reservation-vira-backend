@@ -5888,7 +5888,10 @@ router.post("/test3",function(req,res){
     url: "https://www.google.com/recaptcha/api/siteverify",
     method: "POST",
     json: true,   // <--Very important!!!
-    body: myJSONObject
+    body: {
+      secret:"6Lce7sgZAAAAABlVY5VbfAHr589PRWY-ZgtPRXt9",
+      response: req.body.captcha
+    }
 }, (error, response, body) => {
     if (error) {
       console.error(error)
