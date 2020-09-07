@@ -5883,34 +5883,11 @@ router.get("/signup",function(req,res){
 })
 
 
-router.post("/test3",function(req,res){
-  request({
-    url: "https://www.google.com/recaptcha/api/siteverify?secret=6Lce7sgZAAAAABlVY5VbfAHr589PRWY-ZgtPRXt9&response="+req.body.captcha,
-    method: "POST",
-    json: true,   // <--Very important!!!
-    body: {
-      response: req.body.captcha,
-      secret:"6Lce7sgZAAAAABlVY5VbfAHr589PRWY-ZgtPRXt9"
-    }
-}, (error, response, body) => {
-    if (error) {
-      console.error(error)
-      return
-    }
-    console.log("[[[[[[[[[[[[[[[[[[[[[[[[[")
-    console.log(response.body);
-    console.log("[[[[[[[[[[[[[[[[[[[[[[[[[")
-  })
-})
-
-
 router.post('/signup',function(req,res){
-  console.log(req.body);
-  console.log("-------------")
   req.session.prevurl=req.session.currurl;
   req.session.currurl=req.url;
   request({
-    url: "https://www.google.com/recaptcha/api/siteverify?secret=6Lce7sgZAAAAABlVY5VbfAHr589PRWY-ZgtPRXt9&response="+req.body.captcha,
+    url: "https://www.google.com/recaptcha/api/siteverify?secret=6Lce7sgZAAAAABlVY5VbfAHr589PRWY-ZgtPRXt9&response="+req.body["g-recaptcha-response"],
     method: "POST",
     json: true,   // <--Very important!!!
     body: {
@@ -5927,6 +5904,7 @@ router.post('/signup',function(req,res){
       res.end();
     }
     else if(response.body.success==true){
+      console.log("success in captcha")
       if(req.body.rules=='on'&&req.body.phonenumber!=undefined){
         MongoClient.connect(dburl, function(err, db) {
           if (err) throw err;
