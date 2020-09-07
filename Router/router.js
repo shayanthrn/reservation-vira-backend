@@ -2840,7 +2840,9 @@ router.get("/doctorpanel/patients/:userid",function(req,res){
               res.redirect('/noaccess');
             }
             else{
-              user.reserves=await dbo.collection("Reservations").find({user:user._id,doctor:doctor._id}).toArray();
+              user.reserves=await dbo.collection("Reservations").find({user:userid,doctor:doctor._id}).toArray();
+              user.telereserves=await dbo.collection("teleReservations").find({user:userid,doctor:doctor._id}).toArray();
+              user.chats=await dbo.collection("Chats").find({userphone:result3.phonenumber,doctor:doctor.name}).toArray();
               res.render('DoctorPanel/patient-status.ejs',{user:user,doctor:doctor});
               db.close();
               res.end();
