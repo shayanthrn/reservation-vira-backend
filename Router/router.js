@@ -1731,7 +1731,7 @@ router.post('/addHC',function(req,res){
                         console.log("no image");
                       }
                       dbo.collection("HealthCenters").insertOne(newHC,function(err,result){
-                        sendSMS("HCsingup",result.insertedId,"HealthCenters",req.body.username,)
+                        sendSMS("HCsingup",result.insertedId,"HealthCenters",req.body.username,unhashed,null);
                         if(type.systype=="A"){
                           var cats=[]
                           if(typeof req.body.categories=="string"){
@@ -1998,7 +1998,7 @@ function sendSMS(template,id,type,token,token2,token3){
             token: token,
             token2: token2,
             template : template,
-            receptor:obj.phonenumber
+            receptor:obj.directphonenumber
           },
           function(response, status) {
             console.log(response);
@@ -2043,10 +2043,9 @@ function sendSMS(template,id,type,token,token2,token3){
           case "resHC":
           apikave.VerifyLookup({
             token: token,
-            token2: token2,
-            token10: token3,
+            token10: token2,
             template : template,
-            receptor:obj.phonenumber
+            receptor:obj.directphonenumber
           },
           function(response, status) {
             console.log(response);
@@ -2059,8 +2058,7 @@ function sendSMS(template,id,type,token,token2,token3){
           case "resHCuser":
           apikave.VerifyLookup({
             token: token,
-            token2: token2,
-            token10: token3,
+            token10: token2,
             template : template,
             receptor:obj.phonenumber
           },
@@ -5357,11 +5355,14 @@ router.get("/telepaymenthandler",function(req,res){
               dbo.collection("TempteleReserves").deleteOne({authority:query.Authority},function(err,aa){
                   dbo.collection("Users").updateOne({_id:reservation.user},{$addToSet:{telereservations:reservation}},function(err,ad){
                     dbo.collection("Doctors").findOne({_id:reservation.doctor},function(err,doctor){
-                        dbo.collection("Doctors").updateOne({_id:reservation.doctor},{$addToSet:{telereservations:reservation}},function(err,sas){
-                          strtime=n(reserve.timeinfo.time.start)+"-"+n(reserve.timeinfo.time.end);
+                        dbo.collection("Doctors").updateOne({_id:reservation.doctor},{$addToSet:{telereservations:reservation}},async function(err,sas){
+                          strtime=n(reservation.timeinfo.time.start)+"-"+n(reservation.timeinfo.time.end);
                           changestatustransaction(query.Authority,"موفق");
                           res.render("paymentaccept.ejs",{doctor:doctor,time:strtime,resid:reservation.refid,chat:2,doc:1});
-                          //sendSMSforres(reservation);
+                          user=await dbo.collection("Users").findOne({_id:reservation.user})
+                          mytime=reservation.timeinfo.date.year+"/"+reservation.timeinfo.date.month+"/"+reservation.timeinfo.date.day
+                          sendSMS("teleresdoc",doctor._id,"Doctors",mytime,strtime);
+                          sendSMS("teleresuser",user._id,"Users",mytime,strtime)
                           res.end();
                         })
                     })
@@ -5505,13 +5506,12 @@ router.get("/paymenthandlerHC",function(req,res){
             dbo.collection("Reservations").insertOne(reservation,function(err,result234){
               dbo.collection("TempReservesHC").deleteOne({authority:query.Authority},function(err,aa){
                   dbo.collection("Users").updateOne({_id:reservation.user},{$addToSet:{reserves:reservation}},function(err,ad){
-                    dbo.collection("HealthCenters").findOne({_id:reservation.HC},function(err,HC){
+                    dbo.collection("HealthCenters").findOne({_id:reservation.HC},async function(err,HC){
                       if(HC.systype=="B"){
                         dbo.collection("HealthCenters").updateOne({_id:reservation.HC},{$addToSet:{reservations:reservation,unavailabletimes:reservation.time}},function(err,sas){
                           strtime=n(reserve.time.start.hour)+":"+n(reserve.time.start.min)+"-"+n(reserve.time.end.hour)+":"+n(reserve.time.end.min);
                           changestatustransaction(query.Authority,"موفق");
                           res.render("paymentaccept.ejs",{doctor:HC,time:strtime,resid:reservation.refid,chat:0,doc:0});
-                          //sendSMSforres(reservation);
                           res.end();
                         })
                       }
@@ -5527,10 +5527,13 @@ router.get("/paymenthandlerHC",function(req,res){
                           strtime=n(reserve.time.start.hour)+":"+n(reserve.time.start.min)+"-"+n(reserve.time.end.hour)+":"+n(reserve.time.end.min);
                           changestatustransaction(query.Authority,"موفق");
                           res.render("paymentaccept.ejs",{doctor:HC,time:strtime,resid:reservation.refid,chat:0,doc:0});
-                          //sendSMSforres(reservation);
                           res.end();
                         })
                       }
+                      user=await dbo.collection("Users").findOne({_id:reservation.user})
+                      mytime=new persianDate([reservation.time.date.year,reservation.time.date.month,reservation.time.date.day])
+                      sendSMS("resHC",HC._id,"HealthCenters",mytime.format("L"),user.firstname+" "+suser.lastname,null);
+                      sendSMS("resHCuser",user._id,"Users",mytime.format("L"),HC.name,null);
                     })
                   })
               })
@@ -5831,10 +5834,12 @@ router.get("/paymenthandler",function(req,res){
                 dbo.collection("Doctors").updateOne({_id:reservation.doctor},{$addToSet:{reservations:reservation,unavailabletimes:reservation.time}},function(err,ss){
                   dbo.collection("Users").updateOne({_id:reservation.user},{$addToSet:{reserves:reservation}},function(err,ad){
                     strtime=n(reserve.time.start.hour)+":"+n(reserve.time.start.min)+"-"+n(reserve.time.end.hour)+":"+n(reserve.time.end.min);
-                    dbo.collection("Doctors").findOne({_id:reservation.doctor},function(err,doctor){
+                    dbo.collection("Doctors").findOne({_id:reservation.doctor},async function(err,doctor){
                       changestatustransaction(query.Authority,"موفق");
                       res.render("paymentaccept.ejs",{doctor:doctor,time:strtime,resid:reservation.refid,chat:0,doc:1});
-                      sendSMS("reserveACK",reservation.user.toString(),"Users",reservation.refid,doctor.name,new persianDate([reservation.time.date.year,reservation.time.date.month,reservation.time.date.day]).format("L"))
+                      sendSMS("reserveACK",reservation.user,"Users",reservation.refid,doctor.name,new persianDate([reservation.time.date.year,reservation.time.date.month,reservation.time.date.day]).format("L"))
+                      username=await dbo.collection("Users").findOne({_id:reservation.user})
+                      sendSMS("reserveACKdoc",reservation.doctor,"Doctors",reservation.refid,username.firstname+" "+username.lastname,new persianDate([reservation.time.date.year,reservation.time.date.month,reservation.time.date.day]).format("L"))
                       res.end();
                     })  
                   })
