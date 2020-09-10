@@ -676,8 +676,8 @@ router.get("/api/getCurUser",function(req,res){
         }
         else{
           user.chats=await dbo.collection("Chats").find({userphone:user.phonenumber}).toArray()
-          user.reserves=await dbo.collection("Reservations").aggregate([{$match:{user:user._id}},{$lookup:{from:"Doctors", localField: "doctor", foreignField: "_id", as: "doctor"}},{$lookup:{from:"HealthCenters", localField: "HC", foreignField: "_id", as: "HC"}},{$project:{"doctor.name":1,"time":1,"refid":1,"HC.name":1,"catname":1,"doctor.image":1,"HC.image":1}}]).toArray();
-          user.teleReservations=await dbo.collection("teleReservations").aggregate([{$match:{user:user._id}},{$lookup:{from:"Doctors", localField: "doctor", foreignField: "_id", as: "doctor"}},{$project:{"doctor.name":1,"timeinfo":1,"refid":1,"doctor.image":1}}]).toArray()
+          user.reserves=await dbo.collection("Reservations").aggregate([{$match:{user:user._id}},{$lookup:{from:"Doctors", localField: "doctor", foreignField: "_id", as: "doctor"}},{$lookup:{from:"HealthCenters", localField: "HC", foreignField: "_id", as: "HC"}},{$project:{"doctor":1,"time":1,"refid":1,"HC":1,"catname":1}}]).toArray();
+          user.teleReservations=await dbo.collection("teleReservations").aggregate([{$match:{user:user._id}},{$lookup:{from:"Doctors", localField: "doctor", foreignField: "_id", as: "doctor"}},{$project:{"doctor":1,"timeinfo":1,"refid":1}}]).toArray()
           res.json({user:user});
           db.close();
           res.end();
@@ -810,7 +810,7 @@ router.post("/api/ticketpayment",function(req,res){
               Mobile: user.phonenumber
             }).then(response => {
               if (response.status === 100) {
-                var newchat = new Chat(req.body.doctor,user.phonenumber);
+                var newchat = new Chat(req.body.doctor,user.phonenumber,doctor.chatcost);
                 newchat.authority=response.authority;
                 addtransaction(user._id,req.body.cost,response.authority);
                 var now=new Date();
