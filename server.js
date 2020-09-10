@@ -34,7 +34,7 @@ var certificate = fs.readFileSync('/etc/letsencrypt/live/reservation.drtajviz.co
 
 var credentials = {key: privateKey, cert: certificate};
 var httpServer = http.createServer(apphttp);
-// var httpsServer = https.createServer(credentials, app);
+var httpsServer = https.createServer(credentials, app);
 
 
 httpServer.listen(80);
