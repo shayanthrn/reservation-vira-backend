@@ -236,7 +236,7 @@ router.post("/api/paymentHC",function(req,res){
                 CallbackURL: 'http://reservation.drtajviz.com/paymenthandlerHC',
                 Description: 'Dr tajviz payment',
                 Email: 'shayanthrn@gmail.com',
-                Mobile: '09128993687'
+                Mobile: user.phonenumber
               }).then(response => {
                 if (response.status === 100) {
                   reservation = new ReservationHC(user._id,HC._id,req.body.cat,unavb,response.authority,req.body.cost);
@@ -763,7 +763,7 @@ router.post("/api/payment",function(req,res){
                 CallbackURL: 'http://reservation.drtajviz.com/paymenthandler',
                 Description: 'Dr tajviz payment',
                 Email: 'shayanthrn@gmail.com',
-                Mobile: '09128993687'
+                Mobile: user.phonenumber
               }).then(response => {
                 if (response.status === 100) {
                   reservation = new Reservation(user._id,doctor._id,unavb,response.authority,req.body.cost);
@@ -807,7 +807,7 @@ router.post("/api/ticketpayment",function(req,res){
               CallbackURL: 'http://reservation.drtajviz.com/ticketpaymenthandler',
               Description: 'Dr tajviz payment',
               Email: 'shayanthrn@gmail.com',
-              Mobile: '09128993687'
+              Mobile: user.phonenumber
             }).then(response => {
               if (response.status === 100) {
                 var newchat = new Chat(req.body.doctor,user.phonenumber);
@@ -884,7 +884,7 @@ router.post("/api/telepayment",function(req,res){
                 CallbackURL: 'http://reservation.drtajviz.com/telepaymenthandler',
                 Description: 'Dr tajviz payment',
                 Email: 'shayanthrn@gmail.com',
-                Mobile: '09128993687'
+                Mobile: user.phonenumber
               }).then(response => {
                 if (response.status === 100) {
                   reservation = new teleReservation(user._id,doctor._id,timeinfo,response.authority,req.body.cost);
@@ -5120,7 +5120,7 @@ router.post("/ticketpayment",function(req,res){
               CallbackURL: 'http://reservation.drtajviz.com/ticketpaymenthandler',
               Description: 'Dr tajviz payment',
               Email: 'shayanthrn@gmail.com',
-              Mobile: '09128993687'
+              Mobile: user.phonenumber
             }).then(response => {
               if (response.status === 100) {
                 var newchat = new Chat(req.body.doctor,user.phonenumber,doctor.chatcost);
@@ -5302,7 +5302,7 @@ router.post("/telepayment",function(req,res){
                 CallbackURL: 'http://reservation.drtajviz.com/telepaymenthandler',
                 Description: 'Dr tajviz payment',
                 Email: 'shayanthrn@gmail.com',
-                Mobile: '09128993687'
+                Mobile: user.phonenumber
               }).then(response => {
                 if (response.status === 100) {
                   reservation = new teleReservation(user._id,doctor._id,timeinfo,response.authority,req.body.cost);
@@ -5451,7 +5451,7 @@ router.post("/paymentHC",function(req,res){
                   CallbackURL: 'http://reservation.drtajviz.com/paymenthandlerHC',
                   Description: 'Dr tajviz payment',
                   Email: 'shayanthrn@gmail.com',
-                  Mobile: '09128993687'
+                  Mobile: user.phonenumber
                 }).then(response => {
                   if (response.status === 100) {
                     reservation = new ReservationHC(user._id,HC._id,req.body.cat,unavb,response.authority,req.body.cost);
@@ -5778,7 +5778,7 @@ router.post("/payment",function(req,res){
                   CallbackURL: 'http://reservation.drtajviz.com/paymenthandler',
                   Description: 'Dr tajviz payment',
                   Email: 'shayanthrn@gmail.com',
-                  Mobile: '09128993687'
+                  Mobile: user.phonenumber
                 }).then(response => {
                   if (response.status === 100) {
                     reservation = new Reservation(user._id,doctor._id,unavb,response.authority,req.body.cost);

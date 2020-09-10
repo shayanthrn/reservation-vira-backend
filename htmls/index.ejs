@@ -20,6 +20,19 @@
     <link href="assets/css/plugins/owl.theme.default.min.css" rel="stylesheet" />
     <link href="assets/css/main.css" rel="stylesheet" />
     <link href="assets/css/index.css" rel="stylesheet" />
+    <style>
+        /* @media screen and (max-width:1920px) {
+            #searchinput {
+                visibility: hidden;
+            }
+        } */
+
+        @media screen and (max-width : 800px) {
+            #searchinput {
+                max-width: 100%;
+            }
+        }
+    </style>
 </head>
 
 <body class="index-page sidebar-collapse">
@@ -87,9 +100,9 @@
                         <p id="select-category">لطفا دکتر خود را از لیست زیر انتخاب کنید</p>
                         <% } else{ %>
                         <div class="row">
-                            <div class="col">
+                            <div class="col-12">
                                 <p id="select-category">لطفا تخصص مورد نیاز خود را از لیست زیر انتخاب کنید</p>
-                                <input oninput="fastsearch()" class="form-control" type="text"  name="searchinput" id="searchinput" style="max-width: 30%;border-width: 2px;border-color: black;background-color: white;" placeholder="جتسجو سریع...">
+                                <input oninput="fastsearch()" class="form-control" type="text"  name="searchinput" id="searchinput" style="margin-bottom: 16px; max-width: 30%;border-width: 2px;border-color: black;background-color: white;" placeholder="جستجوی تخصص">
                             </div>
                             <div class="col">
                                
