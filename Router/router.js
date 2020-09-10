@@ -1767,16 +1767,7 @@ router.post('/addHC',function(req,res){
 })
 
 
-//-----------------------test route--------------------------//
 
-router.post("/test2",function(req,res){
-  console.log({asqar:req.body.key.trim()})
-  res.end();
-})
-
-
-
-//-----------------------test route--------------------------//
 
 //-----------------------functions--------------------------//
 
@@ -4776,12 +4767,84 @@ router.get("/",function(req,res){
   MongoClient.connect(dburl,function(err,db){
     if (err) throw err;
     var dbo=db.db("mydb");
-    dbo.collection("Categories").find().forEach(function(doc,err){
-      Categories.push(doc);
+    if(req.cookies.usertoken==undefined){
+      categories().then(basiccategories=>{
+        res.render('index.ejs',{Objects:basiccategories,type:"category",category:"",user:"",categories:basiccategories});
+        res.end();
+        db.close();
+      })
+    }
+    else{
+      dbo.collection("Users").findOne({token:req.cookies.usertoken},function(err,result){
+        if(err) throw err;
+        if(result==null){
+          res.clearCookie('usertoken');
+          res.redirect('/');
+        }
+        categories().then(basiccategories=>{
+          res.render('index.ejs',{Objects:basiccategories,type:"category",category:"",user:result,categories:basiccategories});
+          res.end();
+          db.close();
+        })
+      })
+    }
+  })
+})
+
+
+router.get("/consultant",function(req,res){
+  req.session.prevurl=req.session.currurl;
+  req.session.currurl=req.url;
+  Categories = [];
+  MongoClient.connect(dburl,async function(err,db){
+    if (err) throw err;
+    var dbo=db.db("mydb");
+    if(req.cookies.usertoken==undefined){
+      user="";
+    }
+    else{
+      user=await dbo.collection("Users").findOne({token:req.cookies.usertoken})
+      if(user==null){
+        user="";
+      }
+    }
+    docpics={};
+    counter=1;
+    a=await dbo.collection("Categories").find({}).toArray();
+    drcounts=await dbo.collection("Doctors").find({$or:[{membershiptypes:"chatconsultant"},{membershiptypes:"teleconsultant"}]}).count();
+    a.forEach(async function(doc, index, array){
+      docpics[doc.name]=await dbo.collection("Doctors").find({categories:doc.name},{projection:{image:1,_id:0}}).limit(4).toArray();
+      counter++;
+      if(counter==array.length){
+        categories().then(basiccategories=>{
+          res.render("consultant.ejs",{categories:basiccategories,user:user,drcounts:drcounts,docpics:docpics});
+          res.end();
+        })
+      }
+    })
+  })
+})
+
+router.get("/consultant/:Category",function(req,res){
+  req.session.prevurl=req.session.currurl;
+  req.session.currurl=req.url;
+  var query=url.parse(req.url,true).query;
+  if(query.city=="all"){
+    qcity={$regex:'.*'}
+  }
+  else {
+    qcity=query.city;
+  }
+  Doctors = [];
+  MongoClient.connect(dburl,function(err,db){
+    if(err) throw err;
+    var dbo= db.db("mydb");
+    dbo.collection("Doctors").find({categories:req.params.Category.split('-').join(' '),city:qcity}).forEach(function(doc,err){
+      Doctors.push(doc);
     },function(){
       if(req.cookies.usertoken==undefined){
         categories().then(basiccategories=>{
-          res.render('index.ejs',{Objects:Categories,type:"category",category:"",user:"",categories:basiccategories});
+          res.render("index.ejs",{Objects:Doctors,type:"doc",category:req.params.Category,user:"",categories:basiccategories});
           res.end();
           db.close();
         })
@@ -4791,10 +4854,10 @@ router.get("/",function(req,res){
           if(err) throw err;
           if(result==null){
             res.clearCookie('usertoken');
-            res.redirect('/');
+            res.redirect('/category//'+req.params.Category);
           }
           categories().then(basiccategories=>{
-            res.render('index.ejs',{Objects:Categories,type:"category",category:"",user:result,categories:basiccategories});
+            res.render('index.ejs',{Objects:Doctors,type:"doc",category:req.params.Category.split(' ').join('-'),user:result,categories:basiccategories});
             res.end();
             db.close();
           })
