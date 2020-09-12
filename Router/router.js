@@ -325,7 +325,7 @@ router.get("/api/getAllExperimentsOfuser",function(req,res){
             res.end();
           }
           else{
-            result=await dbo.collection("Experiments").aggregate([{$match:{userid:user._id}},{$lookup:{from:"HealthCenters", localField: "HC", foreignField: "_id", as: "HC"}},{$project:{"HC.name":1,"HC.address":1,"HC.image":1,"HC.phonenumber":1}}]).toArray();
+            result=await dbo.collection("Experiments").aggregate([{$match:{userid:user._id}},{$lookup:{from:"HealthCenters", localField: "hcid", foreignField: "_id", as: "HC"}},{$project:{"HC.name":1,"HC.address":1,"HC.image":1,"HC.phonenumber":1,"dateuploaded":1,"description":1,"path":1}}]).toArray();
             res.json({data:result});
             db.close();
             res.end();
