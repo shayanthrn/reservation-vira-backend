@@ -1696,6 +1696,16 @@ router.get("/Adminpanel/addDoctor-duplicatedname",function(req,res){
   res.end();
 })
 
+router.get("/Adminpanel/addDoctor-duplicatedusername",function(req,res){
+  res.render("adddoc-result.ejs",{data:"این نام کاربری قبلا در سیستم ثبت شده است."})
+  res.end();
+})
+
+router.get("/Adminpanel/addDoctor-success",function(req,res){
+  res.render("adddoc-result.ejs",{data:"عملیات با موفقیت انجام شد."})
+  res.end();
+})
+
 router.post('/addHC',function(req,res){
   var query= url.parse(req.url,true).query;
   if(req.cookies.admintoken==undefined){
