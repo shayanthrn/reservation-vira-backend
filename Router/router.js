@@ -318,19 +318,17 @@ router.get("/api/getAllExperimentsOfuser",function(req,res){
    else{
       MongoClient.connect(dburl,function(err,db){
         var dbo=db.db("mydb");
-        dbo.collection("Users").findOne({phonenumber:query.phonenumber},function(err,user){
+        dbo.collection("Users").findOne({phonenumber:query.phonenumber},async function(err,user){
           if(user==null){
             res.json({data:"user not found"});
             db.close();
             res.end();
           }
           else{
-            dbo.collection("Experiments").find({userid:user._id},async function(err,cursor){
-              result= await cursor.toArray();
-              res.json({data:result});
-              db.close();
-              res.end();
-            })
+            result=await dbo.collection("Experiments").aggregate([{$match:{user:user._id}},{$lookup:{from:"HealthCenters", localField: "HC", foreignField: "_id", as: "HC"}},{$project:{"HC.name":1,"HC.address":1,"HC.image":1,"HC.phonenumber":1}}]).toArray();
+            res.json({data:result});
+            db.close();
+            res.end();
           }
         })
       })
@@ -676,8 +674,8 @@ router.get("/api/getCurUser",function(req,res){
         }
         else{
           user.chats=await dbo.collection("Chats").find({userphone:user.phonenumber}).toArray()
-          user.reserves=await dbo.collection("Reservations").aggregate([{$match:{user:user._id}},{$lookup:{from:"Doctors", localField: "doctor", foreignField: "_id", as: "doctor"}},{$lookup:{from:"HealthCenters", localField: "HC", foreignField: "_id", as: "HC"}},{$project:{"doctor":1,"time":1,"refid":1,"HC":1,"catname":1}}]).toArray();
-          user.teleReservations=await dbo.collection("teleReservations").aggregate([{$match:{user:user._id}},{$lookup:{from:"Doctors", localField: "doctor", foreignField: "_id", as: "doctor"}},{$project:{"doctor":1,"timeinfo":1,"refid":1}}]).toArray()
+          user.reserves=await dbo.collection("Reservations").aggregate([{$match:{user:user._id}},{$lookup:{from:"Doctors", localField: "doctor", foreignField: "_id", as: "doctor"}},{$lookup:{from:"HealthCenters", localField: "HC", foreignField: "_id", as: "HC"}},{$project:{"time":1,"refid":1,"HC.name":1,"HC.image":1,"HC.address":1,"HC.phonenumber":1,"catname":1,"doctor.name":1,"doctor.image":1,"doctor.workphone":1,"doctor.background":1,"doctor.medicalnumber":1,"doctor.address":1}}]).toArray();
+          user.teleReservations=await dbo.collection("teleReservations").aggregate([{$match:{user:user._id}},{$lookup:{from:"Doctors", localField: "doctor", foreignField: "_id", as: "doctor"}},{$project:{"doctor.name":1,"doctor.image":1,"doctor.workphone":1,"doctor.background":1,"doctor.medicalnumber":1,"doctor.address":1,"timeinfo":1,"refid":1}}]).toArray()
           res.json({user:user});
           db.close();
           res.end();
