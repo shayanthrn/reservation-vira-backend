@@ -1642,13 +1642,13 @@ router.post("/addDoctor",function(req,res){
           dbo.collection("Doctors").findOne({name:req.body.name},function(err,res1){
             if(res1!=null){
               db.close();
-              res.redirect('/Adminpanel/addDoctor')
+              res.redirect('/Adminpanel/addDoctor-duplicatedname')
             }
             else{
               dbo.collection("Doctors").findOne({username:req.body.username},function(err,res2){
                 if(res2!=null){
                   db.close();
-                  res.redirect('/Adminpanel/addDoctor')
+                  res.redirect('/Adminpanel/addDoctor-duplicatedusername')
                 }
                 else{
                   var cats=[];
@@ -1679,7 +1679,7 @@ router.post("/addDoctor",function(req,res){
                     })
                     }
                     db.close();
-                    res.redirect('/Adminpanel/addDoctor');
+                    res.redirect('/Adminpanel/addDoctor-success');
                   })
                 }
               })
@@ -1689,6 +1689,13 @@ router.post("/addDoctor",function(req,res){
       })
     })
   }
+})
+
+router.get("/Adminpanel/addDoctor-duplicatedname",function(req,res){
+  res.render("adddoc-result.ejs",{data:"این نام قبلا در سیستم ثبت شده است."})
+  setTimeout(function(){
+    res.redirect("/Adminpanel/addDoctor")
+  },5000);
 })
 
 router.post('/addHC',function(req,res){
