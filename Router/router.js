@@ -1693,9 +1693,7 @@ router.post("/addDoctor",function(req,res){
 
 router.get("/Adminpanel/addDoctor-duplicatedname",function(req,res){
   res.render("adddoc-result.ejs",{data:"این نام قبلا در سیستم ثبت شده است."})
-  setTimeout(function(){
-    res.redirect("/Adminpanel/addDoctor")
-  },5000);
+  res.end();
 })
 
 router.post('/addHC',function(req,res){
