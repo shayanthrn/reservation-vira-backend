@@ -5947,6 +5947,22 @@ router.get("/paymenthandler",function(req,res){
   })
 })
 
+router.get("/doctorsignup",function(req,res){
+  res.render("doctorsignup.ejs");
+  res.end();
+})
+
+router.get("/labsignup",function(req,res){
+
+})
+
+router.get("/clinicsignup",function(req,res){
+  
+})
+
+router.get("/pharmacysignup",function(req,res){
+  
+})
 
 router.get("/signup",function(req,res){
   req.session.prevurl=req.session.currurl;
