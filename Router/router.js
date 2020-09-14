@@ -5949,7 +5949,7 @@ router.get("/paymenthandler",function(req,res){
 
 router.get("/doctorsignup",function(req,res){
   res.render("doctorsignup.ejs");
-  res.end();
+  //res.end();
 })
 
 router.get("/labsignup",function(req,res){
