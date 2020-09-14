@@ -5955,15 +5955,18 @@ router.get("/doctorsignup",function(req,res){
 })
 
 router.get("/labsignup",function(req,res){
-
+  res.render("labsignup.ejs",{flag:1});
+  res.end();
 })
 
 router.get("/clinicsignup",function(req,res){
-  
+  res.render("clinicsignup.ejs",{flag:1});
+  res.end();
 })
 
 router.get("/pharmacysignup",function(req,res){
-  
+  res.render("pharmacysignup.ejs",{flag:1});
+  res.end();
 })
 
 router.get("/signup",function(req,res){
