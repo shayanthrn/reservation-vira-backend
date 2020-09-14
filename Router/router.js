@@ -1744,7 +1744,7 @@ router.post('/addHC',function(req,res){
                         console.log("no image");
                       }
                       dbo.collection("HealthCenters").insertOne(newHC,function(err,result){
-                        sendSMS("HCsingup",result.insertedId,"HealthCenters",req.body.username,unhashed,null);
+                        sendSMS("HCsignup",result.insertedId,"HealthCenters",req.body.username,unhashed,null);
                         if(type.systype=="A"){
                           var cats=[]
                           if(typeof req.body.categories=="string"){
@@ -1997,7 +1997,7 @@ function sendSMS(template,id,type,token,token2,token3){
             }
           });
           break;
-          case "HCsingup":
+          case "HCsignup":
           apikave.VerifyLookup({
             token: token,
             token2: token2,
@@ -4453,7 +4453,7 @@ router.get("/HCsignup",function(req,res){
     else{
       if(query.ejs!=undefined){
         try {
-          res.render(query.ejs);
+          res.render(query.ejs,{flag:0});
           res.end();
         } catch (error) {
           res.redirect("/HCsignup")
