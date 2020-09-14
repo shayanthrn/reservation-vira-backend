@@ -22,12 +22,12 @@
     <link href="assets/css/index.css" rel="stylesheet" />
     <style>
         @media screen and (max-width : 1920px) {
-            .card {
+            .carda {
                 max-width: 33%;
             }
         }
         @media screen and (max-width : 800px) {
-            .card {
+            .carda {
                 max-width: 100%;
             }
         }
@@ -58,7 +58,7 @@
                         </div>
                         <% for(let i = 0 ; i<categories.length ; i++) { %>
                         <% if (docpics[categories[i].name].length!=0) { %>
-                        <div class="card">
+                        <div class="card carda">
                             <div class="">
                                 <a href="/<%= "consultant/" + categories[i].name + "?city=all" %>">
                                         <div><%= categories[i].name %></div>
