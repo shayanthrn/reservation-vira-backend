@@ -5948,8 +5948,10 @@ router.get("/paymenthandler",function(req,res){
 })
 
 router.get("/doctorsignup",function(req,res){
-  res.render("doctorsignup.ejs");
-  //res.end();
+  categories().then(basiccategories=>{
+    res.render("doctorsignup.ejs",{categories:basiccategories});
+    res.end();
+  })
 })
 
 router.get("/labsignup",function(req,res){
