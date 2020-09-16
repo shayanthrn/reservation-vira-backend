@@ -116,13 +116,6 @@
           <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
             <h1 class="h2">دکتر ها</h1>
             <input oninput="fastsearch()" class="form-control" type="text"  name="searchinput" id="searchinput" style="max-width: 30%;border-width: 2px;border-color: black;background-color: white;" placeholder="جتسجو سریع...">
-            <a href="adminPanel/pendingdoctors" class="btn btn-info text-white">
-              دکترهای در انتظار تایید
-            </a>
-            <a href="/AdminPanel/addDoctor" class="btn btn-success text-white">
-              <i class="fa fa-plus"></i>
-              اضافه کردن دکتر
-            </a>
           </div>
           
 
@@ -146,7 +139,7 @@
                     <tr name="objects" data-name="<%= doctors[i].name %>">
                       <th scope="row"><%= i+1 %></th>
                       <td>
-                        <img src="<%= doctors[i].image %>" onerror="this.src='assets/img/altimage.png'"  style="max-height: 50px; max-width: 50px;min-width: 50px;min-height:50px;">
+                        <img src="<%= "/docphotos-temp/" + doctors[i].image.split("/")[2] %>" onerror="this.src='assets/img/altimage.png'"  style="max-height: 50px; max-width: 50px;min-width: 50px;min-height:50px;">
                       </td>
                       <td><%= doctors[i].name %></td>
                       <td>
@@ -162,9 +155,17 @@
                        <%= doctors[i].phonenumber %>
                       </td>
                       <td>
-                        <a href="<%= "AdminPanel/Doctors/" + doctors[i].name %>" class="btn btn-info" href="#">
+                        <a href="<%= "AdminPanel/pendingdoctors/" + doctors[i].name %>" class="btn btn-info" href="#">
                           <i class="fa fa-eye"></i>
                           مشاهده
+                        </a>
+                        <a href="<%= "removependingdoctors/" + doctors[i].name %>" class="btn btn-danger" href="#">
+                            <i class="fa fa-times"></i>
+                            حذف
+                        </a>
+                        <a href="<%= "acceptpendingdoctors/" + doctors[i].name %>" class="btn btn-success" href="#">
+                            <i class="fa fa-check"></i>
+                            تایید
                         </a>
                       </td>
                     </tr>

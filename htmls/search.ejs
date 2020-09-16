@@ -66,6 +66,7 @@
                                 <div class="tab-pane active" id="related" role="tabpanel" aria-expanded="true">
                                     <div class="container no-padding-right">
                                         <ul class="row listing-items">
+                                            <% if (Objects.length!=0){ %>
                                             <% for(let i =0 ;i < Objects.length ; i++) { %>
                                             <li>
                                                 <% if(Objects[i].systype != undefined) { %>
@@ -114,6 +115,9 @@
                                                 </a>
                                                 <% } %>
                                             </li>
+                                            <% } %>
+                                            <% } else { %>
+                                                موردی یافت نشد.
                                             <% } %>
                                         </ul>
                                     </div>
