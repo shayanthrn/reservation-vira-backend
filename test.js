@@ -14,16 +14,5 @@ var dburl="mongodb://localhost:27017/";
 
 MongoClient.connect(dburl,function(err,db){
     var dbo=db.db("mydb");
-    dbo.collection("Doctors").find({}).forEach(function(data){
-        data.password=md5(data.password)
-        dbo.collection("Doctors").save(data);
-    })
-    dbo.collection("Admins").find({}).forEach(function(data){
-        data.password=md5(data.password)
-        dbo.collection("Admins").save(data);
-    })
-    dbo.collection("HealthCenters").find({}).forEach(function(data){
-        data.password=md5(data.password)
-        dbo.collection("HealthCenters").save(data);
-    })
+    dbo.collection("costs").insertOne({docrescost:3000,doctelcost:5000,docchatcost:5000,labrescost:3000,clinicrescost:3000});
 })

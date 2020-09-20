@@ -4491,17 +4491,36 @@ router.get("/changecostadmin", function (req, res) {
         }
         else {
           if (query.type == "doctor") {
-            dbo.collection("Doctors").updateMany({}, { $set: { visitcost: Number(query.cost) } })
-            db.close();
-            res.redirect("/adminpanel/costmanage");
+            switch (query.visittype) {
+              case "chat":
+                dbo.collection("Doctors").updateMany({}, { $set: { chatcost: Number(query.cost) } })
+                dbo.collection("costs").updateOne({},{$set:{docchatcost:Number(query.cost)}});
+                db.close();
+                res.redirect("/adminpanel/costmanage");
+                break;
+              case "tele":
+                dbo.collection("Doctors").updateMany({}, { $set: { televisitcost: Number(query.cost) } })
+                dbo.collection("costs").updateOne({},{$set:{doctelcost:Number(query.cost)}});
+                db.close();
+                res.redirect("/adminpanel/costmanage");
+                break;
+              default:
+                dbo.collection("Doctors").updateMany({}, { $set: { visitcost: Number(query.cost) } })
+                dbo.collection("costs").updateOne({},{$set:{docrescost:Number(query.cost)}});
+                db.close();
+                res.redirect("/adminpanel/costmanage");
+                break;
+            }
           }
           else if (query.type == "آزمایشگاه") {
             dbo.collection("HealthCenters").updateMany({ type: "آزمایشگاه" }, { $set: { visitcost: Number(query.cost) } })
+            dbo.collection("costs").updateOne({},{$set:{labrescost:Number(query.cost)}});
             db.close();
             res.redirect("/adminpanel/costmanage");
           }
           else if (query.type == "کلینیک") {
             dbo.collection("HealthCenters").updateMany({ type: "کلینیک" }, { $set: { 'categories.$[].visitcost': Number(query.cost) } });
+            dbo.collection("costs").updateOne({},{$set:{clinicrescost:Number(query.cost)}});
             db.close();
             res.redirect("/adminpanel/costmanage");
           }
