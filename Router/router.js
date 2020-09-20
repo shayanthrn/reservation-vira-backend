@@ -5874,7 +5874,7 @@ router.get("/paymenthandlerHC", function (req, res) {
                       }
                       user = await dbo.collection("Users").findOne({ _id: reservation.user })
                       mytime = new persianDate([reservation.time.date.year, reservation.time.date.month, reservation.time.date.day])
-                      sendSMS("resHC", HC._id, "HealthCenters", mytime.format("L"), user.firstname + " " + suser.lastname, null);
+                      sendSMS("resHC", HC._id, "HealthCenters", mytime.format("L"), user.firstname + " " + user.lastname, null);
                       sendSMS("resHCuser", user._id, "Users", mytime.format("L"), HC.name, null);
                     })
                   })
