@@ -14,5 +14,17 @@ var dburl="mongodb://localhost:27017/";
 
 MongoClient.connect(dburl,function(err,db){
     var dbo=db.db("mydb");
-    dbo.collection("costs").insertOne({docrescost:3000,doctelcost:5000,docchatcost:5000,labrescost:3000,clinicrescost:3000});
+    dbo.collection("HealthCenters").findOne({systype:"A"},function(err,HC){
+        reservation={time:2323,aaa:22}
+        console.log("this is hc categories------------:");
+        console.log(HC.categories);
+        HC.categories.forEach(function (doc) {
+          if (doc.name == "3") {
+            doc.reservations.push(reservation);
+            doc.unavailabletimes.push(reservation.time);
+          }
+        })
+        console.log("this is hc categories---afterchanges---------:");
+        console.log(HC.categories);
+    })
 })

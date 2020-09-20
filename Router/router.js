@@ -5871,7 +5871,7 @@ router.get("/paymenthandlerHC", function (req, res) {
                         console.log("this is hc categories------------:");
                         console.log(HC.categories);
                         HC.categories.forEach(function (doc) {
-                          if (doc.name == req.body.cat) {
+                          if (doc.name == reservation.catname) {
                             doc.reservations.push(reservation);
                             doc.unavailabletimes.push(reservation.time);
                           }
@@ -5879,7 +5879,6 @@ router.get("/paymenthandlerHC", function (req, res) {
                         console.log("this is hc categories---afterchanges---------:");
                         console.log(HC.categories);
                         dbo.collection("HealthCenters").updateOne({ _id: reservation.HC }, { $set: { categories: HC.categories } }, function (err, sdf) {
-                          console.log(sdf);
                           strtime = n(reserve.time.start.hour) + ":" + n(reserve.time.start.min) + "-" + n(reserve.time.end.hour) + ":" + n(reserve.time.end.min);
                           changestatustransaction(query.Authority, "موفق");
                           if(HC.systype=="A"){
