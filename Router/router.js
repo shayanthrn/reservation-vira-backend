@@ -5653,8 +5653,8 @@ router.get("/telepaymenthandler", function (req, res) {
                         res.render("paymentaccept.ejs", { doctor: doctor, time: strtime, resid: reservation.refid, chat: 2, doc: 1 });
                         user = await dbo.collection("Users").findOne({ _id: reservation.user })
                         mytime = reservation.timeinfo.date.year + "/" + reservation.timeinfo.date.month + "/" + reservation.timeinfo.date.day
-                        sendSMS("teleresdoc", doctor._id, "Doctors", mytime, strtime);
-                        sendSMS("teleresuser", user._id, "Users", mytime, strtime)
+                        sendSMS("teleresdoc", doctor._id, "Doctors", mytime, strtime,user.firstname+" "+user.lastname);
+                        sendSMS("teleresuser", user._id, "Users", mytime, strtime,doctor.name);
                         res.end();
                       })
                     })
