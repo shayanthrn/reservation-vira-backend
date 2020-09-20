@@ -185,6 +185,47 @@
                  <%= HC.type %>
                 </div>
               </div>
+              <div class="row">
+                <div class="col-md-4 col-lg-2">
+                  <h5>نام کاربری</h5>
+                </div>
+                <div class="col-md-6 col-lg-6">
+                 <%= HC.username %>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-md-4 col-lg-2">
+                  <h5> رمز عبور</h5>
+                </div>
+                <div class="col-md-6 col-lg-6">
+                  <a data-toggle="modal" data-target="#exampleModalLong" class="btn btn-info">ریست کردن رمز عبور</a>
+                </div>
+              </div>
+               <!-- modal -->
+               <div class="modal fade" id="exampleModalLong" tabindex="-1" role="dialog" aria-labelledby="exampleModalLongTitle" aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <h5 class="modal-title" id="exampleModalLongTitle" style="position: relative; right: 30px;">دکتر تجویز</h5>
+                      <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                      </button>
+                    </div>
+                    <div class="modal-body">
+                      <form action="resetHCpass" method="POST">
+                        رمز جدید
+                        <input class="form-control" type="text" name="newpass">
+                        <input class="form-control" type="text" style="display: none;" name="HCname" value="<%= HC.name %>" >
+                    </div>
+                    <div class="modal-footer">
+                      <button type="button" class="btn btn-secondary" data-dismiss="modal">بستن</button>
+                      <button type="submit" class="btn btn-danger">تایید</button>
+                      </form>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <!--modal-->
             </div>
           </div>
         </div>

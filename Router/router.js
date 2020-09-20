@@ -2143,7 +2143,7 @@ router.get('/HCpanel/dashboard', function (req, res) {
   else {
     MongoClient.connect(dburl, function (err, db) {
       var dbo = db.db("mydb");
-      dbo.collection("HealthCenters").findOne({ token: req.cookies.HCtoken }, function (err, HC) {
+      dbo.collection("HealthCenters").findOne({ token: req.cookies.HCtoken },async function (err, HC) {
         if (HC == null) {
           res.redirect('/noaccess');
         }
@@ -2161,6 +2161,7 @@ router.get('/HCpanel/dashboard', function (req, res) {
               visittimes.push({ date1: { year: currentday.toArray()[0], month: currentday.format("MMMM"), day: currentday.toArray()[2] }, date: { year: currentday.toArray()[0], month: currentday.toArray()[1], day: currentday.toArray()[2] }, times: [], dayofweek: currentday.format("dddd") });
             }
             if (HC.systype == "B") {
+              HC.reservations=await dbo.collection("Reservations").find({HC:HC._id}).toArray();
               HC.reservations.forEach(function (doc) {
                 for (i = 0; i < 6; i++) {
                   if (lodash.isEqual(visittimes[i].date, doc.time.date)) {
@@ -2171,6 +2172,7 @@ router.get('/HCpanel/dashboard', function (req, res) {
             }
             else {
               for (let k = 0; k < HC.categories.length; k++) {
+                HC.categories[k].reservations=await dbo.collection("Reservations").find({HC:HC._id,catname:HC.categories[k].name}).toArray();
                 HC.categories[k].reservations.forEach(function (doc) {
                   for (i = 0; i < 6; i++) {
                     if (lodash.isEqual(visittimes[i].date, doc.time.date)) {
@@ -2264,7 +2266,7 @@ router.get("/HCpanel/patients", function (req, res) {
   else {
     MongoClient.connect(dburl, function (err, db) {
       var dbo = db.db("mydb");
-      dbo.collection('HealthCenters').findOne({ token: req.cookies.HCtoken }, function (err, HC) {
+      dbo.collection('HealthCenters').findOne({ token: req.cookies.HCtoken },async function (err, HC) {
         if (HC == null) {
           db.close();
           res.redirect('noaccess');
@@ -2274,18 +2276,11 @@ router.get("/HCpanel/patients", function (req, res) {
             res.redirect('noaccess');
           }
           else {
-            if (HC.systype == "A") {
-              HC.categories.forEach(function (doc) {
-                for (var i = 0; i < doc.reservations.length; i++) {
-                  patientsid.push(doc.reservations[i].user);
-                }
-              })
-            }
-            else {
+            HC.reservations=await dbo.collection("Reservations").find({HC:HC._id}).toArray();
               for (var i = 0; i < HC.reservations.length; i++) {
                 patientsid.push(HC.reservations[i].user);
               }
-            }
+
             dbo.collection("Users").find({ _id: { $in: patientsid } }, function (err, result2) {
               result2.forEach(function (doc) {
                 patients.push(doc);
@@ -2492,7 +2487,7 @@ router.get("/HCpanel/addexp", function (req, res) {
   else {
     MongoClient.connect(dburl, function (err, db) {
       var dbo = db.db("mydb");
-      dbo.collection('HealthCenters').findOne({ token: req.cookies.HCtoken }, function (err, HC) {
+      dbo.collection('HealthCenters').findOne({ token: req.cookies.HCtoken },async function (err, HC) {
         if (HC == null) {
           db.close();
           res.redirect('noaccess');
@@ -2503,18 +2498,11 @@ router.get("/HCpanel/addexp", function (req, res) {
             res.redirect('noaccess');
           }
           else {
-            if (HC.systype == "A") {
-              HC.categories.forEach(function (doc) {
-                for (var i = 0; i < doc.reservations.length; i++) {
-                  patientsid.push(doc.reservations[i].user);
-                }
-              })
-            }
-            else {
+              HC.reservations=await dbo.collection("Reservations").find({HC:HC._id}).toArray();
               for (var i = 0; i < HC.reservations.length; i++) {
                 patientsid.push(HC.reservations[i].user);
               }
-            }
+           
             dbo.collection("Users").find({ _id: { $in: patientsid } }, function (err, result2) {
               result2.forEach(function (doc) {
                 phonenumbers.push(doc.phonenumber);
@@ -4057,6 +4045,27 @@ router.post("/resetdocpass",function(req,res){
         else {
           dbo.collection("Doctors").updateOne({name:req.body.docname},{$set:{password:md5(req.body.newpass)}});
           res.redirect("/AdminPanel/Doctors/"+req.body.docname)
+        }
+      })
+    })
+  }
+})
+
+router.post("/resetHCpass",function(req,res){
+  if (req.cookies.admintoken == undefined) {
+    res.redirect('/noaccess');
+  }
+  else {
+    MongoClient.connect(dburl, function (err, db) {
+      var dbo = db.db("mydb");
+      dbo.collection("Admins").findOne({ token: req.cookies.admintoken }, function (err, result) {
+        if (result == null) {
+          db.close();
+          res.redirect('/noaccess');
+        }
+        else {
+          dbo.collection("HealthCenters").updateOne({name:req.body.HCname},{$set:{password:md5(req.body.newpass)}});
+          res.redirect("/AdminPanel/HealthCenters/"+req.body.HCname)
         }
       })
     })
@@ -5827,6 +5836,9 @@ router.get("/paymenthandlerHC", function (req, res) {
           strtime = n(reserve.time.start.hour) + ":" + n(reserve.time.start.min) + "-" + n(reserve.time.end.hour) + ":" + n(reserve.time.end.min);
           dbo.collection("HealthCenters").findOne({ _id: reserve.HC }, function (err, HC) {
             dbo.collection("TempReservesHC").deleteOne({ authority: query.Authority }, function (err, result) {
+              if(HC.systype=="A"){
+                HC.visitcost=HC.categories[0].visitcost;
+              }
               changestatustransaction(query.Authority, "ناموفق");
               res.render("paymentfail.ejs", { doctor: HC, time: strtime, resid: 0, chat: 0, doc: 0 });
               db.close();
@@ -5884,6 +5896,9 @@ router.get("/paymenthandlerHC", function (req, res) {
               strtime = n(reserve.time.start.hour) + ":" + n(reserve.time.start.min) + "-" + n(reserve.time.end.hour) + ":" + n(reserve.time.end.min);
               dbo.collection("HealthCenters").findOne({ _id: reserve.HC }, function (err, HC) {
                 dbo.collection("TempReservesHC").deleteOne({ authority: query.Authority }, function (err, result) {
+                  if(HC.systype=="A"){
+                    HC.visitcost=HC.categories[0].visitcost;
+                  }
                   changestatustransaction(query.Authority, "ناموفق");
                   res.render("paymentfail.ejs", { doctor: HC, time: strtime, resid: 0, chat: 0, doc: 0 });
                   res.end();
@@ -6594,7 +6609,6 @@ router.get("/loginAdmin", function (req, res) {
 router.post('/loginAdmin', function (req, res) {
   req.session.prevurl = req.session.currurl;
   req.session.currurl = req.url;
-  console.log(req.body)
   MongoClient.connect(dburl, function (err, db) {
     var dbo = db.db("mydb");
     dbo.collection("Admins").findOne({ username: req.body.username }, function (err, result) {
