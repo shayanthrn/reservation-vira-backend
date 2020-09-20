@@ -20,10 +20,10 @@ class Doctor{
         if(membershiptypes.includes("teleconsultant")){
             this.teletimes=[]
             this.telereservations=[];
-            this.televisitcost=5000;
+            this.televisitcost=3000;
         }
         if(membershiptypes.includes("chatconsultant")){
-            this.chatcost=5000;
+            this.chatcost=3000
         }
         this.token="";
         this.appknowledge=appknowledge;

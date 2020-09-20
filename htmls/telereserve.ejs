@@ -84,7 +84,7 @@
                         </div>
                         <section class="page-content default">
                             <div class="checkout-shipment">
-                               <form action="telepayment?from=/telereserve/<%=doctor.name%>" method="POST">
+                               <form action="telepayment?from=/telereserve/<%=doctor.name%>" onsubmit="return checkchoice()" method="POST">
                                 <ul>
                                     <li><span> نام دکتر :</span><span><%= doctor.name %></span></li>
                                     <li><span>  تخصص :</span><span><%= doctor.category %></span></li>
@@ -194,187 +194,30 @@
         <!-- main-shopping -->
 
         <!-- footer -->
-        <footer class="main-footer default">
-            <div class="back-to-top">
-                <a href="#"><span class="icon"><i class="now-ui-icons arrows-1_minimal-up"></i></span> <span>بازگشت به
-                        بالا</span></a>
-            </div>
-            <div class="container">
-                <div class="footer-services">
-                    <div class="row">
-                        <div class="service-item col">
-                            <a href="#" target="_blank">
-                                <img src="assets/img/svg/delivery.svg">
-                            </a>
-                            <p>صرفه جویی در زمان</p>
-                        </div>
-                        <div class="service-item col">
-                            <a href="#" target="_blank">
-                                <img src="assets/img/svg/contact-us.svg">
-                            </a>
-                            <p>پشتیبانی 24 ساعته</p>
-                        </div>
-                        <div class="service-item col">
-                            <a href="#" target="_blank">
-                                <img src="assets/img/svg/payment-terms.svg">
-                            </a>
-                            <p>پرداخت امن شاپرک</p>
-                        </div>
-                        <div class="service-item col">
-                            <a href="#" target="_blank">
-                                <img src="assets/img/svg/return-policy.svg">
-                            </a>
-                            <p>ضمانت کیفیت</p>
-                        </div>
-                        <div class="service-item col">
-                            <a href="#" target="_blank">
-                                <img src="assets/img/svg/origin-guarantee.svg">
-                            </a>
-                            <p>پزشکان تایید شده</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="footer-widgets">
-                    <div class="row">
-                        <div class="col-12 col-md-6 col-lg-3">
-                            <div class="widget-menu widget card">
-                                <header class="card-header">
-                                    <h3 class="card-title">راهنمای رزرو از دکتر تجویز</h3>
-                                </header>
-                                <ul class="footer-menu">
-                                    <li>
-                                        <a href="#">نحوه ثبت سفارش</a>
-                                    </li>
-                                    <li>
-                                        <a href="#">رویه ارسال سفارش</a>
-                                    </li>
-                                    <li>
-                                        <a href="#">شیوه‌های پرداخت</a>
-                                    </li>
-                                </ul>
-                            </div>
-                        </div>
-                        <div class="col-12 col-md-6 col-lg-3">
-                            <div class="widget-menu widget card">
-                                <header class="card-header">
-                                    <h3 class="card-title">خدمات مشتریان</h3>
-                                </header>
-                                <ul class="footer-menu">
-                                    <li>
-                                        <a href="#">پاسخ به پرسش‌های متداول</a>
-                                    </li>
-                                    <li>
-                                        <a href="#">رویه‌های بازگرداندن کالا</a>
-                                    </li>
-                                    <li>
-                                        <a href="#">شرایط استفاده</a>
-                                    </li>
-                                    <li>
-                                        <a href="#">حریم خصوصی</a>
-                                    </li>
-                                </ul>
-                            </div>
-                        </div>
-                        <div class="col-12 col-md-6 col-lg-3">
-                            <div class="widget-menu widget card">
-                                <header class="card-header">
-                                    <h3 class="card-title">با دکتر تجویز</h3>
-                                </header>
-                                <ul class="footer-menu">
-                                    <li>
-                                        <a href="#">فروش در دکتر تجویز</a>
-                                    </li>
-                                    <li>
-                                        <a href="#">همکاری با سازمان‌ها</a>
-                                    </li>
-                                    <li>
-                                        <a href="#">فرصت‌های شغلی</a>
-                                    </li>
-                                    <li>
-                                        <a href="#">تماس با دکتر تجویز</a>
-                                    </li>
-                                    <li>
-                                        <a href="#">درباره دکتر تجویز</a>
-                                    </li>
-                                </ul>
-                            </div>
-                        </div>
-                        <div class="col-12 col-md-6 col-lg-3">
-                            <div class="newsletter">
-                                <p>از تخفیف‌ها و جدیدترین‌های فروشگاه باخبر شوید:</p>
-                                <form action="">
-                                    <input type="email" class="form-control"
-                                        placeholder="آدرس ایمیل خود را وارد کنید...">
-                                    <input type="submit" class="btn btn-primary" value="ارسال">
-                                </form>
-                            </div>
-                            <div class="socials">
-                                <p>ما را در شبکه های اجتماعی دنبال کنید.</p>
-                                <div class="footer-social">
-                                    <a href="instagram.com/drtajviz" target="_blank"><i class="fa fa-instagram"></i>اینستاگرام دکتر تجویز</a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="info">
-                    <div class="row">
-                        <div class="col-12 col-lg-4">
-                            <span>هفت روز هفته ، 24 ساعت شبانه‌روز پاسخگوی شما هستیم.</span>
-                        </div>
-                        <div class="col-12 col-lg-2">شماره تماس: 08433230491</div>
-                        <div class="col-12 col-lg-2">آدرس ایمیل:<a href="#">info@drtajviz.com</a></div>
-                        <div class="col-12 col-lg-4 text-center">
-                            <a href="#" target="_blank"><img src="assets/img/bazzar.png" width="159" height="48"
-                                    alt=""></a>
-                            <a href="#" target="_blank"><img src="assets/img/sibapp.png" width="159" height="48"
-                                    alt=""></a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="description">
-                <div class="container">
-                    <div class="row">
-                        <div class="site-description col-12 col-lg-7">
-                            <h1 class="site-title">دکتر تجویز، رزرو وقت دکتر و مشاوره آنلاین</h1>
-                            <p>
-                                شرکت آروین اکسیر شفا فعال در زمینه مراقبت های پزشکی، با تکیه بر دانش و تیم فنی جوان
-                                خود سایت دکتر تجویز را برای خدمت دهی به مردم غیور کرمانشاه و ایلام راه اندازی کرده است
-                                ما برای سلامت شما تلاش میکنیم.
-                                <br><br>
-                                شماره تماس دفتر :
-
-08433230491 – 08433239431
-<br>
-مهندس سعید موسی پور : 09195922594
-<br>
-دکتر جعفر نرگسی : 09124893112
-<br>
-کارشناس پیمان فرامرزی : 09184668332
-                            </p>
-                        </div>
-                        <div class="symbol col-12 col-lg-5">
-                            <a href="#" target="_blank"><img src="assets/img/symbol-01.png" alt=""></a>
-                            <a href="https://trustseal.enamad.ir/?id=158172&amp;Code=KWMTD87eZJ8aJXUj5caV" target="_blank"><img src="assets/img/symbol-02.png" alt=""></a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="copyright">
-                <div class="container">
-                    <p>
-                        تمامی حقوق متعلق به شرکت آروین اکسیر شفا می‌باشد.
-                    </p>
-                </div>
-            </div>
-        </footer>
+        <%- include('footer.ejs'); -%>
         <!-- footer -->
+
 
     </div>
 
 </body>
 <!--   Core JS Files   -->
+<script>
+    function checkchoice(){
+        flag=false;
+        document.getElementsByName("choice").forEach(function(doc){
+            if(doc.checked){
+                flag=true;
+            }
+        })
+        if(flag==false){
+            alert("لطفا یکی از زمان ها را انتخاب نمایید.")
+        }
+        return flag;
+    }
+    
+
+</script>
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
 <script src="https://unpkg.com/flickity@2/dist/flickity.pkgd.min.js"></script>
 <script src="/scriptres.js"></script>

@@ -1562,9 +1562,9 @@ router.post("/changepass", function (req, res) {
           res.redirect('noaccess');
         }
         else {
-          if (result.password == req.body.oldPassword) {
+          if (result.password == md5(req.body.oldPassword)) {
             if (req.body.confirmPassword == req.body.newPassword) {
-              dbo.collection("Doctors").updateOne({ token: req.cookies.doctortoken }, { $set: { password: req.body.newPassword } }, function (err, result3) {
+              dbo.collection("Doctors").updateOne({ token: req.cookies.doctortoken }, { $set: { password: md5(req.body.newPassword) } }, function (err, result3) {
                 db.close();
                 res.redirect("/doctorpanel/systemicinfo");
               })
@@ -1600,9 +1600,9 @@ router.post("/changepassHC", function (req, res) {
           res.redirect('noaccess');
         }
         else {
-          if (HC.password == req.body.oldPassword) {
+          if (HC.password == md5(req.body.oldPassword)) {
             if (req.body.confirmPassword == req.body.newPassword) {
-              dbo.collection("HealthCenters").updateOne({ token: req.cookies.HCtoken }, { $set: { password: req.body.newPassword } }, function (err, result3) {
+              dbo.collection("HealthCenters").updateOne({ token: req.cookies.HCtoken }, { $set: { password: md5(req.body.newPassword) } }, function (err, result3) {
                 db.close();
                 res.redirect("/HCpanel/systemicinfo");
               })
@@ -1643,7 +1643,7 @@ router.post("/addDoctor", function (req, res) {
               res.redirect('/Adminpanel/addDoctor-duplicatedname')
             }
             else {
-              dbo.collection("Doctors").findOne({ username: req.body.username }, function (err, res2) {
+              dbo.collection("Doctors").findOne({ username: req.body.username },async function (err, res2) {
                 if (res2 != null) {
                   db.close();
                   res.redirect('/Adminpanel/addDoctor-duplicatedusername')
@@ -1669,7 +1669,12 @@ router.post("/addDoctor", function (req, res) {
                   }
                   unhashed = req.body.pass;
                   req.body.pass = md5(req.body.pass)
-                  dbo.collection('Doctors').insertOne(new Doctor(req.body.username, req.body.pass, req.body.name, cats, req.body.medicalnumber, req.body.codemeli, req.body.workphone, req.body.phonenumber, req.body.address, req.body.city, "/docphotos/" + req.body.name.trim() + ".png", req.body.background, req.body.description, memtype, req.body.appknowledge), function (err, res2) {
+                  mydoc=new Doctor(req.body.username, req.body.pass, req.body.name, cats, req.body.medicalnumber, req.body.codemeli, req.body.workphone, req.body.phonenumber, req.body.address, req.body.city, "/docphotos/" + req.body.name.trim() + ".png", req.body.background, req.body.description, memtype, req.body.appknowledge);
+                  costs=await dbo.collection("costs").findOne({})
+                  mydoc.visitcost=costs.docrescost;
+                  mydoc.televisitcost=costs.doctelcost;
+                  mydoc.chatcost=costs.docchatcost;
+                  dbo.collection('Doctors').insertOne(mydoc, function (err, res2) {
                     sendSMS("docsignup", res2.insertedId, "Doctors", req.body.username, unhashed, null);
                     if (req.files != null) {
                       mv(req.files.image.tempFilePath, "public/docphotos/" + req.body.name + ".png", function (err) {
@@ -1731,11 +1736,12 @@ router.post('/addHC', function (req, res) {
                     res.end();
                   }
                   else {
-                    dbo.collection("HCtypes").findOne({ name: query.type }, function (err, type) {
+                    dbo.collection("HCtypes").findOne({ name: query.type },async function (err, type) {
                       var img = "/" + query.type + "photos/" + req.body.name + ".png";
                       unhashed = req.body.password;
                       req.body.password = md5(req.body.password);
-                      var newHC = new HealthCenter(query.type, type.systype, req.body.name, type.systype == "B" || type.systype == "A", req.body.codemeli, req.body.codeofHC, req.body.city, req.body.phonenumber, req.body.address, req.body.directphonenumber, req.body.background, req.body.medicalnumber, req.body.appknowledge, req.body.username, req.body.password, img);
+                      costs=await dbo.collection("costs").findOne({});
+                      var newHC = new HealthCenter(query.type, type.systype, req.body.name, type.systype == "B" || type.systype == "A", req.body.codemeli, req.body.codeofHC, req.body.city, req.body.phonenumber, req.body.address, req.body.directphonenumber, req.body.background, req.body.medicalnumber, req.body.appknowledge, req.body.username, req.body.password, img,costs);
                       try {
                         mv(req.files.image.tempFilePath, "public" + img, { mkdirp: true }, function (err) {
                           console.log("image added");
@@ -1743,7 +1749,7 @@ router.post('/addHC', function (req, res) {
                       } catch (error) {
                         console.log("no image");
                       }
-                      dbo.collection("HealthCenters").insertOne(newHC, function (err, result) {
+                      dbo.collection("HealthCenters").insertOne(newHC,async function (err, result) {
                         sendSMS("HCsignup", result.insertedId, "HealthCenters", req.body.username, unhashed, null);
                         if (type.systype == "A") {
                           var cats = []
@@ -1758,8 +1764,9 @@ router.post('/addHC', function (req, res) {
                               cats = req.body.categories;
                             }
                           }
+                          costs=await dbo.collection("costs").findOne({});
                           cats.forEach(function (doc) {
-                            var newcat = { name: doc, unavailabletimes: [], reservations: [], visitduration: 30, visitcost: 3000 };
+                            var newcat = { name: doc, unavailabletimes: [], reservations: [], visitduration: 30, visitcost: costs.clinicrescost };
                             dbo.collection("HealthCenters").updateOne({ name: req.body.name }, { $addToSet: { categories: newcat } }, function (err, result) {
                               console.log("cats added");
                             })
@@ -4035,6 +4042,27 @@ router.get("/AdminPanel/telereserves/:teleresid", function (req, res) {
   }
 })
 
+router.post("/resetdocpass",function(req,res){
+  if (req.cookies.admintoken == undefined) {
+    res.redirect('/noaccess');
+  }
+  else {
+    MongoClient.connect(dburl, function (err, db) {
+      var dbo = db.db("mydb");
+      dbo.collection("Admins").findOne({ token: req.cookies.admintoken }, function (err, result) {
+        if (result == null) {
+          db.close();
+          res.redirect('/noaccess');
+        }
+        else {
+          dbo.collection("Doctors").updateOne({name:req.body.docname},{$set:{password:md5(req.body.newpass)}});
+          res.redirect("/AdminPanel/Doctors/"+req.body.docname)
+        }
+      })
+    })
+  }
+})
+
 
 router.get("/AdminPanel/patients", function (req, res) {
   if (req.cookies.admintoken == undefined) {
@@ -5837,6 +5865,9 @@ router.get("/paymenthandlerHC", function (req, res) {
                         dbo.collection("HealthCenters").updateOne({ _id: reservation.HC }, { $set: { categories: HC.categories } }, function (err, sdf) {
                           strtime = n(reserve.time.start.hour) + ":" + n(reserve.time.start.min) + "-" + n(reserve.time.end.hour) + ":" + n(reserve.time.end.min);
                           changestatustransaction(query.Authority, "موفق");
+                          if(HC.systype=="A"){
+                            HC.visitcost=HC.categories[0].visitcost;
+                          }
                           res.render("paymentaccept.ejs", { doctor: HC, time: strtime, resid: reservation.refid, chat: 0, doc: 0 });
                           res.end();
                         })
@@ -6194,7 +6225,7 @@ router.post("/doctorsignup", function (req, res) {
         res.redirect('/Adminpanel/addDoctor-duplicatedname')
       }
       else {
-        dbo.collection("Doctors").findOne({ username: req.body.username }, function (err, res2) {
+        dbo.collection("Doctors").findOne({ username: req.body.username },async function (err, res2) {
           if (res2 != null) {
             db.close();
             res.redirect('/Adminpanel/addDoctor-duplicatedusername')
@@ -6220,7 +6251,12 @@ router.post("/doctorsignup", function (req, res) {
             }
             unhashed = req.body.pass;
             req.body.pass = md5(req.body.pass)
-            dbo.collection('tempDoctors').insertOne(new Doctor(req.body.username, req.body.pass, req.body.name, cats, req.body.medicalnumber, req.body.codemeli, req.body.workphone, req.body.phonenumber, req.body.address, req.body.city, "/docphotos/" + req.body.name.trim() + ".png", req.body.background, req.body.description, memtype, req.body.appknowledge), function (err, res2) {
+            mydoc=new Doctor(req.body.username, req.body.pass, req.body.name, cats, req.body.medicalnumber, req.body.codemeli, req.body.workphone, req.body.phonenumber, req.body.address, req.body.city, "/docphotos/" + req.body.name.trim() + ".png", req.body.background, req.body.description, memtype, req.body.appknowledge)
+            costs=await dbo.collection("costs").findOne({})
+            mydoc.visitcost=costs.docrescost;
+            mydoc.televisitcost=costs.doctelcost;
+            mydoc.chatcost=costs.docchatcost;
+            dbo.collection('tempDoctors').insertOne(mydoc, function (err, res2) {
               //sendSMS("docsignup",res2.insertedId,"Doctors",req.body.username,unhashed,null);
               if (req.files != null) {
                 mv(req.files.image.tempFilePath, "public/docphotos-temp/" + req.body.name.trim() + ".png", function (err) {
@@ -6270,12 +6306,13 @@ router.post("/addHC2", function (req, res) {
               res.end();
             }
             else {
-              dbo.collection("HCtypes").findOne({ name: query.type }, function (err, type) {
+              dbo.collection("HCtypes").findOne({ name: query.type },async function (err, type) {
                 var img = "/" + query.type + "photos/" + req.body.name + ".png";
                 var imgtemp = "/" + query.type + "photos-temp/" + req.body.name + ".png";
                 unhashed = req.body.password;
                 req.body.password = md5(req.body.password);
-                var newHC = new HealthCenter(query.type, type.systype, req.body.name, type.systype == "B" || type.systype == "A", req.body.codemeli, req.body.codeofHC, req.body.city, req.body.phonenumber, req.body.address, req.body.directphonenumber, req.body.background, req.body.medicalnumber, req.body.appknowledge, req.body.username, req.body.password, img);
+                costs=await dbo.collection("costs").findOne({});
+                var newHC = new HealthCenter(query.type, type.systype, req.body.name, type.systype == "B" || type.systype == "A", req.body.codemeli, req.body.codeofHC, req.body.city, req.body.phonenumber, req.body.address, req.body.directphonenumber, req.body.background, req.body.medicalnumber, req.body.appknowledge, req.body.username, req.body.password, img,costs);
                 try {
                   mv(req.files.image.tempFilePath, "public" + imgtemp, { mkdirp: true }, function (err) {
                     console.log("image added");
@@ -6283,7 +6320,7 @@ router.post("/addHC2", function (req, res) {
                 } catch (error) {
                   console.log("no image");
                 }
-                dbo.collection("tempHealthCenters").insertOne(newHC, function (err, result) {
+                dbo.collection("tempHealthCenters").insertOne(newHC,async function (err, result) {
                   //sendSMS("HCsignup",result.insertedId,"HealthCenters",req.body.username,unhashed,null);
                   if (type.systype == "A") {
                     var cats = []
@@ -6298,8 +6335,9 @@ router.post("/addHC2", function (req, res) {
                         cats = req.body.categories;
                       }
                     }
+                    costs=await dbo.collection("costs").findOne({});
                     cats.forEach(function (doc) {
-                      var newcat = { name: doc, unavailabletimes: [], reservations: [], visitduration: 30, visitcost: 3000 };
+                      var newcat = { name: doc, unavailabletimes: [], reservations: [], visitduration: 30, visitcost: costs.clinicrescost };
                       dbo.collection("tempHealthCenters").updateOne({ name: req.body.name }, { $addToSet: { categories: newcat } }, function (err, result) {
                         console.log("cats added");
                       })
