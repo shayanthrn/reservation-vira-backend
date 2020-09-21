@@ -2988,6 +2988,9 @@ router.get("/doctorpanel/tickets", function (req, res) {
             }
           });
           foreach.then(a => {
+            chats.forEach(function(doc){
+              console.log(doc);
+            })
             res.render('DoctorPanel/tickets.ejs', { doctor: result, chats: chats });
             db.close();
             //res.end();
