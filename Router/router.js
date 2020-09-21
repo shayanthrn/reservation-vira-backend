@@ -6651,6 +6651,13 @@ router.post('/loginAdmin', function (req, res) {
   })
 })
 
+router.get("/index",function(req,res){
+  categories().then(basiccategories=>{
+    res.render("index2.ejs",{categories:basiccategories,user:""});
+    res.end();
+  })
+  
+})
 
 router.get('/exit', function (req, res) {
   req.session.prevurl = req.session.currurl;
