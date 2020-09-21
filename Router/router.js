@@ -2986,7 +2986,7 @@ router.get("/doctorpanel/tickets", function (req, res) {
                   console.log("koss");
                 }
                 doc.datecreated = new persianDate(doc.tickets[doc.tickets.length - 1].datecreated).format("l")
-                if (index === array.length ) {
+                if (index === chats.length -1 ) {
                   console.log(chats);
                   resolve();
                 }
