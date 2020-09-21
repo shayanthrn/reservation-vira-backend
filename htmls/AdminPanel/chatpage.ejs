@@ -79,6 +79,12 @@ border-top: 10px solid #ffffff;
 clear: both;
 }
 
+@media screen and (max-width:1920px) {
+        .mycards{
+          max-width:50%;
+          }
+        }
+
 @media screen and (max-width : 800px) {
       .mycards{
           max-width:100%;
@@ -186,10 +192,10 @@ clear: both;
           <div class='col'>
             <% for(let i = 0; i<chat.tickets.length;i++) { %>
             <% if (chat.tickets[i].sender=="patient") { %>
-            <div class="col-sm-12 col-md-6 col-lg-4 mb-3 mycards" style="float: left; clear: both; max-width: 50%;">
+            <div class="col-sm-12 col-md-6 col-lg-4 mb-3 mycards" style="float: left; clear: both;">
                <div class="card shadow left">
             <% } else { %>
-            <div class="col-sm-12 col-md-6 col-lg-4 mb-3 mycards" style="float: right; clear: both; max-width: 50%;">
+            <div class="col-sm-12 col-md-6 col-lg-4 mb-3 mycards" style="float: right; clear: both;">
               <div class="card shadow right">
             <% } %>
               
