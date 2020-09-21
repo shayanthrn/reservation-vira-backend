@@ -2979,24 +2979,19 @@ router.get("/doctorpanel/tickets", function (req, res) {
               resolve();
             }
             else {
+              counter=0;
               chats.forEach(async function (doc, index, array) {
                 user = await dbo.collection("Users").findOne({ phonenumber: doc.userphone },{ projection: { firstname: 1,lastname:1 } })
                 doc.user = user;
-                if(doc.authority=="A00000000000000000000000000213689012"){
-                  console.log("koss");
-                }
                 doc.datecreated = new persianDate(doc.tickets[doc.tickets.length - 1].datecreated).format("l")
-                if (index === chats.length -1 ) {
-                  console.log(chats);
+                counter++;
+                if (counter === chats.length -1 ) {
                   resolve();
                 }
               });
             }
           });
           foreach.then(a => {
-            // chats.forEach(function(doc){
-            //   console.log(doc);
-            // })
             res.render('DoctorPanel/tickets.ejs', { doctor: result, chats: chats });
             db.close();
             //res.end();
