@@ -2985,7 +2985,7 @@ router.get("/doctorpanel/tickets", function (req, res) {
                 doc.user = user;
                 doc.datecreated = new persianDate(doc.tickets[doc.tickets.length - 1].datecreated).format("l")
                 counter++;
-                if (counter === chats.length -1 ) {
+                if (counter === chats.length ) {
                   console.log(counter);
                   resolve();
                 }
@@ -2995,7 +2995,7 @@ router.get("/doctorpanel/tickets", function (req, res) {
           foreach.then(a => {
             res.render('DoctorPanel/tickets.ejs', { doctor: result, chats: chats });
             db.close();
-           // res.end();
+           res.end();
           })
         }
       })
