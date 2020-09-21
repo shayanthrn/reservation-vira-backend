@@ -2980,8 +2980,8 @@ router.get("/doctorpanel/tickets", function (req, res) {
             }
             else {
               chats.forEach(async function (doc, index, array) {
-                console.log("hi");
                 user = await dbo.collection("Users").findOne({ phonenumber: doc.userphone })
+                console.log(user);
                 doc.user = user;
                 doc.datecreated = new persianDate(doc.tickets[doc.tickets.length - 1].datecreated).format("l")
                 if (index === array.length - 1) resolve();
@@ -2989,9 +2989,9 @@ router.get("/doctorpanel/tickets", function (req, res) {
             }
           });
           foreach.then(a => {
-            chats.forEach(function(doc){
-              console.log(doc);
-            })
+            // chats.forEach(function(doc){
+            //   console.log(doc);
+            // })
             res.render('DoctorPanel/tickets.ejs', { doctor: result, chats: chats });
             db.close();
             //res.end();
