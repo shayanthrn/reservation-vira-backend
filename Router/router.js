@@ -2982,9 +2982,11 @@ router.get("/doctorpanel/tickets", function (req, res) {
               chats.forEach(async function (doc, index, array) {
                 user = await dbo.collection("Users").findOne({ phonenumber: doc.userphone },{ projection: { firstname: 1,lastname:1 } })
                 doc.user = user;
-                console.log(doc.user);
                 doc.datecreated = new persianDate(doc.tickets[doc.tickets.length - 1].datecreated).format("l")
-                if (index === array.length - 1) resolve();
+                if (index === array.length - 1) {
+                  console.log(chats);
+                  resolve();
+                }
               });
             }
           });
