@@ -2980,6 +2980,7 @@ router.get("/doctorpanel/tickets", function (req, res) {
             }
             else {
               chats.forEach(async function (doc, index, array) {
+                console.log("hi");
                 user = await dbo.collection("Users").findOne({ phonenumber: doc.userphone })
                 doc.user = user;
                 doc.datecreated = new persianDate(doc.tickets[doc.tickets.length - 1].datecreated).format("l")
