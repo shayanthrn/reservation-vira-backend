@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html dir="rtl" class="fa-events-icons-ready" style="width: fit-content;" lang="en"><head>
+<html dir="rtl" class="fa-events-icons-ready" lang="en"><head>
   <meta charset="utf-8">
   <base id="base">
   <script src="/assets/js/config.js"></script>
@@ -78,6 +78,12 @@ border: 10px solid transparent;
 border-top: 10px solid #ffffff;
 clear: both;
 }
+
+@media screen and (max-width : 800px) {
+      .mycards{
+          max-width:100%;
+      }
+  }
 </style>
 </head>
 
@@ -174,17 +180,16 @@ clear: both;
       <main role="main" class=" ml-sm-auto col-lg-9 col-xl-10 px-4" id="dashboard">
         <div class="container-fluid">
           <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-            <h1 class="h2" style="right: 148px;
-            position: relative;">گفتگو ها</h1>
+            <h1 class="h2">گفتگو ها</h1>
             <a href="javascript:history.back()" class="btn btn-info">بازگشت به صفحه قبل</a>
           </div>
           <div class='col'>
             <% for(let i = 0; i<chat.tickets.length;i++) { %>
             <% if (chat.tickets[i].sender=="patient") { %>
-            <div class="col-sm-12 col-md-6 col-lg-4 mb-3" style="float: left; clear: both; max-width: 50%;">
+            <div class="col-sm-12 col-md-6 col-lg-4 mb-3 mycards" style="float: left; clear: both; max-width: 50%;">
                <div class="card shadow left">
             <% } else { %>
-            <div class="col-sm-12 col-md-6 col-lg-4 mb-3" style="float: right; clear: both; max-width: 50%;">
+            <div class="col-sm-12 col-md-6 col-lg-4 mb-3 mycards" style="float: right; clear: both; max-width: 50%;">
               <div class="card shadow right">
             <% } %>
               
