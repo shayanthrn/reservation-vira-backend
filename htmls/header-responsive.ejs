@@ -13,7 +13,7 @@
             </button>
             <div class="search-nav default">
                 <form action="/search" method="GET">
-                    <input type="text" placeholder="جستجو ...">
+                    <input type="text" name="query" placeholder="جستجو ...">
                     <input type="text" style="display: none;" name="filter" id="filter" value="Doctors">
                     <button type="submit"><img src="assets/img/search.png" alt=""></button>
                 </form>
@@ -31,7 +31,7 @@
             </div>
             <ul class="navbar-nav default">
                 <li class="sub-menu">
-                    <a href="#"> تخصص ها</a>
+                    <a href="#"> رزرو نوبت</a>
                     <ul>
                         <% for(let i=0 ; i < categories.length;i++) { %>
                         <li>
@@ -44,17 +44,61 @@
                 <li>
                     <a href="/healthcenters">بانک سلامت</a>
                 </li>
+
                 <li>
                     <a href="/consultant">مشاوره آنلاین</a>
                 </li>
-                <li>
-                    <a href="https://drtajviz.com/aboutus/">درباره ما </a>
+                <li class="sub-menu">
+                    <a href="#"> پنل مدیریت</a>
+                    <ul>
+                        <li>
+                            <a href="/logindoc">دکتر ها</a>
+                        </li>
+                        <li>
+                            <a href="/loginHC">آزمایشگاه ها</a>
+                        </li>
+                        <li>
+                            <a href="/loginHC">سونوگرافی ها</a>
+                        </li>
+                        <li>
+                            <a href="/loginHC">کلینیک ها</a>
+                        </li>
+                        <li>
+                            <a href="/loginHC">داروخانه ها</a>
+                        </li>
+                    </ul>
+                </li>
+                <li class="sub-menu">
+                    <a href="#"> ثبت نام</a>
+                    <ul>
+                        <li>
+                            <a href="/doctorsignup">دکتر ها</a>
+                        </li>
+                        <li>
+                            <a href="/labsignup">آزمایشگاه ها</a>
+                        </li>
+                        <li>
+                            <a href="/labsignup">سونوگرافی ها</a>
+                        </li>
+                        <li>
+                            <a href="/clinicsignup">کلینیک ها</a>
+                        </li>
+                        <li>
+                            <a href="/pharmacysignup">داروخانه ها</a>
+                        </li>
+                    </ul>
                 </li>
                 <li>
-                    <a href="https://drtajviz.com/contact-us/"> تماس با ما </a>
+                    <a href="https://shop.drtajviz.com">فروشگاه </a>
                 </li>
                 <li>
-                    <a href="https://drtajviz.com/mag/"> بلاگ</a>
+                    <a href="https://shop.drtajviz.com/mag/"> مجله پزشکی</a>
+                </li>
+                <li>
+                    <a href="https://shop.drtajviz.com/aboutus/">درباره ما </a>
+                </li>
+                <li>
+                    <a href="https://shop.drtajviz.com/contact-us/"> تماس با ما </a>
                 </li>
             </ul>
         </div>
