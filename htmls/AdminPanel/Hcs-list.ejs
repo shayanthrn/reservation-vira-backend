@@ -163,6 +163,15 @@
                           <i class="fa fa-eye"></i>
                           مشاهده
                         </a>
+                        <% if(HCs[i].archived==false) { %>
+                          <a href="<%= "/archive/hc/"+HCs[i]._id %>" class="btn btn-danger" href="#">
+                            آرشیو کردن  
+                          </a>
+                          <% } else {  %>
+                            <a href="<%= "/unarchive/hc/"+HCs[i]._id %>" class="btn btn-danger" href="#">
+                              خارج کردن از آرشیو   
+                            </a>
+                          <% } %>
                       </td>
                     </tr>
                     <% } %>

@@ -4518,6 +4518,66 @@ router.get("/adminpanel/costmanage", function (req, res) {
   }
 })
 
+router.get("/archive/:type/:id",function(req,res){
+  id=ObjectID(req.params.id);
+  if (req.cookies.admintoken == undefined) {
+    res.redirect('/noaccess');
+  }
+  else {
+    MongoClient.connect(dburl, function (err, db) {
+      var dbo = db.db("mydb");
+      dbo.collection("Admins").findOne({ token: req.cookies.admintoken }, function (err, result) {
+        if (result == null) {
+          db.close();
+          res.redirect('/noaccess');
+        }
+        else {
+          if(req.params.type=="doc"){
+            dbo.collection("Doctors").updateOne({_id:id},{$set:{archived:true}});
+            res.redirect("/adminpanel/doctors");
+            db.close();
+          }
+          else{
+            dbo.collection("HealthCenters").updateOne({_id:id},{$set:{archived:true}});
+            res.redirect("/adminpanel/HealthCenters");
+            db.close();
+          }
+        }
+      })
+    })
+  }
+})
+
+router.get("/unarchive/:type/:id",function(req,res){
+  id=ObjectID(req.params.id);
+  if (req.cookies.admintoken == undefined) {
+    res.redirect('/noaccess');
+  }
+  else {
+    MongoClient.connect(dburl, function (err, db) {
+      var dbo = db.db("mydb");
+      dbo.collection("Admins").findOne({ token: req.cookies.admintoken }, function (err, result) {
+        if (result == null) {
+          db.close();
+          res.redirect('/noaccess');
+        }
+        else {
+          if(req.params.type=="doc"){
+            dbo.collection("Doctors").updateOne({_id:id},{$set:{archived:false}});
+            res.redirect("/adminpanel/doctors");
+            db.close();
+          }
+          else{
+            dbo.collection("HealthCenters").updateOne({_id:id},{$set:{archived:false}});
+            res.redirect("/adminpanel/HealthCenters");
+            db.close();
+          }
+        }
+      })
+    })
+  }
+})
+
 router.get("/changecostadmin", function (req, res) {
   var query = url.parse(req.url, true).query;
   if (req.cookies.admintoken == undefined) {
@@ -5097,9 +5157,9 @@ router.get("/consultant", function (req, res) {
     docpics = {};
     counter = 1;
     a = await dbo.collection("Categories").find({}).toArray();
-    drcounts = await dbo.collection("Doctors").find({ $or: [{ membershiptypes: "chatconsultant" }, { membershiptypes: "teleconsultant" }] }).count();
+    drcounts = await dbo.collection("Doctors").find({ $or: [{ membershiptypes: "chatconsultant" }, { membershiptypes: "teleconsultant" }] ,archived:false }).count();
     a.forEach(async function (doc, index, array) {
-      docpics[doc.name] = await dbo.collection("Doctors").find({ categories: doc.name }, { projection: { image: 1, _id: 0 } }).limit(4).toArray();
+      docpics[doc.name] = await dbo.collection("Doctors").find({ categories: doc.name ,archived:false }, { projection: { image: 1, _id: 0 } }).limit(4).toArray();
       counter++;
       if (counter == array.length) {
         categories().then(basiccategories => {
@@ -5125,7 +5185,7 @@ router.get("/consultant/:Category", function (req, res) {
   MongoClient.connect(dburl, function (err, db) {
     if (err) throw err;
     var dbo = db.db("mydb");
-    dbo.collection("Doctors").find({ categories: req.params.Category.split('-').join(' '), city: qcity }).forEach(function (doc, err) {
+    dbo.collection("Doctors").find({ categories: req.params.Category.split('-').join(' '), city: qcity ,archived:false }).forEach(function (doc, err) {
       Doctors.push(doc);
     }, function () {
       if (req.cookies.usertoken == undefined) {
@@ -5197,7 +5257,7 @@ router.get("/healthcenters/:type", function (req, res) {
   var type = req.params.type.split("-").join(' ');
   MongoClient.connect(dburl, function (err, db) {
     var dbo = db.db("mydb");
-    dbo.collection("HealthCenters").find({ type: type }, async function (err, result) {
+    dbo.collection("HealthCenters").find({ type: type ,archived:false }, async function (err, result) {
       HCs = await result.toArray();
       if (req.cookies.usertoken == undefined) {
         categories().then(basiccategories => {
@@ -5371,7 +5431,7 @@ router.get("/reservation/:type/:HCname/:category", function (req, res) {
     var dbo = db.db("mydb");
     days = [];
     freetimes = []
-    dbo.collection("HealthCenters").findOne({ name: HCname, type: type }, function (err, result) {
+    dbo.collection("HealthCenters").findOne({ name: HCname, type: type ,archived:false }, function (err, result) {
       if (result == null || result.categories == undefined) {
         res.redirect("/noaccess")
       }
@@ -5409,7 +5469,7 @@ router.get("/reservation/:type/:HCname", function (req, res) {
     var dbo = db.db("mydb");
     days = [];
     freetimes = []
-    dbo.collection("HealthCenters").findOne({ name: HCname, type: type }, function (err, HC) {
+    dbo.collection("HealthCenters").findOne({ name: HCname, type: type ,archived:false }, function (err, HC) {
       if (HC == null || HC.systype != "B") {
         res.redirect("/noaccess")
       }
@@ -5433,9 +5493,9 @@ router.get("/reservation/:type/:HCname", function (req, res) {
 router.get("/ticket/:doctor", function (req, res) {
   MongoClient.connect(dburl, function (err, db) {
     var dbo = db.db("mydb");
-    dbo.collection("Doctors").findOne({ name: req.params.doctor.split('-').join(' ') }, function (err, doctor) {
+    dbo.collection("Doctors").findOne({ name: req.params.doctor.split('-').join(' ') ,archived:false }, function (err, doctor) {
       if (doctor == null) {
-        console.log(req.url)
+        res.redirect("/")
         res.end();
       }
       else {
@@ -5940,7 +6000,7 @@ router.get("/category/:Category", function (req, res) {
   MongoClient.connect(dburl, function (err, db) {
     if (err) throw err;
     var dbo = db.db("mydb");
-    dbo.collection("Doctors").find({ categories: req.params.Category.split('-').join(' '), city: qcity }).forEach(function (doc, err) {
+    dbo.collection("Doctors").find({ categories: req.params.Category.split('-').join(' '), city: qcity,archived:false }).forEach(function (doc, err) {
       Doctors.push(doc);
     }, function () {
       if (req.cookies.usertoken == undefined) {
@@ -5974,23 +6034,29 @@ router.get("/category/:Category/:Doctor", function (req, res) {
   MongoClient.connect(dburl, function (err, db) {
     if (err) throw err;
     var dbo = db.db("mydb");
-    dbo.collection("Doctors").findOne({ name: req.params.Doctor.split('-').join(' ') }, function (err, result) {
-      dbo.collection("Users").findOne({ token: req.cookies.usertoken }, function (err, user) {
-        if (user == null) {
-          categories().then(basiccategories => {
-            res.render("doctorpage.ejs", { doctor: result, categories: basiccategories, user: "" });
-            db.close();
-            res.end();
-          })
-        }
-        else {
-          categories().then(basiccategories => {
-            res.render("doctorpage.ejs", { doctor: result, categories: basiccategories, user: user });
-            db.close();
-            res.end();
-          })
-        }
-      })
+    dbo.collection("Doctors").findOne({ name: req.params.Doctor.split('-').join(' ') ,archived:false }, function (err, result) {
+      if(result==null){
+        res.redirect("/");
+        db.close();
+      }
+      else{
+        dbo.collection("Users").findOne({ token: req.cookies.usertoken }, function (err, user) {
+          if (user == null) {
+            categories().then(basiccategories => {
+              res.render("doctorpage.ejs", { doctor: result, categories: basiccategories, user: "" });
+              db.close();
+              res.end();
+            })
+          }
+          else {
+            categories().then(basiccategories => {
+              res.render("doctorpage.ejs", { doctor: result, categories: basiccategories, user: user });
+              db.close();
+              res.end();
+            })
+          }
+        })
+      }
     })
   })
 })
@@ -6003,7 +6069,7 @@ router.get("/reserve/:Doctor", function (req, res) {
     var dbo = db.db("mydb");
     days = [];
     freetimes = []
-    dbo.collection("Doctors").findOne({ name: req.params.Doctor.split('-').join(' ') }, function (err, result) {
+    dbo.collection("Doctors").findOne({ name: req.params.Doctor.split('-').join(' '), archived:false }, function (err, result) {
       if (result == null) {
         db.close();
         res.redirect('/');
@@ -6033,7 +6099,7 @@ router.get("/telereserve/:Doctor", function (req, res) {
     var dbo = db.db("mydb");
     days = [];
     freetimes = []
-    dbo.collection("Doctors").findOne({ name: req.params.Doctor.split('-').join(' ') }, function (err, result) {
+    dbo.collection("Doctors").findOne({ name: req.params.Doctor.split('-').join(' ') ,archived:false}, function (err, result) {
       if (result == null) {
         db.close();
         res.redirect('/');

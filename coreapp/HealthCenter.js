@@ -31,6 +31,7 @@ class HealthCenter{
         this.token="";
         this.medicalnumber=medicalnumber;
         this.systype=systype;
+        this.archived=false;
     }
 }
 
