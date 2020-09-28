@@ -21,10 +21,10 @@
                                         <option value="HealthCenters">مراکز درمانی</option>
                                     </select>
                                 </span>
-                                <input type="text" oninput
-                                ="checkempty()" name="query" id="gsearchsimple"
+                                <input type="text" oninput="checkempty()" name="query" id="gsearchsimple"
                                     placeholder="نام دکتر  و یا دسته مورد نظر خود را جستجو کنید…">
-                                <button type="submit" id="searchbtn" style="max-height: 53%;top: 47%;" disabled><img src="assets/img/search.png" alt=""></button>
+                                <button type="submit" id="searchbtn" style="max-height: 53%;top: 47%;" disabled><img
+                                        src="assets/img/search.png" alt=""></button>
                             </form>
                         </div>
                     </div>
@@ -88,28 +88,23 @@
                     <a class="nav-link" href="#">پنل مدیریت</a>
                     <ul class="sub-menu nav">
                         <li class="list-item">
-                            <a class="main-list-item nav-link"
-                                href="/logindoc"> دکتر ها
+                            <a class="main-list-item nav-link" href="/logindoc"> دکتر ها
                             </a>
                         </li>
                         <li class="list-item">
-                            <a class="main-list-item nav-link"
-                                href="/loginHC"> آزمایشگاه ها
+                            <a class="main-list-item nav-link" href="/loginHC"> آزمایشگاه ها
                             </a>
                         </li>
                         <li class="list-item">
-                            <a class="main-list-item nav-link"
-                                href="/loginHC"> سونوگرافی ها 
+                            <a class="main-list-item nav-link" href="/loginHC"> سونوگرافی ها
                             </a>
                         </li>
                         <li class="list-item">
-                            <a class="main-list-item nav-link"
-                                href="/loginHC"> کلینیک ها
+                            <a class="main-list-item nav-link" href="/loginHC"> کلینیک ها
                             </a>
                         </li>
                         <li class="list-item">
-                            <a class="main-list-item nav-link"
-                                href="/loginHC"> داروخانه ها
+                            <a class="main-list-item nav-link" href="/loginHC"> داروخانه ها
                             </a>
                         </li>
                     </ul>
@@ -118,28 +113,23 @@
                     <a class="nav-link" href="#">ثبت نام</a>
                     <ul class="sub-menu nav">
                         <li class="list-item">
-                            <a class="main-list-item nav-link"
-                                href="/doctorsignup"> دکتر ها
+                            <a class="main-list-item nav-link" href="/doctorsignup"> دکتر ها
                             </a>
                         </li>
                         <li class="list-item">
-                            <a class="main-list-item nav-link"
-                                href="/labsignup"> آزمایشگاه ها
+                            <a class="main-list-item nav-link" href="/labsignup"> آزمایشگاه ها
                             </a>
                         </li>
                         <li class="list-item">
-                            <a class="main-list-item nav-link"
-                                href="/labsignup"> سونوگرافی ها 
+                            <a class="main-list-item nav-link" href="/labsignup"> سونوگرافی ها
                             </a>
                         </li>
                         <li class="list-item">
-                            <a class="main-list-item nav-link"
-                                href="/clinicsignup"> کلینیک ها
+                            <a class="main-list-item nav-link" href="/clinicsignup"> کلینیک ها
                             </a>
                         </li>
                         <li class="list-item">
-                            <a class="main-list-item nav-link"
-                                href="/pharmacysignup"> داروخانه ها
+                            <a class="main-list-item nav-link" href="/pharmacysignup"> داروخانه ها
                             </a>
                         </li>
                     </ul>
@@ -148,22 +138,22 @@
                     <a class="nav-link" href="https://shop.drtajviz.com">فروشگاه</a>
                 </li>
                 <li class="list-item">
-                    <a class="nav-link" href="https://drtajviz.com/mag/">مجله پزشکی</a>
+                    <a class="nav-link" href="https://shop.drtajviz.com/mag/">مجله پزشکی</a>
                 </li>
                 <li class="list-item">
-                    <a class="nav-link" href="https://drtajviz.com/contact-us/" id="contactus">تماس با ما</a>
+                    <a class="nav-link" href="https://shop.drtajviz.com/contact-us/" id="contactus">تماس با ما</a>
                 </li>
                 <li class="list-item">
-                    <a class="nav-link" href="https://drtajviz.com/aboutus/" id="aboutus">درباره ی ما</a>
+                    <a class="nav-link" href="https://shop.drtajviz.com/aboutus/" id="aboutus">درباره ی ما</a>
                 </li>
             </ul>
         </div>
     </nav>
     <script>
-        function checkempty(){
-            if(document.getElementById("gsearchsimple").value!=""){
+        function checkempty() {
+            if (document.getElementById("gsearchsimple").value != "") {
                 console.log("saf")
-                document.getElementById("searchbtn").disabled=false
+                document.getElementById("searchbtn").disabled = false
             }
         }
     </script>
