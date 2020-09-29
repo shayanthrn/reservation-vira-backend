@@ -1,5 +1,7 @@
 <!DOCTYPE html>
-<html dir="rtl" class="fa-events-icons-ready" lang="en"><head>
+<html dir="rtl" class="fa-events-icons-ready" lang="en">
+
+<head>
   <meta charset="utf-8">
   <base id="base">
   <script src="/assets/js/config.js"></script>
@@ -10,8 +12,9 @@
   <link rel="icon" href="favicon.ico">
 
   <title></title>
-  
-  <link rel="stylesheet" href="https://cdn.rtlcss.com/bootstrap/v4.1.3/css/bootstrap.min.css" integrity="sha384-Jt6Tol1A2P9JBesGeCxNrxkmRFSjWCBW1Af7CSQSKsfMVQCqnUVWhZzG0puJMCK6" crossorigin="anonymous">
+
+  <link rel="stylesheet" href="https://cdn.rtlcss.com/bootstrap/v4.1.3/css/bootstrap.min.css"
+    integrity="sha384-Jt6Tol1A2P9JBesGeCxNrxkmRFSjWCBW1Af7CSQSKsfMVQCqnUVWhZzG0puJMCK6" crossorigin="anonymous">
   <link href="assets/panelassests/dashboard.rtl.css" rel="stylesheet">
   <script src="https://use.fontawesome.com/6d68f18b97.js"></script>
   <link href="https://use.fontawesome.com/6d68f18b97.css" media="all" rel="stylesheet">
@@ -22,7 +25,8 @@
 
   <nav class="navbar fixed-top navbar-expand-lg nav-dark">
     <a class="navbar-brand mr-2" style="color: white;"> دکتر تجویز</a>
-    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarTogglerDemo" aria-controls="navbarTogglerDemo" aria-expanded="false" aria-label="Toggle navigation">
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarTogglerDemo"
+      aria-controls="navbarTogglerDemo" aria-expanded="false" aria-label="Toggle navigation">
       <i class="fa fa-bars menu-icon"></i>
     </button>
   </nav>
@@ -30,7 +34,7 @@
 
   <div class="container-fluid">
     <div class="row">
-      
+
       <nav class="col-lg-3 col-xl-2 d-lg-block sidebar collapse" id="navbarTogglerDemo">
         <div class="sidebar-sticky">
           <ul class="nav flex-column">
@@ -41,13 +45,13 @@
               </a>
             </li>
             <% if(doctor.membershiptypes.includes("teleconsultant")) { %>
-              <li class="nav-item">
-                <a class="nav-link" href="/DoctorPanel/telereserve">
-                  <i class="fa fa-phone"></i>
-                  رزرو تلفنی
-                </a>
-              </li>
-              <% } %>
+            <li class="nav-item">
+              <a class="nav-link" href="/DoctorPanel/telereserve">
+                <i class="fa fa-phone"></i>
+                رزرو تلفنی
+              </a>
+            </li>
+            <% } %>
             <li class="nav-item">
               <a class="nav-link active" href="/DoctorPanel/profile">
                 <i class="fa fa-user-md"></i>
@@ -69,10 +73,10 @@
             </li>
             <% } %>
             <li class="nav-item">
-                <a class="nav-link" href="/DoctorPanel/removevisittimes">
-                  <i class="fa fa-calendar"></i>
-                  حذف زمانبندی
-                </a>
+              <a class="nav-link" href="/DoctorPanel/removevisittimes">
+                <i class="fa fa-calendar"></i>
+                حذف زمانبندی
+              </a>
             </li>
             <li class="nav-item">
               <a class="nav-link" href="/DoctorPanel/visittimes">
@@ -94,12 +98,13 @@
             </li>
           </ul>
 
-          </div>
+        </div>
       </nav>
 
       <main role="main" class=" ml-sm-auto col-lg-9 col-xl-10 px-4" id="profile">
         <div class="container-fluid">
-          <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+          <div
+            class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
             <h1 class="h2">پروفایل</h1>
           </div>
 
@@ -119,7 +124,8 @@
                   <div class="col-md-6 col-lg-6">
                     <p><%=doctor.name %></p>
                     <div class="form-group mb-2">
-                      <input type="text" class="form-control form-control-sm" name="name" id="name" placeholder="نام و نام خانوادگی" value="<%=doctor.name %>" disabled>
+                      <input type="text" class="form-control form-control-sm" name="name" id="name"
+                        placeholder="نام و نام خانوادگی" value="<%=doctor.name %>" disabled>
                     </div>
                   </div>
                 </div>
@@ -130,7 +136,7 @@
                   <div class="col-md-6 col-lg-6">
                     <p><% for(let i=0;i<doctor.categories.length;i++){  %>
                       <% if(i==doctor.categories.length-1){ %>
-                          <%= doctor.categories[i] %>
+                      <%= doctor.categories[i] %>
                       <% } else { %>
                       <%= doctor.categories[i]+"," %>
                       <% } %>
@@ -144,10 +150,13 @@
                           <option class="options" value="<%= categories[j].name %>"></option>
                           <% } %>
                         </datalist>
-                        <button type="button" onclick="newElement()" id="addcat" class="addBtn btn btn-danger">اضافه</button>
+                        <button type="button" onclick="newElement()" id="addcat"
+                          class="addBtn btn btn-danger">اضافه</button>
                         <ul id="myUL">
                           <% for(let i=0;i<doctor.categories.length;i++) { %>
-                            <li class="checklist" data-mydata="<%=doctor.categories[i]%>" style="list-style: none;"><%=doctor.categories[i]%><input class="prevcats" type="checkbox" name="categories" value="<%=doctor.categories[i]%>" style="visibility: hidden;" checked></li>
+                          <li class="checklist" data-mydata="<%=doctor.categories[i]%>" style="list-style: none;">
+                            <%=doctor.categories[i]%><input class="prevcats" type="checkbox" name="categories"
+                              value="<%=doctor.categories[i]%>" style="visibility: hidden;" checked></li>
                           <% } %>
                         </ul>
                       </div>
@@ -157,33 +166,36 @@
                 <div class="row">
                   <div class="col-md-4 col-lg-2">
                     <h5>سابقه کار</h5>
-                  </div>  
+                  </div>
                   <div class="col-md-6 col-lg-6">
                     <p><%= doctor.background %></p>
                     <div class="form-group mb-2">
-                      <input type="text" class="form-control form-control-sm" name="experience" id="experience" placeholder="سابقه کار" value="<%= doctor.background %>" required>
+                      <input type="text" class="form-control form-control-sm" name="experience" id="experience"
+                        placeholder="سابقه کار" value="<%= doctor.background %>" required>
                     </div>
                   </div>
                 </div>
                 <div class="row">
                   <div class="col-md-4 col-lg-2">
                     <h5>شماره نظام پزشکی</h5>
-                  </div>  
+                  </div>
                   <div class="col-md-6 col-lg-6">
                     <p><%= doctor.medicalnumber %></p>
                     <div class="form-group mb-2">
-                      <input type="text" class="form-control form-control-sm" name="medicalnumber" id="medicalnumber" placeholder="شماره نظام پزشکی" value="<%= doctor.medicalnumber %>" required>
+                      <input type="text" class="form-control form-control-sm" name="medicalnumber" id="medicalnumber"
+                        placeholder="شماره نظام پزشکی" value="<%= doctor.medicalnumber %>" required>
                     </div>
                   </div>
                 </div>
                 <div class="row">
                   <div class="col-md-4 col-lg-2">
                     <h5>کد ملی</h5>
-                  </div>  
+                  </div>
                   <div class="col-md-6 col-lg-6">
                     <p><%= doctor.codemeli %></p>
                     <div class="form-group mb-2">
-                      <input type="text" class="form-control form-control-sm" name="codemeli" id="codemeli" placeholder="کد ملی" value="<%= doctor.codemeli %>" required>
+                      <input type="text" class="form-control form-control-sm" name="codemeli" id="codemeli"
+                        placeholder="کد ملی" value="<%= doctor.codemeli %>" required>
                     </div>
                   </div>
                 </div>
@@ -194,7 +206,8 @@
                   <div class="col-md-6 col-lg-6">
                     <p><%=doctor.address %></p>
                     <div class="form-group mb-2">
-                      <input type="text" class="form-control form-control-sm" name="address" id="address" placeholder="ادرس" value="<%=doctor.address %>" required>
+                      <input type="text" class="form-control form-control-sm" name="address" id="address"
+                        placeholder="ادرس" value="<%=doctor.address %>" required>
                     </div>
                   </div>
                 </div>
@@ -205,7 +218,8 @@
                   <div class="col-md-6 col-lg-6">
                     <p><%=doctor.phonenumber %></p>
                     <div class="form-group mb-2">
-                      <input type="text" class="form-control form-control-sm" name="phone" id="phone" placeholder="شماره تماس" value="<%=doctor.phonenumber %>" required>
+                      <input type="text" class="form-control form-control-sm" name="phone" id="phone"
+                        placeholder="شماره تماس" value="<%=doctor.phonenumber %>" required>
                     </div>
                   </div>
                 </div>
@@ -216,7 +230,8 @@
                   <div class="col-md-6 col-lg-6">
                     <p><%=doctor.workphone %></p>
                     <div class="form-group mb-2">
-                      <input type="text" class="form-control form-control-sm" name="workphone" id="workphone" placeholder="تلفن مطب" value="<%=doctor.workphone %>" required>
+                      <input type="text" class="form-control form-control-sm" name="workphone" id="workphone"
+                        placeholder="تلفن مطب" value="<%=doctor.workphone %>" required>
                     </div>
                   </div>
                 </div>
@@ -241,7 +256,8 @@
                   <div class="col-md-6 col-lg-6">
                     <p><%=doctor.visitduration %> دقیقه</p>
                     <div class="form-group mb-2">
-                      <input type="number" min="1" class="form-control form-control-sm" name="duration" id="duration" placeholder="مدت هر ویزیت" value="<%=doctor.visitduration %>" required>
+                      <input type="number" min="1" class="form-control form-control-sm" name="duration" id="duration"
+                        placeholder="مدت هر ویزیت" value="<%=HC.visitduration %>" required>
                     </div>
                   </div>
                 </div>
@@ -250,9 +266,10 @@
                     <h5>هزینه هر ویزیت</h5>
                   </div>
                   <div class="col-md-6 col-lg-6">
-                    <p><%=doctor.visitcost %>  تومان</p>
+                    <p><%=doctor.visitcost %> تومان</p>
                     <div class="form-group mb-2">
-                      <input type="number" class="form-control form-control-sm" name="cost" id="cost" placeholder="هزینه هر ویزیت" value=<%= doctor.visitcost %> disabled>
+                      <input type="number" class="form-control form-control-sm" name="cost" id="cost"
+                        placeholder="هزینه هر ویزیت" value=<%= doctor.visitcost %> disabled>
                     </div>
                   </div>
                 </div>
@@ -265,7 +282,8 @@
                       <%=doctor.description %>
                     </p>
                     <div class="form-group mb-2">
-                      <textarea class="form-control form-control-sm" name="description" id="description" rows="5" required><%=doctor.description %></textarea>
+                      <textarea class="form-control form-control-sm" name="description" id="description" rows="5"
+                        required><%=doctor.description %></textarea>
                     </div>
                   </div>
                 </div>
@@ -296,14 +314,20 @@
 
     </div>
   </div>
-  
 
 
 
-  <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+
+  <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+    integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+    crossorigin="anonymous"></script>
   <script>window.jQuery || document.write('<script src="assets/panelassests/jquery-slim.min.js"><\/script>')</script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
-  <script src="https://cdn.rtlcss.com/bootstrap/v4.1.3/js/bootstrap.min.js" integrity="sha384-C/pvytx0t5v9BEbkMlBAGSPnI1TQU1IrTJ6DJbC8GBHqdMnChcb6U4xg4uRkIQCV" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"
+    integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49"
+    crossorigin="anonymous"></script>
+  <script src="https://cdn.rtlcss.com/bootstrap/v4.1.3/js/bootstrap.min.js"
+    integrity="sha384-C/pvytx0t5v9BEbkMlBAGSPnI1TQU1IrTJ6DJbC8GBHqdMnChcb6U4xg4uRkIQCV"
+    crossorigin="anonymous"></script>
 
   <script type="text/javascript">
     $profileForm = $("#profile form")
@@ -313,98 +337,98 @@
     })
   </script>
 
-<script>
-  // Create a "close" button and append it to each list item
-  var myNodelist = document.getElementsByClassName("checklist");
-  var i;
-  for (i = 0; i < myNodelist.length; i++) {
-    var span = document.createElement("SPAN");
-    var txt = document.createTextNode("\u00D7");
-    span.className = "close";
-    span.style="font-size:20px"
-    span.appendChild(txt);
-    myNodelist[i].appendChild(span);
-  }
-  
-  // Click on a close button to hide the current list item
-  var close = document.getElementsByClassName("close");
-  var i;
-  for (i = 0; i < close.length; i++) {
-    close[i].onclick = function() {
-      var div = this.parentElement;
-        var opt=document.createElement("option");
-        opt.value=div.dataset.mydata;
-        opt.className="options";
+  <script>
+    // Create a "close" button and append it to each list item
+    var myNodelist = document.getElementsByClassName("checklist");
+    var i;
+    for (i = 0; i < myNodelist.length; i++) {
+      var span = document.createElement("SPAN");
+      var txt = document.createTextNode("\u00D7");
+      span.className = "close";
+      span.style = "font-size:20px"
+      span.appendChild(txt);
+      myNodelist[i].appendChild(span);
+    }
+
+    // Click on a close button to hide the current list item
+    var close = document.getElementsByClassName("close");
+    var i;
+    for (i = 0; i < close.length; i++) {
+      close[i].onclick = function () {
+        var div = this.parentElement;
+        var opt = document.createElement("option");
+        opt.value = div.dataset.mydata;
+        opt.className = "options";
         this.parentElement.remove();
         document.getElementById("mylist").appendChild(opt);
+      }
     }
-  }
-  
-  var options = document.getElementsByClassName("options");
-  var prevcats = document.getElementsByClassName("prevcats");
-    for(i =0 ; i<options.length;i++){
-      for(k=0;k<prevcats.length;k++){
-        if(options[i].value==prevcats[k].value){
-        options[i].remove();
+
+    var options = document.getElementsByClassName("options");
+    var prevcats = document.getElementsByClassName("prevcats");
+    for (i = 0; i < options.length; i++) {
+      for (k = 0; k < prevcats.length; k++) {
+        if (options[i].value == prevcats[k].value) {
+          options[i].remove();
         }
       }
     }
-  
-  // Create a new list item when clicking on the "Add" button
-  function newElement() {
-    var li = document.createElement("li");
-    var input = document.createElement("input");
-    var inputValue = document.getElementById("myInput").value;
-    var t = document.createTextNode(inputValue);
-    input.value=inputValue;
-    input.type="checkbox";
-    input.checked=true;
-    input.name="categories";
-    input.style.visibility="hidden";
-    li.className="checklist";
-    li.style.listStyle="none";
-    li.dataset.mydata=inputValue;
-    li.appendChild(t);
-    li.appendChild(input);
-    if (inputValue === '') {
-      alert("تخصص وارد شده معتبر نیست");
-    } else {
-      document.getElementById("myUL").appendChild(li);
-    }
-    document.getElementById("myInput").value = "";
-  
-    var span = document.createElement("SPAN");
-    var txt = document.createTextNode("\u00D7");
-    span.className = "close";
-    span.style="font-size:20px"
-    span.appendChild(txt);
-    li.appendChild(span);
-  
-    for (i = 0; i < close.length; i++) {
-      close[i].onclick = function() {
-        var div = this.parentElement;
-        var opt=document.createElement("option");
-        opt.value=div.dataset.mydata;
-        opt.className="options";
-        this.parentElement.remove();
-        document.getElementById("mylist").appendChild(opt);
-      }
-    }
-    
-    var options = document.getElementsByClassName("options");
-    for(i =0 ; i<options.length;i++){
-      if(options[i].value==inputValue){
-        options[i].remove();
-      }
-    }
-  }
 
-  function checkdatalist(){
-    const currentValue = document.getElementById('myInput').value;
-    document.getElementById("addcat").disabled =
-    currentValue.length === 0 ||
-    document.querySelector('option[value="' + currentValue + '"]') === null;
-  }
+    // Create a new list item when clicking on the "Add" button
+    function newElement() {
+      var li = document.createElement("li");
+      var input = document.createElement("input");
+      var inputValue = document.getElementById("myInput").value;
+      var t = document.createTextNode(inputValue);
+      input.value = inputValue;
+      input.type = "checkbox";
+      input.checked = true;
+      input.name = "categories";
+      input.style.visibility = "hidden";
+      li.className = "checklist";
+      li.style.listStyle = "none";
+      li.dataset.mydata = inputValue;
+      li.appendChild(t);
+      li.appendChild(input);
+      if (inputValue === '') {
+        alert("تخصص وارد شده معتبر نیست");
+      } else {
+        document.getElementById("myUL").appendChild(li);
+      }
+      document.getElementById("myInput").value = "";
+
+      var span = document.createElement("SPAN");
+      var txt = document.createTextNode("\u00D7");
+      span.className = "close";
+      span.style = "font-size:20px"
+      span.appendChild(txt);
+      li.appendChild(span);
+
+      for (i = 0; i < close.length; i++) {
+        close[i].onclick = function () {
+          var div = this.parentElement;
+          var opt = document.createElement("option");
+          opt.value = div.dataset.mydata;
+          opt.className = "options";
+          this.parentElement.remove();
+          document.getElementById("mylist").appendChild(opt);
+        }
+      }
+
+      var options = document.getElementsByClassName("options");
+      for (i = 0; i < options.length; i++) {
+        if (options[i].value == inputValue) {
+          options[i].remove();
+        }
+      }
+    }
+
+    function checkdatalist() {
+      const currentValue = document.getElementById('myInput').value;
+      document.getElementById("addcat").disabled =
+        currentValue.length === 0 ||
+        document.querySelector('option[value="' + currentValue + '"]') === null;
+    }
 
   </script>
 
