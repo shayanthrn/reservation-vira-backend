@@ -1829,6 +1829,7 @@ function createinterval(start, end) {
 
 function getDoctimeslots(doctor, date, flag) {
   duration = doctor.visitduration;
+  console.log(doctor);
   unavb = doctor.unavailabletimes;
   dayofweek = new persianDate([date.year, date.month, date.day]).format('dddd');
   mintime = 0;
