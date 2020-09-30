@@ -977,12 +977,26 @@ router.post("/changeHCinfo", function (req, res) {
           res.redirect('noaccess');
         }
         else {
-          var cats = []
+          dbo.collection("HealthCenters").findOne({name:req.body.name},function(err,myhc){
+            if(myhc!=null && HC.name!=req.body.name){
+              db.close();
+              res.redirect("/duplicated-name");
+            }
+          else{
+              var cats = []
           if (typeof req.body.categories == "string") {
             cats.push(req.body.categories);
           }
           else {
             cats = req.body.categories;
+          }
+          temp=HC.image.split("/").slice(0,2);
+          temp.push(req.body.name+".png");
+          newimg=temp.join("/");
+          if(HC.name!=req.body.name){
+            fs.rename("public"+HC.image,"public"+newimg,function(err){
+              console.log("changed photo path");
+            })
           }
           if (HC.systype == "A") {
             HC.categories.forEach(function (item, index, object) {
@@ -999,7 +1013,7 @@ router.post("/changeHCinfo", function (req, res) {
                 HC.categories.push({ name: doc, unavailabletimes: [], reservations: [], visitduration: 30, visitcost: 3000 })
               }
             })
-            dbo.collection('HealthCenters').updateOne({ token: req.cookies.HCtoken }, { $set: { codeofHC: req.body.codeofHC, categories: HC.categories, codemeli: req.body.codemeli, city: req.body.city, phonenumber: req.body.phonenumber, directphonenumber: req.body.directphonenumber, background: req.body.background, address: req.body.address, medicalnumber: req.body.medicalnumber } }, function (err, res2) {
+            dbo.collection('HealthCenters').updateOne({ token: req.cookies.HCtoken }, { $set: {name:req.body.name,image:newimg , codeofHC: req.body.codeofHC, categories: HC.categories, codemeli: req.body.codemeli, city: req.body.city, phonenumber: req.body.phonenumber, directphonenumber: req.body.directphonenumber, background: req.body.background, address: req.body.address, medicalnumber: req.body.medicalnumber } }, function (err, res2) {
               if (req.files != null) {
                 mv(req.files.image.tempFilePath, "public" + HC.image, function (err) {
                   console.log("public" + HC.image)
@@ -1010,7 +1024,7 @@ router.post("/changeHCinfo", function (req, res) {
             })
           }
           else {
-            dbo.collection('HealthCenters').updateOne({ token: req.cookies.HCtoken }, { $set: { codeofHC: req.body.codeofHC, codemeli: req.body.codemeli, city: req.body.city, phonenumber: req.body.phonenumber, directphonenumber: req.body.directphonenumber, background: req.body.background, address: req.body.address, medicalnumber: req.body.medicalnumber } }, function (err, res2) {
+            dbo.collection('HealthCenters').updateOne({ token: req.cookies.HCtoken }, { $set: { name:req.body.name, image:newimg , codeofHC: req.body.codeofHC, codemeli: req.body.codemeli, city: req.body.city, phonenumber: req.body.phonenumber, directphonenumber: req.body.directphonenumber, background: req.body.background, address: req.body.address, medicalnumber: req.body.medicalnumber } }, function (err, res2) {
               if (req.files != null) {
                 mv(req.files.image.tempFilePath, "public" + HC.image, function (err) {
                   console.log("public" + HC.image)
@@ -1020,6 +1034,8 @@ router.post("/changeHCinfo", function (req, res) {
               res.redirect('/HCpanel/profile');
             })
           }
+            }
+          })
         }
       })
     })
