@@ -920,26 +920,43 @@ router.post("/changedocinfo", function (req, res) {
           res.redirect('noaccess');
         }
         else {
-          var cats = []
-          if (typeof req.body.categories == "string") {
-            cats.push(req.body.categories);
-          }
-          else {
-            if (req.body.categories == undefined || req.body.categories == null) {
-              cats = [];
+          dbo.collection("Doctors").findOne({name:req.body.name},function(err,doctor){
+            if(doctor!=null && result.name!=req.body.name){
+              db.close();
+              res.redirect('duplicatename');
             }
-            else {
-              cats = req.body.categories;
-            }
-          }
-          dbo.collection('Doctors').updateOne({ token: req.cookies.doctortoken }, { $set: { categories: cats, city: req.body.city, workphone: req.body.workphone, medicalnumber: req.body.medicalnumber, codemeli: req.body.codemeli, background: req.body.experience, address: req.body.address, phonenumber: req.body.phone, visitduration: Number(req.body.duration), description: req.body.description } }, function (err, res2) {
-            if (req.files != null) {
-              mv(req.files.image.tempFilePath, "public" + result.image, function (err) {
-                console.log("public" + result.image)
+            else{
+              var cats = []
+              if (typeof req.body.categories == "string") {
+                cats.push(req.body.categories);
+              }
+              else {
+                if (req.body.categories == undefined || req.body.categories == null) {
+                  cats = [];
+                }
+                else {
+                  cats = req.body.categories;
+                }
+              }
+              temp=result.image.split("/").slice(0,2);
+              temp.push(req.body.name+".png");
+              newimg=temp.join("/");
+              if(result.name!=req.body.name){
+                fs.rename("public"+result.image,"public"+newimg,function(err){
+                  console.log("changed photo path");
+                })
+                dbo.collection("Chats").updateMany({doctor:result.name},{$set:{doctor:req.body.name}});
+              }
+              dbo.collection('Doctors').updateOne({ token: req.cookies.doctortoken }, { $set: { name:req.body.name , image:newimg ,categories: cats, city: req.body.city, workphone: req.body.workphone, medicalnumber: req.body.medicalnumber, codemeli: req.body.codemeli, background: req.body.experience, address: req.body.address, phonenumber: req.body.phone, visitduration: Number(req.body.duration), description: req.body.description } }, function (err, res2) {
+                if (req.files != null) {
+                  mv(req.files.image.tempFilePath, "public" + result.image, function (err) {
+                    console.log("public" + result.image)
+                  })
+                }
+                db.close();
+                res.redirect('/doctorpanel/profile');
               })
             }
-            db.close();
-            res.redirect('/doctorpanel/profile');
           })
         }
       })
@@ -982,7 +999,7 @@ router.post("/changeHCinfo", function (req, res) {
                 HC.categories.push({ name: doc, unavailabletimes: [], reservations: [], visitduration: 30, visitcost: 3000 })
               }
             })
-            dbo.collection('HealthCenters').updateOne({ token: req.cookies.HCtoken }, { $set: { codeofHC: req.body.codeofHC, categories: HC.categories, codemeli: req.body.codemeli, city: req.body.city, phonenumber: req.body.phonenumber, directphonenumber: req.body.directphonenumber, background: req.body.background, visitduration: Number(req.body.duration), address: req.body.address, medicalnumber: req.body.medicalnumber } }, function (err, res2) {
+            dbo.collection('HealthCenters').updateOne({ token: req.cookies.HCtoken }, { $set: { codeofHC: req.body.codeofHC, categories: HC.categories, codemeli: req.body.codemeli, city: req.body.city, phonenumber: req.body.phonenumber, directphonenumber: req.body.directphonenumber, background: req.body.background, address: req.body.address, medicalnumber: req.body.medicalnumber } }, function (err, res2) {
               if (req.files != null) {
                 mv(req.files.image.tempFilePath, "public" + HC.image, function (err) {
                   console.log("public" + HC.image)
