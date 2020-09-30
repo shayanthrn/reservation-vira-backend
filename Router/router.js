@@ -993,7 +993,7 @@ router.post("/changeHCinfo", function (req, res) {
             })
           }
           else {
-            dbo.collection('HealthCenters').updateOne({ token: req.cookies.HCtoken }, { $set: { codeofHC: req.body.codeofHC, codemeli: req.body.codemeli, city: req.body.city, phonenumber: req.body.phonenumber, directphonenumber: req.body.directphonenumber, background: req.body.background, visitduration: Number(req.body.duration), address: req.body.address, medicalnumber: req.body.medicalnumber } }, function (err, res2) {
+            dbo.collection('HealthCenters').updateOne({ token: req.cookies.HCtoken }, { $set: { codeofHC: req.body.codeofHC, codemeli: req.body.codemeli, city: req.body.city, phonenumber: req.body.phonenumber, directphonenumber: req.body.directphonenumber, background: req.body.background, address: req.body.address, medicalnumber: req.body.medicalnumber } }, function (err, res2) {
               if (req.files != null) {
                 mv(req.files.image.tempFilePath, "public" + HC.image, function (err) {
                   console.log("public" + HC.image)
