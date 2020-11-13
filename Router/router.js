@@ -68,6 +68,25 @@ function categories() {
 //------------------------api------------------------------//
 
 
+router.get("/testpayment",function(req,res){
+  request({
+    url: "https://fcp.shaparak.ir/_ipgw_/payment/simple/",
+    method: "POST",
+    json: true,
+    body: {
+      Amount:1007,
+      ResNum:"first123",
+      MID:"21918395",
+      redirectURL:"https://reservation.drtajviz.com"
+    }
+  }, (error, response, body) => {
+    console.log(response)
+    console.log("----------");
+    console.log(body);
+  })
+})
+
+
 
 
 
