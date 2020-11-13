@@ -74,7 +74,7 @@ router.get("/testpayment",function(req,res){
     method: "POST",
     json: true,
     body: {
-      Amount:1007,
+      Amount:"1007",
       ResNum:"first123",
       MID:"21918395",
       redirectURL:"https://reservation.drtajviz.com"
