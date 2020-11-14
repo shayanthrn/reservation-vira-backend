@@ -70,11 +70,12 @@ function categories() {
 
 router.get("/testpayment",function(req,res){
   request({
-    url: "https://fcp.shaparak.ir/_ipgw_/payment/simple/",
+    //url: "https://fcp.shaparak.ir/_ipgw_/payment/simple/",
+    uri: "https://reservation.drtajviz.com/testpay",
     method: "POST",
     json: true,
     body: {
-      Amount:"1007",
+      Amount:1007,
       ResNum:"first123",
       MID:"21918395",
       redirectURL:"https://reservation.drtajviz.com"
@@ -86,6 +87,10 @@ router.get("/testpayment",function(req,res){
   })
 })
 
+router.post("/testpay",function(req,res){
+  console.log("this is testpay");
+  console.log(req.body)
+})
 
 
 
