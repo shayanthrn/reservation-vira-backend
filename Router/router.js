@@ -68,17 +68,18 @@ function categories() {
 //------------------------api------------------------------//
 
 
-router.get("/testpayment",function(req,res){
+router.get("/testpayment", function (req, res) {
   request({
-    url: "https://fcp.shaparak.ir/_ipgw_/payment/simple/",
+    url: "https://fcp.shaparak.ir/ref-payment/RestServices/mts/generateTokenWithNoSign/",
     method: "POST",
     json: true,
     body: {
-      Amount:1007,
-      ResNum:"first123",
-      MID:21918395,
-      redirectURL:"https://reservation.drtajviz.com"
-    }
+      "WSContext": { "UserId": "21918395", "Password": "21918395" },
+      "TransType": "EN_GOODS",
+      "ReserveNum": "FanAvaTest123",
+      "Amount": "1007",
+      "RedirectUrl": "https://reservation.drtajviz.com/testtest",
+      }
   }, (error, response, body) => {
     console.log(response)
     console.log("----------");
@@ -935,12 +936,12 @@ router.post("/changedocinfo", function (req, res) {
           res.redirect('noaccess');
         }
         else {
-          dbo.collection("Doctors").findOne({name:req.body.name},function(err,doctor){
-            if(doctor!=null && result.name!=req.body.name){
+          dbo.collection("Doctors").findOne({ name: req.body.name }, function (err, doctor) {
+            if (doctor != null && result.name != req.body.name) {
               db.close();
               res.redirect('duplicatename');
             }
-            else{
+            else {
               var cats = []
               if (typeof req.body.categories == "string") {
                 cats.push(req.body.categories);
@@ -953,16 +954,16 @@ router.post("/changedocinfo", function (req, res) {
                   cats = req.body.categories;
                 }
               }
-              temp=result.image.split("/").slice(0,2);
-              temp.push(req.body.name+".png");
-              newimg=temp.join("/");
-              if(result.name!=req.body.name){
-                fs.rename("public"+result.image,"public"+newimg,function(err){
+              temp = result.image.split("/").slice(0, 2);
+              temp.push(req.body.name + ".png");
+              newimg = temp.join("/");
+              if (result.name != req.body.name) {
+                fs.rename("public" + result.image, "public" + newimg, function (err) {
                   console.log("changed photo path");
                 })
-                dbo.collection("Chats").updateMany({doctor:result.name},{$set:{doctor:req.body.name}});
+                dbo.collection("Chats").updateMany({ doctor: result.name }, { $set: { doctor: req.body.name } });
               }
-              dbo.collection('Doctors').updateOne({ token: req.cookies.doctortoken }, { $set: { name:req.body.name , image:newimg ,categories: cats, city: req.body.city, workphone: req.body.workphone, medicalnumber: req.body.medicalnumber, codemeli: req.body.codemeli, background: req.body.experience, address: req.body.address, phonenumber: req.body.phone, visitduration: Number(req.body.duration), description: req.body.description } }, function (err, res2) {
+              dbo.collection('Doctors').updateOne({ token: req.cookies.doctortoken }, { $set: { name: req.body.name, image: newimg, categories: cats, city: req.body.city, workphone: req.body.workphone, medicalnumber: req.body.medicalnumber, codemeli: req.body.codemeli, background: req.body.experience, address: req.body.address, phonenumber: req.body.phone, visitduration: Number(req.body.duration), description: req.body.description } }, function (err, res2) {
                 if (req.files != null) {
                   mv(req.files.image.tempFilePath, "public" + result.image, function (err) {
                     console.log("public" + result.image)
@@ -992,63 +993,63 @@ router.post("/changeHCinfo", function (req, res) {
           res.redirect('noaccess');
         }
         else {
-          dbo.collection("HealthCenters").findOne({name:req.body.name},function(err,myhc){
-            if(myhc!=null && HC.name!=req.body.name){
+          dbo.collection("HealthCenters").findOne({ name: req.body.name }, function (err, myhc) {
+            if (myhc != null && HC.name != req.body.name) {
               db.close();
               res.redirect("/duplicated-name");
             }
-          else{
+            else {
               var cats = []
-          if (typeof req.body.categories == "string") {
-            cats.push(req.body.categories);
-          }
-          else {
-            cats = req.body.categories;
-          }
-          temp=HC.image.split("/").slice(0,2);
-          temp.push(req.body.name+".png");
-          newimg=temp.join("/");
-          if(HC.name!=req.body.name){
-            fs.rename("public"+HC.image,"public"+newimg,function(err){
-              console.log("changed photo path");
-            })
-          }
-          if (HC.systype == "A") {
-            HC.categories.forEach(function (item, index, object) {
-              if (!req.body.categories.includes(item.name)) {
-                object.splice(index, 1);
+              if (typeof req.body.categories == "string") {
+                cats.push(req.body.categories);
               }
-            })
-            hccatnames = [];
-            HC.categories.forEach(function (item, index, object) {
-              hccatnames.push(item.name);
-            })
-            cats.forEach(function (doc) {
-              if (!hccatnames.includes(doc)) {
-                HC.categories.push({ name: doc, unavailabletimes: [], reservations: [], visitduration: 30, visitcost: 3000 })
+              else {
+                cats = req.body.categories;
               }
-            })
-            dbo.collection('HealthCenters').updateOne({ token: req.cookies.HCtoken }, { $set: {name:req.body.name,image:newimg , codeofHC: req.body.codeofHC, categories: HC.categories, codemeli: req.body.codemeli, city: req.body.city, phonenumber: req.body.phonenumber, directphonenumber: req.body.directphonenumber, background: req.body.background, address: req.body.address, medicalnumber: req.body.medicalnumber } }, function (err, res2) {
-              if (req.files != null) {
-                mv(req.files.image.tempFilePath, "public" + HC.image, function (err) {
-                  console.log("public" + HC.image)
+              temp = HC.image.split("/").slice(0, 2);
+              temp.push(req.body.name + ".png");
+              newimg = temp.join("/");
+              if (HC.name != req.body.name) {
+                fs.rename("public" + HC.image, "public" + newimg, function (err) {
+                  console.log("changed photo path");
                 })
               }
-              db.close();
-              res.redirect('/HCpanel/profile');
-            })
-          }
-          else {
-            dbo.collection('HealthCenters').updateOne({ token: req.cookies.HCtoken }, { $set: { name:req.body.name, image:newimg , codeofHC: req.body.codeofHC, codemeli: req.body.codemeli, city: req.body.city, phonenumber: req.body.phonenumber, directphonenumber: req.body.directphonenumber, background: req.body.background, address: req.body.address, medicalnumber: req.body.medicalnumber } }, function (err, res2) {
-              if (req.files != null) {
-                mv(req.files.image.tempFilePath, "public" + HC.image, function (err) {
-                  console.log("public" + HC.image)
+              if (HC.systype == "A") {
+                HC.categories.forEach(function (item, index, object) {
+                  if (!req.body.categories.includes(item.name)) {
+                    object.splice(index, 1);
+                  }
+                })
+                hccatnames = [];
+                HC.categories.forEach(function (item, index, object) {
+                  hccatnames.push(item.name);
+                })
+                cats.forEach(function (doc) {
+                  if (!hccatnames.includes(doc)) {
+                    HC.categories.push({ name: doc, unavailabletimes: [], reservations: [], visitduration: 30, visitcost: 3000 })
+                  }
+                })
+                dbo.collection('HealthCenters').updateOne({ token: req.cookies.HCtoken }, { $set: { name: req.body.name, image: newimg, codeofHC: req.body.codeofHC, categories: HC.categories, codemeli: req.body.codemeli, city: req.body.city, phonenumber: req.body.phonenumber, directphonenumber: req.body.directphonenumber, background: req.body.background, address: req.body.address, medicalnumber: req.body.medicalnumber } }, function (err, res2) {
+                  if (req.files != null) {
+                    mv(req.files.image.tempFilePath, "public" + HC.image, function (err) {
+                      console.log("public" + HC.image)
+                    })
+                  }
+                  db.close();
+                  res.redirect('/HCpanel/profile');
                 })
               }
-              db.close();
-              res.redirect('/HCpanel/profile');
-            })
-          }
+              else {
+                dbo.collection('HealthCenters').updateOne({ token: req.cookies.HCtoken }, { $set: { name: req.body.name, image: newimg, codeofHC: req.body.codeofHC, codemeli: req.body.codemeli, city: req.body.city, phonenumber: req.body.phonenumber, directphonenumber: req.body.directphonenumber, background: req.body.background, address: req.body.address, medicalnumber: req.body.medicalnumber } }, function (err, res2) {
+                  if (req.files != null) {
+                    mv(req.files.image.tempFilePath, "public" + HC.image, function (err) {
+                      console.log("public" + HC.image)
+                    })
+                  }
+                  db.close();
+                  res.redirect('/HCpanel/profile');
+                })
+              }
             }
           })
         }
@@ -1691,7 +1692,7 @@ router.post("/addDoctor", function (req, res) {
               res.redirect('/Adminpanel/addDoctor-duplicatedname')
             }
             else {
-              dbo.collection("Doctors").findOne({ username: req.body.username },async function (err, res2) {
+              dbo.collection("Doctors").findOne({ username: req.body.username }, async function (err, res2) {
                 if (res2 != null) {
                   db.close();
                   res.redirect('/Adminpanel/addDoctor-duplicatedusername')
@@ -1717,11 +1718,11 @@ router.post("/addDoctor", function (req, res) {
                   }
                   unhashed = req.body.pass;
                   req.body.pass = md5(req.body.pass)
-                  mydoc=new Doctor(req.body.username, req.body.pass, req.body.name, cats, req.body.medicalnumber, req.body.codemeli, req.body.workphone, req.body.phonenumber, req.body.address, req.body.city, "/docphotos/" + req.body.name.trim() + ".png", req.body.background, req.body.description, memtype, req.body.appknowledge);
-                  costs=await dbo.collection("costs").findOne({})
-                  mydoc.visitcost=costs.docrescost;
-                  mydoc.televisitcost=costs.doctelcost;
-                  mydoc.chatcost=costs.docchatcost;
+                  mydoc = new Doctor(req.body.username, req.body.pass, req.body.name, cats, req.body.medicalnumber, req.body.codemeli, req.body.workphone, req.body.phonenumber, req.body.address, req.body.city, "/docphotos/" + req.body.name.trim() + ".png", req.body.background, req.body.description, memtype, req.body.appknowledge);
+                  costs = await dbo.collection("costs").findOne({})
+                  mydoc.visitcost = costs.docrescost;
+                  mydoc.televisitcost = costs.doctelcost;
+                  mydoc.chatcost = costs.docchatcost;
                   dbo.collection('Doctors').insertOne(mydoc, function (err, res2) {
                     sendSMS("docsignup", res2.insertedId, "Doctors", req.body.username, unhashed, null);
                     if (req.files != null) {
@@ -1784,12 +1785,12 @@ router.post('/addHC', function (req, res) {
                     res.end();
                   }
                   else {
-                    dbo.collection("HCtypes").findOne({ name: query.type },async function (err, type) {
+                    dbo.collection("HCtypes").findOne({ name: query.type }, async function (err, type) {
                       var img = "/" + query.type + "photos/" + req.body.name + ".png";
                       unhashed = req.body.password;
                       req.body.password = md5(req.body.password);
-                      costs=await dbo.collection("costs").findOne({});
-                      var newHC = new HealthCenter(query.type, type.systype, req.body.name, type.systype == "B" || type.systype == "A", req.body.codemeli, req.body.codeofHC, req.body.city, req.body.phonenumber, req.body.address, req.body.directphonenumber, req.body.background, req.body.medicalnumber, req.body.appknowledge, req.body.username, req.body.password, img,costs);
+                      costs = await dbo.collection("costs").findOne({});
+                      var newHC = new HealthCenter(query.type, type.systype, req.body.name, type.systype == "B" || type.systype == "A", req.body.codemeli, req.body.codeofHC, req.body.city, req.body.phonenumber, req.body.address, req.body.directphonenumber, req.body.background, req.body.medicalnumber, req.body.appknowledge, req.body.username, req.body.password, img, costs);
                       try {
                         mv(req.files.image.tempFilePath, "public" + img, { mkdirp: true }, function (err) {
                           console.log("image added");
@@ -1797,7 +1798,7 @@ router.post('/addHC', function (req, res) {
                       } catch (error) {
                         console.log("no image");
                       }
-                      dbo.collection("HealthCenters").insertOne(newHC,async function (err, result) {
+                      dbo.collection("HealthCenters").insertOne(newHC, async function (err, result) {
                         sendSMS("HCsignup", result.insertedId, "HealthCenters", req.body.username, unhashed, null);
                         if (type.systype == "A") {
                           var cats = []
@@ -1812,7 +1813,7 @@ router.post('/addHC', function (req, res) {
                               cats = req.body.categories;
                             }
                           }
-                          costs=await dbo.collection("costs").findOne({});
+                          costs = await dbo.collection("costs").findOne({});
                           cats.forEach(function (doc) {
                             var newcat = { name: doc, unavailabletimes: [], reservations: [], visitduration: 30, visitcost: costs.clinicrescost };
                             dbo.collection("HealthCenters").updateOne({ name: req.body.name }, { $addToSet: { categories: newcat } }, function (err, result) {
@@ -2192,7 +2193,7 @@ router.get('/HCpanel/dashboard', function (req, res) {
   else {
     MongoClient.connect(dburl, function (err, db) {
       var dbo = db.db("mydb");
-      dbo.collection("HealthCenters").findOne({ token: req.cookies.HCtoken },async function (err, HC) {
+      dbo.collection("HealthCenters").findOne({ token: req.cookies.HCtoken }, async function (err, HC) {
         if (HC == null) {
           res.redirect('/noaccess');
         }
@@ -2210,7 +2211,7 @@ router.get('/HCpanel/dashboard', function (req, res) {
               visittimes.push({ date1: { year: currentday.toArray()[0], month: currentday.format("MMMM"), day: currentday.toArray()[2] }, date: { year: currentday.toArray()[0], month: currentday.toArray()[1], day: currentday.toArray()[2] }, times: [], dayofweek: currentday.format("dddd") });
             }
             if (HC.systype == "B") {
-              HC.reservations=await dbo.collection("Reservations").find({HC:HC._id}).toArray();
+              HC.reservations = await dbo.collection("Reservations").find({ HC: HC._id }).toArray();
               HC.reservations.forEach(function (doc) {
                 for (i = 0; i < 6; i++) {
                   if (lodash.isEqual(visittimes[i].date, doc.time.date)) {
@@ -2221,7 +2222,7 @@ router.get('/HCpanel/dashboard', function (req, res) {
             }
             else {
               for (let k = 0; k < HC.categories.length; k++) {
-                HC.categories[k].reservations=await dbo.collection("Reservations").find({HC:HC._id,catname:HC.categories[k].name}).toArray();
+                HC.categories[k].reservations = await dbo.collection("Reservations").find({ HC: HC._id, catname: HC.categories[k].name }).toArray();
                 HC.categories[k].reservations.forEach(function (doc) {
                   for (i = 0; i < 6; i++) {
                     if (lodash.isEqual(visittimes[i].date, doc.time.date)) {
@@ -2315,7 +2316,7 @@ router.get("/HCpanel/patients", function (req, res) {
   else {
     MongoClient.connect(dburl, function (err, db) {
       var dbo = db.db("mydb");
-      dbo.collection('HealthCenters').findOne({ token: req.cookies.HCtoken },async function (err, HC) {
+      dbo.collection('HealthCenters').findOne({ token: req.cookies.HCtoken }, async function (err, HC) {
         if (HC == null) {
           db.close();
           res.redirect('noaccess');
@@ -2325,10 +2326,10 @@ router.get("/HCpanel/patients", function (req, res) {
             res.redirect('noaccess');
           }
           else {
-            HC.reservations=await dbo.collection("Reservations").find({HC:HC._id}).toArray();
-              for (var i = 0; i < HC.reservations.length; i++) {
-                patientsid.push(HC.reservations[i].user);
-              }
+            HC.reservations = await dbo.collection("Reservations").find({ HC: HC._id }).toArray();
+            for (var i = 0; i < HC.reservations.length; i++) {
+              patientsid.push(HC.reservations[i].user);
+            }
 
             dbo.collection("Users").find({ _id: { $in: patientsid } }, function (err, result2) {
               result2.forEach(function (doc) {
@@ -2536,7 +2537,7 @@ router.get("/HCpanel/addexp", function (req, res) {
   else {
     MongoClient.connect(dburl, function (err, db) {
       var dbo = db.db("mydb");
-      dbo.collection('HealthCenters').findOne({ token: req.cookies.HCtoken },async function (err, HC) {
+      dbo.collection('HealthCenters').findOne({ token: req.cookies.HCtoken }, async function (err, HC) {
         if (HC == null) {
           db.close();
           res.redirect('noaccess');
@@ -2547,11 +2548,11 @@ router.get("/HCpanel/addexp", function (req, res) {
             res.redirect('noaccess');
           }
           else {
-              HC.reservations=await dbo.collection("Reservations").find({HC:HC._id}).toArray();
-              for (var i = 0; i < HC.reservations.length; i++) {
-                patientsid.push(HC.reservations[i].user);
-              }
-           
+            HC.reservations = await dbo.collection("Reservations").find({ HC: HC._id }).toArray();
+            for (var i = 0; i < HC.reservations.length; i++) {
+              patientsid.push(HC.reservations[i].user);
+            }
+
             dbo.collection("Users").find({ _id: { $in: patientsid } }, function (err, result2) {
               result2.forEach(function (doc) {
                 phonenumbers.push(doc.phonenumber);
@@ -3028,13 +3029,13 @@ router.get("/doctorpanel/tickets", function (req, res) {
               resolve();
             }
             else {
-              counter=0;
+              counter = 0;
               chats.forEach(async function (doc, index, array) {
-                user = await dbo.collection("Users").findOne({ phonenumber: doc.userphone },{ projection: { firstname: 1,lastname:1 } })
+                user = await dbo.collection("Users").findOne({ phonenumber: doc.userphone }, { projection: { firstname: 1, lastname: 1 } })
                 doc.user = user;
                 doc.datecreated = new persianDate(doc.tickets[doc.tickets.length - 1].datecreated).format("l")
                 counter++;
-                if (counter === chats.length ) {
+                if (counter === chats.length) {
                   console.log(counter);
                   resolve();
                 }
@@ -3044,7 +3045,7 @@ router.get("/doctorpanel/tickets", function (req, res) {
           foreach.then(a => {
             res.render('DoctorPanel/tickets.ejs', { doctor: result, chats: chats });
             db.close();
-           res.end();
+            res.end();
           })
         }
       })
@@ -4084,7 +4085,7 @@ router.get("/AdminPanel/telereserves/:teleresid", function (req, res) {
   }
 })
 
-router.post("/resetdocpass",function(req,res){
+router.post("/resetdocpass", function (req, res) {
   if (req.cookies.admintoken == undefined) {
     res.redirect('/noaccess');
   }
@@ -4097,15 +4098,15 @@ router.post("/resetdocpass",function(req,res){
           res.redirect('/noaccess');
         }
         else {
-          dbo.collection("Doctors").updateOne({name:req.body.docname},{$set:{password:md5(req.body.newpass)}});
-          res.redirect("/AdminPanel/Doctors/"+req.body.docname)
+          dbo.collection("Doctors").updateOne({ name: req.body.docname }, { $set: { password: md5(req.body.newpass) } });
+          res.redirect("/AdminPanel/Doctors/" + req.body.docname)
         }
       })
     })
   }
 })
 
-router.post("/resetHCpass",function(req,res){
+router.post("/resetHCpass", function (req, res) {
   if (req.cookies.admintoken == undefined) {
     res.redirect('/noaccess');
   }
@@ -4118,8 +4119,8 @@ router.post("/resetHCpass",function(req,res){
           res.redirect('/noaccess');
         }
         else {
-          dbo.collection("HealthCenters").updateOne({name:req.body.HCname},{$set:{password:md5(req.body.newpass)}});
-          res.redirect("/AdminPanel/HealthCenters/"+req.body.HCname)
+          dbo.collection("HealthCenters").updateOne({ name: req.body.HCname }, { $set: { password: md5(req.body.newpass) } });
+          res.redirect("/AdminPanel/HealthCenters/" + req.body.HCname)
         }
       })
     })
@@ -4474,8 +4475,8 @@ router.get("/removependinghcs/:HC", function (req, res) {
         }
         else {
           dbo.collection("tempHealthCenters").findOne({ name: req.params.HC }, function (err, HC) {
-            a=HC.image.split("/");
-            a[1]+="-temp";
+            a = HC.image.split("/");
+            a[1] += "-temp";
             path = a.join("/");
             path = "public" + path;
             fs.unlink(path, function (err) {
@@ -4504,8 +4505,8 @@ router.get("/acceptpendinghcs/:HC", function (req, res) {
         }
         else {
           dbo.collection("tempHealthCenters").findOne({ name: req.params.HC }, function (err, HC) {
-            a=HC.image.split("/");
-            a[1]+="-temp";
+            a = HC.image.split("/");
+            a[1] += "-temp";
             path = a.join("/");
             path = "public" + path;
             dest = "public" + HC.image
@@ -4567,8 +4568,8 @@ router.get("/adminpanel/costmanage", function (req, res) {
   }
 })
 
-router.get("/archive/:type/:id",function(req,res){
-  id=ObjectID(req.params.id);
+router.get("/archive/:type/:id", function (req, res) {
+  id = ObjectID(req.params.id);
   if (req.cookies.admintoken == undefined) {
     res.redirect('/noaccess');
   }
@@ -4581,13 +4582,13 @@ router.get("/archive/:type/:id",function(req,res){
           res.redirect('/noaccess');
         }
         else {
-          if(req.params.type=="doc"){
-            dbo.collection("Doctors").updateOne({_id:id},{$set:{archived:true}});
+          if (req.params.type == "doc") {
+            dbo.collection("Doctors").updateOne({ _id: id }, { $set: { archived: true } });
             res.redirect("/adminpanel/doctors");
             db.close();
           }
-          else{
-            dbo.collection("HealthCenters").updateOne({_id:id},{$set:{archived:true}});
+          else {
+            dbo.collection("HealthCenters").updateOne({ _id: id }, { $set: { archived: true } });
             res.redirect("/adminpanel/HealthCenters");
             db.close();
           }
@@ -4597,8 +4598,8 @@ router.get("/archive/:type/:id",function(req,res){
   }
 })
 
-router.get("/unarchive/:type/:id",function(req,res){
-  id=ObjectID(req.params.id);
+router.get("/unarchive/:type/:id", function (req, res) {
+  id = ObjectID(req.params.id);
   if (req.cookies.admintoken == undefined) {
     res.redirect('/noaccess');
   }
@@ -4611,13 +4612,13 @@ router.get("/unarchive/:type/:id",function(req,res){
           res.redirect('/noaccess');
         }
         else {
-          if(req.params.type=="doc"){
-            dbo.collection("Doctors").updateOne({_id:id},{$set:{archived:false}});
+          if (req.params.type == "doc") {
+            dbo.collection("Doctors").updateOne({ _id: id }, { $set: { archived: false } });
             res.redirect("/adminpanel/doctors");
             db.close();
           }
-          else{
-            dbo.collection("HealthCenters").updateOne({_id:id},{$set:{archived:false}});
+          else {
+            dbo.collection("HealthCenters").updateOne({ _id: id }, { $set: { archived: false } });
             res.redirect("/adminpanel/HealthCenters");
             db.close();
           }
@@ -4645,19 +4646,19 @@ router.get("/changecostadmin", function (req, res) {
             switch (query.visittype) {
               case "chat":
                 dbo.collection("Doctors").updateMany({}, { $set: { chatcost: Number(query.cost) } })
-                dbo.collection("costs").updateOne({},{$set:{docchatcost:Number(query.cost)}});
+                dbo.collection("costs").updateOne({}, { $set: { docchatcost: Number(query.cost) } });
                 db.close();
                 res.redirect("/adminpanel/costmanage");
                 break;
               case "tele":
                 dbo.collection("Doctors").updateMany({}, { $set: { televisitcost: Number(query.cost) } })
-                dbo.collection("costs").updateOne({},{$set:{doctelcost:Number(query.cost)}});
+                dbo.collection("costs").updateOne({}, { $set: { doctelcost: Number(query.cost) } });
                 db.close();
                 res.redirect("/adminpanel/costmanage");
                 break;
               default:
                 dbo.collection("Doctors").updateMany({}, { $set: { visitcost: Number(query.cost) } })
-                dbo.collection("costs").updateOne({},{$set:{docrescost:Number(query.cost)}});
+                dbo.collection("costs").updateOne({}, { $set: { docrescost: Number(query.cost) } });
                 db.close();
                 res.redirect("/adminpanel/costmanage");
                 break;
@@ -4665,13 +4666,13 @@ router.get("/changecostadmin", function (req, res) {
           }
           else if (query.type == "آزمایشگاه") {
             dbo.collection("HealthCenters").updateMany({ type: "آزمایشگاه" }, { $set: { visitcost: Number(query.cost) } })
-            dbo.collection("costs").updateOne({},{$set:{labrescost:Number(query.cost)}});
+            dbo.collection("costs").updateOne({}, { $set: { labrescost: Number(query.cost) } });
             db.close();
             res.redirect("/adminpanel/costmanage");
           }
           else if (query.type == "کلینیک") {
             dbo.collection("HealthCenters").updateMany({ type: "کلینیک" }, { $set: { 'categories.$[].visitcost': Number(query.cost) } });
-            dbo.collection("costs").updateOne({},{$set:{clinicrescost:Number(query.cost)}});
+            dbo.collection("costs").updateOne({}, { $set: { clinicrescost: Number(query.cost) } });
             db.close();
             res.redirect("/adminpanel/costmanage");
           }
@@ -5206,9 +5207,9 @@ router.get("/consultant", function (req, res) {
     docpics = {};
     counter = 1;
     a = await dbo.collection("Categories").find({}).toArray();
-    drcounts = await dbo.collection("Doctors").find({ $or: [{ membershiptypes: "chatconsultant" }, { membershiptypes: "teleconsultant" }] ,archived:false }).count();
+    drcounts = await dbo.collection("Doctors").find({ $or: [{ membershiptypes: "chatconsultant" }, { membershiptypes: "teleconsultant" }], archived: false }).count();
     a.forEach(async function (doc, index, array) {
-      docpics[doc.name] = await dbo.collection("Doctors").find({ categories: doc.name ,archived:false }, { projection: { image: 1, _id: 0 } }).limit(4).toArray();
+      docpics[doc.name] = await dbo.collection("Doctors").find({ categories: doc.name, archived: false }, { projection: { image: 1, _id: 0 } }).limit(4).toArray();
       counter++;
       if (counter == array.length) {
         categories().then(basiccategories => {
@@ -5234,7 +5235,7 @@ router.get("/consultant/:Category", function (req, res) {
   MongoClient.connect(dburl, function (err, db) {
     if (err) throw err;
     var dbo = db.db("mydb");
-    dbo.collection("Doctors").find({ categories: req.params.Category.split('-').join(' '), city: qcity ,archived:false }).forEach(function (doc, err) {
+    dbo.collection("Doctors").find({ categories: req.params.Category.split('-').join(' '), city: qcity, archived: false }).forEach(function (doc, err) {
       Doctors.push(doc);
     }, function () {
       if (req.cookies.usertoken == undefined) {
@@ -5306,7 +5307,7 @@ router.get("/healthcenters/:type", function (req, res) {
   var type = req.params.type.split("-").join(' ');
   MongoClient.connect(dburl, function (err, db) {
     var dbo = db.db("mydb");
-    dbo.collection("HealthCenters").find({ type: type ,archived:false }, async function (err, result) {
+    dbo.collection("HealthCenters").find({ type: type, archived: false }, async function (err, result) {
       HCs = await result.toArray();
       if (req.cookies.usertoken == undefined) {
         categories().then(basiccategories => {
@@ -5480,7 +5481,7 @@ router.get("/reservation/:type/:HCname/:category", function (req, res) {
     var dbo = db.db("mydb");
     days = [];
     freetimes = []
-    dbo.collection("HealthCenters").findOne({ name: HCname, type: type ,archived:false }, function (err, result) {
+    dbo.collection("HealthCenters").findOne({ name: HCname, type: type, archived: false }, function (err, result) {
       if (result == null || result.categories == undefined) {
         res.redirect("/noaccess")
       }
@@ -5518,7 +5519,7 @@ router.get("/reservation/:type/:HCname", function (req, res) {
     var dbo = db.db("mydb");
     days = [];
     freetimes = []
-    dbo.collection("HealthCenters").findOne({ name: HCname, type: type ,archived:false }, function (err, HC) {
+    dbo.collection("HealthCenters").findOne({ name: HCname, type: type, archived: false }, function (err, HC) {
       if (HC == null || HC.systype != "B") {
         res.redirect("/noaccess")
       }
@@ -5542,7 +5543,7 @@ router.get("/reservation/:type/:HCname", function (req, res) {
 router.get("/ticket/:doctor", function (req, res) {
   MongoClient.connect(dburl, function (err, db) {
     var dbo = db.db("mydb");
-    dbo.collection("Doctors").findOne({ name: req.params.doctor.split('-').join(' ') ,archived:false }, function (err, doctor) {
+    dbo.collection("Doctors").findOne({ name: req.params.doctor.split('-').join(' '), archived: false }, function (err, doctor) {
       if (doctor == null) {
         res.redirect("/")
         res.end();
@@ -5823,8 +5824,8 @@ router.get("/telepaymenthandler", function (req, res) {
                         res.render("paymentaccept.ejs", { doctor: doctor, time: strtime, resid: reservation.refid, chat: 2, doc: 1 });
                         user = await dbo.collection("Users").findOne({ _id: reservation.user })
                         mytime = reservation.timeinfo.date.year + "/" + reservation.timeinfo.date.month + "/" + reservation.timeinfo.date.day
-                        sendSMS("teleresdoc", doctor._id, "Doctors", mytime, strtime,user.firstname+" "+user.lastname);
-                        sendSMS("teleresuser", user._id, "Users", mytime, strtime,doctor.name);
+                        sendSMS("teleresdoc", doctor._id, "Doctors", mytime, strtime, user.firstname + " " + user.lastname);
+                        sendSMS("teleresuser", user._id, "Users", mytime, strtime, doctor.name);
                         res.end();
                       })
                     })
@@ -5950,8 +5951,8 @@ router.get("/paymenthandlerHC", function (req, res) {
           strtime = n(reserve.time.start.hour) + ":" + n(reserve.time.start.min) + "-" + n(reserve.time.end.hour) + ":" + n(reserve.time.end.min);
           dbo.collection("HealthCenters").findOne({ _id: reserve.HC }, function (err, HC) {
             dbo.collection("TempReservesHC").deleteOne({ authority: query.Authority }, function (err, result) {
-              if(HC.systype=="A"){
-                HC.visitcost=HC.categories[0].visitcost;
+              if (HC.systype == "A") {
+                HC.visitcost = HC.categories[0].visitcost;
               }
               changestatustransaction(query.Authority, "ناموفق");
               res.render("paymentfail.ejs", { doctor: HC, time: strtime, resid: 0, chat: 0, doc: 0 });
@@ -5995,8 +5996,8 @@ router.get("/paymenthandlerHC", function (req, res) {
                         dbo.collection("HealthCenters").updateOne({ _id: reservation.HC }, { $set: { categories: HC.categories } }, function (err, sdf) {
                           strtime = n(reserve.time.start.hour) + ":" + n(reserve.time.start.min) + "-" + n(reserve.time.end.hour) + ":" + n(reserve.time.end.min);
                           changestatustransaction(query.Authority, "موفق");
-                          if(HC.systype=="A"){
-                            HC.visitcost=HC.categories[0].visitcost;
+                          if (HC.systype == "A") {
+                            HC.visitcost = HC.categories[0].visitcost;
                           }
                           res.render("paymentaccept.ejs", { doctor: HC, time: strtime, resid: reservation.refid, chat: 0, doc: 0 });
                           res.end();
@@ -6014,8 +6015,8 @@ router.get("/paymenthandlerHC", function (req, res) {
               strtime = n(reserve.time.start.hour) + ":" + n(reserve.time.start.min) + "-" + n(reserve.time.end.hour) + ":" + n(reserve.time.end.min);
               dbo.collection("HealthCenters").findOne({ _id: reserve.HC }, function (err, HC) {
                 dbo.collection("TempReservesHC").deleteOne({ authority: query.Authority }, function (err, result) {
-                  if(HC.systype=="A"){
-                    HC.visitcost=HC.categories[0].visitcost;
+                  if (HC.systype == "A") {
+                    HC.visitcost = HC.categories[0].visitcost;
                   }
                   changestatustransaction(query.Authority, "ناموفق");
                   res.render("paymentfail.ejs", { doctor: HC, time: strtime, resid: 0, chat: 0, doc: 0 });
@@ -6049,7 +6050,7 @@ router.get("/category/:Category", function (req, res) {
   MongoClient.connect(dburl, function (err, db) {
     if (err) throw err;
     var dbo = db.db("mydb");
-    dbo.collection("Doctors").find({ categories: req.params.Category.split('-').join(' '), city: qcity,archived:false }).forEach(function (doc, err) {
+    dbo.collection("Doctors").find({ categories: req.params.Category.split('-').join(' '), city: qcity, archived: false }).forEach(function (doc, err) {
       Doctors.push(doc);
     }, function () {
       if (req.cookies.usertoken == undefined) {
@@ -6083,12 +6084,12 @@ router.get("/category/:Category/:Doctor", function (req, res) {
   MongoClient.connect(dburl, function (err, db) {
     if (err) throw err;
     var dbo = db.db("mydb");
-    dbo.collection("Doctors").findOne({ name: req.params.Doctor.split('-').join(' ') ,archived:false }, function (err, result) {
-      if(result==null){
+    dbo.collection("Doctors").findOne({ name: req.params.Doctor.split('-').join(' '), archived: false }, function (err, result) {
+      if (result == null) {
         res.redirect("/");
         db.close();
       }
-      else{
+      else {
         dbo.collection("Users").findOne({ token: req.cookies.usertoken }, function (err, user) {
           if (user == null) {
             categories().then(basiccategories => {
@@ -6118,7 +6119,7 @@ router.get("/reserve/:Doctor", function (req, res) {
     var dbo = db.db("mydb");
     days = [];
     freetimes = []
-    dbo.collection("Doctors").findOne({ name: req.params.Doctor.split('-').join(' '), archived:false }, function (err, result) {
+    dbo.collection("Doctors").findOne({ name: req.params.Doctor.split('-').join(' '), archived: false }, function (err, result) {
       if (result == null) {
         db.close();
         res.redirect('/');
@@ -6148,7 +6149,7 @@ router.get("/telereserve/:Doctor", function (req, res) {
     var dbo = db.db("mydb");
     days = [];
     freetimes = []
-    dbo.collection("Doctors").findOne({ name: req.params.Doctor.split('-').join(' ') ,archived:false}, function (err, result) {
+    dbo.collection("Doctors").findOne({ name: req.params.Doctor.split('-').join(' '), archived: false }, function (err, result) {
       if (result == null) {
         db.close();
         res.redirect('/');
@@ -6364,7 +6365,7 @@ router.post("/doctorsignup", function (req, res) {
         res.redirect('/Adminpanel/addDoctor-duplicatedname')
       }
       else {
-        dbo.collection("Doctors").findOne({ username: req.body.username },async function (err, res2) {
+        dbo.collection("Doctors").findOne({ username: req.body.username }, async function (err, res2) {
           if (res2 != null) {
             db.close();
             res.redirect('/Adminpanel/addDoctor-duplicatedusername')
@@ -6390,11 +6391,11 @@ router.post("/doctorsignup", function (req, res) {
             }
             unhashed = req.body.pass;
             req.body.pass = md5(req.body.pass)
-            mydoc=new Doctor(req.body.username, req.body.pass, req.body.name, cats, req.body.medicalnumber, req.body.codemeli, req.body.workphone, req.body.phonenumber, req.body.address, req.body.city, "/docphotos/" + req.body.name.trim() + ".png", req.body.background, req.body.description, memtype, req.body.appknowledge)
-            costs=await dbo.collection("costs").findOne({})
-            mydoc.visitcost=costs.docrescost;
-            mydoc.televisitcost=costs.doctelcost;
-            mydoc.chatcost=costs.docchatcost;
+            mydoc = new Doctor(req.body.username, req.body.pass, req.body.name, cats, req.body.medicalnumber, req.body.codemeli, req.body.workphone, req.body.phonenumber, req.body.address, req.body.city, "/docphotos/" + req.body.name.trim() + ".png", req.body.background, req.body.description, memtype, req.body.appknowledge)
+            costs = await dbo.collection("costs").findOne({})
+            mydoc.visitcost = costs.docrescost;
+            mydoc.televisitcost = costs.doctelcost;
+            mydoc.chatcost = costs.docchatcost;
             dbo.collection('tempDoctors').insertOne(mydoc, function (err, res2) {
               //sendSMS("docsignup",res2.insertedId,"Doctors",req.body.username,unhashed,null);
               if (req.files != null) {
@@ -6445,13 +6446,13 @@ router.post("/addHC2", function (req, res) {
               res.end();
             }
             else {
-              dbo.collection("HCtypes").findOne({ name: query.type },async function (err, type) {
+              dbo.collection("HCtypes").findOne({ name: query.type }, async function (err, type) {
                 var img = "/" + query.type + "photos/" + req.body.name + ".png";
                 var imgtemp = "/" + query.type + "photos-temp/" + req.body.name + ".png";
                 unhashed = req.body.password;
                 req.body.password = md5(req.body.password);
-                costs=await dbo.collection("costs").findOne({});
-                var newHC = new HealthCenter(query.type, type.systype, req.body.name, type.systype == "B" || type.systype == "A", req.body.codemeli, req.body.codeofHC, req.body.city, req.body.phonenumber, req.body.address, req.body.directphonenumber, req.body.background, req.body.medicalnumber, req.body.appknowledge, req.body.username, req.body.password, img,costs);
+                costs = await dbo.collection("costs").findOne({});
+                var newHC = new HealthCenter(query.type, type.systype, req.body.name, type.systype == "B" || type.systype == "A", req.body.codemeli, req.body.codeofHC, req.body.city, req.body.phonenumber, req.body.address, req.body.directphonenumber, req.body.background, req.body.medicalnumber, req.body.appknowledge, req.body.username, req.body.password, img, costs);
                 try {
                   mv(req.files.image.tempFilePath, "public" + imgtemp, { mkdirp: true }, function (err) {
                     console.log("image added");
@@ -6459,7 +6460,7 @@ router.post("/addHC2", function (req, res) {
                 } catch (error) {
                   console.log("no image");
                 }
-                dbo.collection("tempHealthCenters").insertOne(newHC,async function (err, result) {
+                dbo.collection("tempHealthCenters").insertOne(newHC, async function (err, result) {
                   //sendSMS("HCsignup",result.insertedId,"HealthCenters",req.body.username,unhashed,null);
                   if (type.systype == "A") {
                     var cats = []
@@ -6474,7 +6475,7 @@ router.post("/addHC2", function (req, res) {
                         cats = req.body.categories;
                       }
                     }
-                    costs=await dbo.collection("costs").findOne({});
+                    costs = await dbo.collection("costs").findOne({});
                     cats.forEach(function (doc) {
                       var newcat = { name: doc, unavailabletimes: [], reservations: [], visitduration: 30, visitcost: costs.clinicrescost };
                       dbo.collection("tempHealthCenters").updateOne({ name: req.body.name }, { $addToSet: { categories: newcat } }, function (err, result) {
@@ -6766,12 +6767,12 @@ router.post('/loginAdmin', function (req, res) {
   })
 })
 
-router.get("/index",function(req,res){
-  categories().then(basiccategories=>{
-    res.render("index2.ejs",{categories:basiccategories,user:""});
+router.get("/index", function (req, res) {
+  categories().then(basiccategories => {
+    res.render("index2.ejs", { categories: basiccategories, user: "" });
     res.end();
   })
-  
+
 })
 
 router.get('/exit', function (req, res) {
