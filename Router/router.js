@@ -79,32 +79,26 @@ router.get("/testpayment", function (req, res) {
       "ReserveNum": "FanAvaTest123",
       "Amount": "1007",
       "RedirectUrl": "https://reservation.drtajviz.com/testtest",
-      }
+    }
   }, (error, response, body) => {
     console.log(body);
-    if(body.Result=="erSucceed"){
-      categories().then(basiccategories=>{
-        res.render("continuepayment.ejs",{token:body.Token,categories:basiccategories,user: ""});
-        res.end();
-      })
+    if (body.Result == "erSucceed") {
+      res.render("continuepayment.ejs", { token: body.Token});
+      res.end();
     }
-    else{
+    else {
       console.log("test");
     }
   })
 })
 
 
-router.post("/testtest",function(req,res){
+router.post("/testtest", function (req, res) {
   console.log("this is post test test");
   console.log(req.body);
 })
 
-router.get("/testtest",function(req,res){
-  console.log("this is get testtest");
-})
 
-//banksalamat
 
 router.get("/api/getAlltypesofHC", function (req, res) {
   var query = url.parse(req.url, true).query;
@@ -6262,31 +6256,39 @@ router.post("/payment", function (req, res) {
                 else {
                   reservedata = req.body.choice.split(":");
                   date = new myDate(Number(reservedata[4]), Number(reservedata[3]), Number(reservedata[2]));
-                  console.log(date);
                   start = { hour: Number(reservedata[0]), min: Number(reservedata[1]) };
                   temp = (start.hour * 60) + start.min + doctor.visitduration;
                   end = { hour: Math.floor(temp / 60), min: temp % 60 }
                   unavb = { start: start, end: end, date: date, dayofweek: new persianDate([Number(reservedata[2]), Number(reservedata[3]), Number(reservedata[4])]).format("dddd") };
-                  zarinpal.PaymentRequest({
-                    Amount: req.body.cost, // In Tomans
-                    CallbackURL: 'http://reservation.drtajviz.com/paymenthandler',
-                    Description: 'Dr tajviz payment',
-                    Email: 'shayanthrn@gmail.com',
-                    Mobile: user.phonenumber
-                  }).then(response => {
-                    if (response.status === 100) {
-                      reservation = new Reservation(user._id, doctor._id, unavb, response.authority, req.body.cost);
-                      addtransaction(user._id, req.body.cost, response.authority);
-                      dbo.collection("TempReserves").insertOne(reservation, function (err, reserve) {
-                        res.redirect(response.url)
+                  authority=new Date().getTime().toString();
+                  reservation = new Reservation(user._id, doctor._id, unavb,authority, req.body.cost);
+                  addtransaction(user._id, req.body.cost, response.authority);
+                  request({
+                    url: "https://fcp.shaparak.ir/ref-payment/RestServices/mts/generateTokenWithNoSign/",
+                    method: "POST",
+                    json: true,
+                    body: {
+                      "WSContext": { "UserId": "21918395", "Password": "21918395" },
+                      "TransType": "EN_GOODS",
+                      "ReserveNum": "FanAvaTest123",
+                      "Amount": "1007",
+                      "RedirectUrl": "https://reservation.drtajviz.com/testtest",
+                    }
+                  }, (error, response, body) => {
+                    console.log(body);
+                    if (body.Result == "erSucceed") {
+                      categories().then(basiccategories => {
+                        res.render("continuepayment.ejs", { token: body.Token, categories: basiccategories, user: "" });
+                        res.end();
                       })
                     }
-                  }).catch(err => {
-                    res.write("<html><body><p>there is a problem on server please try again later</p><a href='/' >go back to main page</a></body></html>");
-                    console.error(err);
-                    db.close();
-                    res.end();
-                  });
+                    else {
+                      console.log("test");
+                    }
+                  })
+                  // dbo.collection("TempReserves").insertOne(reservation, function (err, reserve) {
+                  //   res.redirect(response.url)
+                  // })
                 }
               })
             }
