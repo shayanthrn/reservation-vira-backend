@@ -83,7 +83,7 @@ router.get("/testpayment", function (req, res) {
   }, (error, response, body) => {
     console.log(body);
     if(body.Result=="erSucceed"){
-      res.redirect("https://fcp.shaparak.ir/_ipgw_/payment/?token="+body.Token+"&lang=fa")
+      res.redirect("https://fcp.shaparak.ir/_ipgw_/payment/?token="+body.Token+"&language=fa")
       // categories().then(basiccategories=>{
       //   res.render("continuepayment.ejs",{token:body.Token,categories:basiccategories,user: ""});
       //   res.end();
