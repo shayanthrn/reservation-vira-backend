@@ -5766,26 +5766,33 @@ router.post("/telepayment", function (req, res) {
               var date = new myDate(Number(reservedata[2]), Number(reservedata[1]), Number(reservedata[0]));
               var time = { start: reservedata[3], end: reservedata[4] };
               var timeinfo = { time: time, date: date }
-              zarinpal.PaymentRequest({
-                Amount: req.body.cost, // In Tomans
-                CallbackURL: 'http://reservation.drtajviz.com/telepaymenthandler',
-                Description: 'Dr tajviz payment',
-                Email: 'shayanthrn@gmail.com',
-                Mobile: user.phonenumber
-              }).then(response => {
-                if (response.status === 100) {
-                  reservation = new teleReservation(user._id, doctor._id, timeinfo, response.authority, req.body.cost);
-                  addtransaction(user._id, req.body.cost, response.authority);
+              authority = new Date().getTime().toString();
+              reservation = new teleReservation(user._id, doctor._id, timeinfo, authority, req.body.cost);
+              request({
+                url: "https://fcp.shaparak.ir/ref-payment/RestServices/mts/generateTokenWithNoSign/",
+                method: "POST",
+                json: true,
+                body: {
+                  "WSContext": { "UserId": "21918395", "Password": "21918395" },
+                  "TransType": "EN_GOODS",
+                  "ReserveNum": authority,
+                  "Amount": req.body.cost + "0",
+                  "RedirectUrl": "https://reservation.drtajviz.com/telepaymenthandler",
+                }
+              }, (error, response, body) => {
+                if (body.Result == "erSucceed") {
+                  addtransaction(user._id, req.body.cost, authority, body.Token);
                   dbo.collection("TempteleReserves").insertOne(reservation, function (err, reserve) {
-                    res.redirect(response.url)
+                    res.render("continuepayment.ejs", { token: body.Token });
+                    res.end();
                   })
                 }
-              }).catch(err => {
-                res.write("<html><body><p>there is a problem on server please try again later</p><a href='/' >go back to main page</a></body></html>");
-                console.error(err);
-                db.close();
-                res.end();
-              });
+                else {
+                  res.write("<html><body><p>there is a problem on bank server please try again later</p><a href='/' >go back to main page</a></body></html>");
+                  console.error(err);
+                  res.end();
+                }
+              })
             })
           }
         })
@@ -5794,74 +5801,80 @@ router.post("/telepayment", function (req, res) {
   }
 })
 
-router.get("/telepaymenthandler", function (req, res) {
-  var query = url.parse(req.url, true).query;
-  MongoClient.connect(dburl, function (err, db) {
-    var dbo = db.db("mydb");
-    dbo.collection("TempteleReserves").findOne({ authority: query.Authority }, function (err, reserve) {
-      if (reserve == null) {
-        db.close();
-        res.redirect("/paymentaccept2")
+router.post("/telepaymenthandler", function (req, res) {
+  if (req.headers.referer == "https://fcp.shaparak.ir/") {
+    MongoClient.connect(dburl, function (err, db) {
+      var dbo = db.db("mydb");
+      dbo.collection("TempteleReserves").findOne({ authority: req.body.ResNum }, function (err, reserve) {
+        if (reserve == null) {
+          db.close();
+          res.redirect("/paymentaccept2")
 
-      }
-      else {
-        if (query.Status == "NOK") {
-          strtime = n(reserve.timeinfo.time.start) + "-" + n(reserve.timeinfo.time.end);
-          dbo.collection("Doctors").findOne({ _id: reserve.doctor }, function (err, doctor) {
-            dbo.collection("TempteleReserves").deleteOne({ authority: query.Authority }, function (err, result) {
-              changestatustransaction(query.Authority, "ناموفق");
-              res.render("paymentfail.ejs", { doctor: doctor, time: strtime, resid: 0, chat: 2, doc: 1 });
-              db.close();
-              res.end();
-            })
-          })
         }
         else {
-          zarinpal.PaymentVerification({
-            Amount: reserve.cost, // In Tomans
-            Authority: reserve.authority,
-          }).then(response => {
-            if (response.status === 100 && response.RefID != 0) {
-              var reservation = reserve;
-              reservation.refid = response.RefID;
-              dbo.collection("teleReservations").insertOne(reservation, function (err, result234) {
-                dbo.collection("TempteleReserves").deleteOne({ authority: query.Authority }, function (err, aa) {
-                  dbo.collection("Users").updateOne({ _id: reservation.user }, { $addToSet: { telereservations: reservation } }, function (err, ad) {
-                    dbo.collection("Doctors").findOne({ _id: reservation.doctor }, function (err, doctor) {
-                      dbo.collection("Doctors").updateOne({ _id: reservation.doctor }, { $addToSet: { telereservations: reservation } }, async function (err, sas) {
-                        strtime = n(reservation.timeinfo.time.start) + "-" + n(reservation.timeinfo.time.end);
-                        changestatustransaction(query.Authority, "موفق");
-                        res.render("paymentaccept.ejs", { doctor: doctor, time: strtime, resid: reservation.refid, chat: 2, doc: 1 });
-                        user = await dbo.collection("Users").findOne({ _id: reservation.user })
-                        mytime = reservation.timeinfo.date.year + "/" + reservation.timeinfo.date.month + "/" + reservation.timeinfo.date.day
-                        sendSMS("teleresdoc", doctor._id, "Doctors", mytime, strtime, user.firstname + " " + user.lastname);
-                        sendSMS("teleresuser", user._id, "Users", mytime, strtime, doctor.name);
-                        res.end();
+          if (req.body.State == "Canceled By User") {
+            strtime = n(reserve.timeinfo.time.start) + "-" + n(reserve.timeinfo.time.end);
+            dbo.collection("Doctors").findOne({ _id: reserve.doctor }, function (err, doctor) {
+              dbo.collection("TempteleReserves").deleteOne({ authority: req.body.ResNum }, function (err, result) {
+                changestatustransaction(req.body.ResNum, "ناموفق");
+                res.render("paymentfail.ejs", { doctor: doctor, time: strtime, resid: 0, chat: 2, doc: 1 });
+                db.close();
+                res.end();
+              })
+            })
+          }
+          else {
+            request({
+              url: "https://fcp.shaparak.ir/ref-payment/RestServices/mts/verifyMerchantTrans/",
+              method: "POST",
+              json: true,
+              body: {
+                "WSContext": { "UserId": "21918395", "Password": "21918395" },
+                "Token": req.body.token,
+                "RefNum": req.body.RefNum
+              }
+            }, (error, response, body) => {
+              if (body.Result == "erSucceed") {
+                var reservation = reserve;
+                reservation.refid = req.body.RefNum;
+                dbo.collection("teleReservations").insertOne(reservation, function (err, result234) {
+                  dbo.collection("TempteleReserves").deleteOne({ authority: req.body.ResNum }, function (err, aa) {
+                    dbo.collection("Users").updateOne({ _id: reservation.user }, { $addToSet: { telereservations: reservation } }, function (err, ad) {
+                      dbo.collection("Doctors").findOne({ _id: reservation.doctor }, function (err, doctor) {
+                        dbo.collection("Doctors").updateOne({ _id: reservation.doctor }, { $addToSet: { telereservations: reservation } }, async function (err, sas) {
+                          strtime = n(reservation.timeinfo.time.start) + "-" + n(reservation.timeinfo.time.end);
+                          changestatustransaction(req.body.ResNum, "موفق");
+                          res.render("paymentaccept.ejs", { doctor: doctor, time: strtime, resid: reservation.refid, chat: 2, doc: 1 });
+                          user = await dbo.collection("Users").findOne({ _id: reservation.user })
+                          mytime = reservation.timeinfo.date.year + "/" + reservation.timeinfo.date.month + "/" + reservation.timeinfo.date.day
+                          sendSMS("teleresdoc", doctor._id, "Doctors", mytime, strtime, user.firstname + " " + user.lastname);
+                          sendSMS("teleresuser", user._id, "Users", mytime, strtime, doctor.name);
+                          res.end();
+                        })
                       })
                     })
                   })
                 })
-              })
-            }
-            else {
-              strtime = n(reserve.timeinfo.time.start) + "-" + n(reserve.timeinfo.time.end);
-              dbo.collection("Doctors").findOne({ _id: reserve.doctor }, function (err, doctor) {
-                dbo.collection("TempteleReserves").deleteOne({ authority: query.Authority }, function (err, result) {
-                  changestatustransaction(query.Authority, "ناموفق");
-                  res.render("paymentfail.ejs", { doctor: doctor, time: strtime, resid: 0, chat: 2, doc: 1 });
-                  res.end();
+              }
+              else {
+                strtime = n(reserve.timeinfo.time.start) + "-" + n(reserve.timeinfo.time.end);
+                dbo.collection("Doctors").findOne({ _id: reserve.doctor }, function (err, doctor) {
+                  dbo.collection("TempteleReserves").deleteOne({ authority: req.body.ResNum }, function (err, result) {
+                    changestatustransaction(req.body.ResNum, "ناموفق");
+                    res.render("paymentfail.ejs", { doctor: doctor, time: strtime, resid: 0, chat: 2, doc: 1 });
+                    res.end();
+                  })
                 })
-              })
-            }
-          }).catch(err => {
-            res.write("<html><body><p>there is a problem on server please try again later</p><a href='/' >go back to main page</a></body></html>");
-            console.error(err);
-            res.end();
-          });
+              }
+            })
+          }
         }
-      }
+      })
     })
-  })
+  }
+  else {
+    res.redirect("noacess");
+  }
 })
 
 
