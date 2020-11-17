@@ -36,8 +36,8 @@
         <!-- main -->
         <main class="page-404">
             <div class="container text-center">
-                <form method="POST" action=<%="https://fcp.shaparak.ir/_ipgw_/payment/?token="+token %>>
-                    <input type="text" value="<%= token %>" name="token">
+                <form method="GET" action=<%="https://fcp.shaparak.ir/_ipgw_/payment/?token="+token %>>
+                    <!-- <input type="text" value="<%= token %>" name="token"> -->
                     <button type="submit">ادامه</button>
                 </form>
             </div>
