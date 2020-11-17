@@ -83,21 +83,26 @@ router.get("/testpayment", function (req, res) {
   }, (error, response, body) => {
     console.log(body);
     if(body.Result=="erSucceed"){
-      res.redirect("https://fcp.shaparak.ir/_ipgw_/payment/?token="+body.Token+"&language=fa")
-      // categories().then(basiccategories=>{
-      //   res.render("continuepayment.ejs",{token:body.Token,categories:basiccategories,user: ""});
-      //   res.end();
-      // })
+      categories().then(basiccategories=>{
+        res.render("continuepayment.ejs",{token:body.Token,categories:basiccategories,user: ""});
+        res.end();
+      })
+    }
+    else{
+      console.log("test");
     }
   })
 })
 
 
 router.post("/testtest",function(req,res){
-  console.log("this is test test");
+  console.log("this is post test test");
   console.log(req.body);
 })
 
+router.get("/testtest",function(req,res){
+  console.log("this is get testtest");
+})
 
 //banksalamat
 
