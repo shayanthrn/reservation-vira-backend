@@ -5874,7 +5874,6 @@ router.post("/paymentHC", function (req, res) {
   }
   else {
     if (req.body.choice == undefined) {
-      console.log(query.from)
       res.redirect("back")
       res.end();
     }
@@ -5915,26 +5914,33 @@ router.post("/paymentHC", function (req, res) {
                   temp = (start.hour * 60) + start.min + catobj.visitduration;
                   end = { hour: Math.floor(temp / 60), min: temp % 60 }
                   unavb = { start: start, end: end, date: date, dayofweek: new persianDate([Number(reservedata[2]), Number(reservedata[3]), Number(reservedata[4])]).format("dddd") };
-                  zarinpal.PaymentRequest({
-                    Amount: req.body.cost, // In Tomans
-                    CallbackURL: 'http://reservation.drtajviz.com/paymenthandlerHC',
-                    Description: 'Dr tajviz payment',
-                    Email: 'shayanthrn@gmail.com',
-                    Mobile: user.phonenumber
-                  }).then(response => {
-                    if (response.status === 100) {
-                      reservation = new ReservationHC(user._id, HC._id, req.body.cat, unavb, response.authority, req.body.cost);
-                      addtransaction(user._id, req.body.cost, response.authority);
+                  authority = new Date().getTime().toString();
+                  reservation = new ReservationHC(user._id, HC._id, req.body.cat, unavb, authority, req.body.cost);
+                  request({
+                    url: "https://fcp.shaparak.ir/ref-payment/RestServices/mts/generateTokenWithNoSign/",
+                    method: "POST",
+                    json: true,
+                    body: {
+                      "WSContext": { "UserId": "21918395", "Password": "21918395" },
+                      "TransType": "EN_GOODS",
+                      "ReserveNum": authority,
+                      "Amount": req.body.cost + "0",
+                      "RedirectUrl": "https://reservation.drtajviz.com/paymenthandlerHC",
+                    }
+                  }, (error, response, body) => {
+                    if (body.Result == "erSucceed") {
+                      addtransaction(user._id, req.body.cost, authority, body.Token);
                       dbo.collection("TempReservesHC").insertOne(reservation, function (err, reserve) {
-                        res.redirect(response.url)
+                        res.render("continuepayment.ejs", { token: body.Token });
+                        res.end();
                       })
                     }
-                  }).catch(err => {
-                    res.write("<html><body><p>there is a problem on server please try again later</p><a href='/' >go back to main page</a></body></html>");
-                    console.error(err);
-                    db.close();
-                    res.end();
-                  });
+                    else {
+                      res.write("<html><body><p>there is a problem on bank server please try again later</p><a href='/' >go back to main page</a></body></html>");
+                      console.error(err);
+                      res.end();
+                    }
+                  })
                 }
               })
             }
@@ -5947,102 +5953,104 @@ router.post("/paymentHC", function (req, res) {
 
 
 
-router.get("/paymenthandlerHC", function (req, res) {
-  var query = url.parse(req.url, true).query;
-  MongoClient.connect(dburl, function (err, db) {
-    var dbo = db.db("mydb");
-    dbo.collection("TempReservesHC").findOne({ authority: query.Authority }, function (err, reserve) {
-      if (reserve == null) {
-        db.close();
-        res.redirect("/paymentaccept2")
-      }
-      else {
-        if (query.Status == "NOK") {
-          strtime = n(reserve.time.start.hour) + ":" + n(reserve.time.start.min) + "-" + n(reserve.time.end.hour) + ":" + n(reserve.time.end.min);
-          dbo.collection("HealthCenters").findOne({ _id: reserve.HC }, function (err, HC) {
-            dbo.collection("TempReservesHC").deleteOne({ authority: query.Authority }, function (err, result) {
-              if (HC.systype == "A") {
-                HC.visitcost = HC.categories[0].visitcost;
-              }
-              changestatustransaction(query.Authority, "ناموفق");
-              res.render("paymentfail.ejs", { doctor: HC, time: strtime, resid: 0, chat: 0, doc: 0 });
-              db.close();
-              res.end();
-            })
-          })
+router.post("/paymenthandlerHC", function (req, res) {
+  if (req.headers.referer == "https://fcp.shaparak.ir/") {
+    MongoClient.connect(dburl, function (err, db) {
+      var dbo = db.db("mydb");
+      dbo.collection("TempReservesHC").findOne({ authority: req.body.ResNum }, function (err, reserve) {
+        if (reserve == null) {
+          db.close();
+          res.redirect("/paymentaccept2")
         }
         else {
-          zarinpal.PaymentVerification({
-            Amount: reserve.cost, // In Tomans
-            Authority: reserve.authority,
-          }).then(response => {
-            if (response.status === 100 && response.RefID != 0) {
-              var reservation = reserve;
-              reservation.refid = response.RefID;
-              dbo.collection("Reservations").insertOne(reservation, function (err, result234) {
-                dbo.collection("TempReservesHC").deleteOne({ authority: query.Authority }, function (err, aa) {
-                  dbo.collection("Users").updateOne({ _id: reservation.user }, { $addToSet: { reserves: reservation } }, function (err, ad) {
-                    dbo.collection("HealthCenters").findOne({ _id: reservation.HC }, async function (err, HC) {
-                      if (HC.systype == "B") {
-                        dbo.collection("HealthCenters").updateOne({ _id: reservation.HC }, { $addToSet: { reservations: reservation, unavailabletimes: reservation.time } }, function (err, sas) {
-                          strtime = n(reserve.time.start.hour) + ":" + n(reserve.time.start.min) + "-" + n(reserve.time.end.hour) + ":" + n(reserve.time.end.min);
-                          changestatustransaction(query.Authority, "موفق");
-                          res.render("paymentaccept.ejs", { doctor: HC, time: strtime, resid: reservation.refid, chat: 0, doc: 0 });
-                          res.end();
-                        })
-                      }
-                      else {
-                        var catobj = null;
-                        console.log("this is hc categories------------:");
-                        console.log(HC.categories);
-                        HC.categories.forEach(function (doc) {
-                          if (doc.name == reservation.catname) {
-                            doc.reservations.push(reservation);
-                            doc.unavailabletimes.push(reservation.time);
-                          }
-                        })
-                        console.log("this is hc categories---afterchanges---------:");
-                        console.log(HC.categories);
-                        dbo.collection("HealthCenters").updateOne({ _id: reservation.HC }, { $set: { categories: HC.categories } }, function (err, sdf) {
-                          strtime = n(reserve.time.start.hour) + ":" + n(reserve.time.start.min) + "-" + n(reserve.time.end.hour) + ":" + n(reserve.time.end.min);
-                          changestatustransaction(query.Authority, "موفق");
-                          if (HC.systype == "A") {
-                            HC.visitcost = HC.categories[0].visitcost;
-                          }
-                          res.render("paymentaccept.ejs", { doctor: HC, time: strtime, resid: reservation.refid, chat: 0, doc: 0 });
-                          res.end();
-                        })
-                      }
-                      user = await dbo.collection("Users").findOne({ _id: reservation.user })
-                      mytime = new persianDate([reservation.time.date.year, reservation.time.date.month, reservation.time.date.day])
-                      sendSMS("resHC", HC._id, "HealthCenters", mytime.format("L"), user.firstname + " " + user.lastname, null);
-                      sendSMS("resHCuser", user._id, "Users", mytime.format("L"), HC.name, null);
+          if (req.body.State == "Canceled By User") {
+            strtime = n(reserve.time.start.hour) + ":" + n(reserve.time.start.min) + "-" + n(reserve.time.end.hour) + ":" + n(reserve.time.end.min);
+            dbo.collection("HealthCenters").findOne({ _id: reserve.HC }, function (err, HC) {
+              dbo.collection("TempReservesHC").deleteOne({ authority: req.body.ResNum }, function (err, result) {
+                if (HC.systype == "A") {
+                  HC.visitcost = HC.categories[0].visitcost;
+                }
+                changestatustransaction(req.body.ResNum, "ناموفق");
+                res.render("paymentfail.ejs", { doctor: HC, time: strtime, resid: 0, chat: 0, doc: 0 });
+                db.close();
+                res.end();
+              })
+            })
+          }
+          else {
+            request({
+              url: "https://fcp.shaparak.ir/ref-payment/RestServices/mts/verifyMerchantTrans/",
+              method: "POST",
+              json: true,
+              body: {
+                "WSContext": { "UserId": "21918395", "Password": "21918395" },
+                "Token": req.body.token,
+                "RefNum": req.body.RefNum
+              }
+            }, (error, response, body) => {
+              if (body.Result == "erSucceed") {
+                var reservation = reserve;
+                reservation.refid = req.body.RefNum;
+                dbo.collection("Reservations").insertOne(reservation, function (err, result234) {
+                  dbo.collection("TempReservesHC").deleteOne({ authority: req.body.ResNum }, function (err, aa) {
+                    dbo.collection("Users").updateOne({ _id: reservation.user }, { $addToSet: { reserves: reservation } }, function (err, ad) {
+                      dbo.collection("HealthCenters").findOne({ _id: reservation.HC }, async function (err, HC) {
+                        if (HC.systype == "B") {
+                          dbo.collection("HealthCenters").updateOne({ _id: reservation.HC }, { $addToSet: { reservations: reservation, unavailabletimes: reservation.time } }, function (err, sas) {
+                            strtime = n(reserve.time.start.hour) + ":" + n(reserve.time.start.min) + "-" + n(reserve.time.end.hour) + ":" + n(reserve.time.end.min);
+                            changestatustransaction(req.body.ResNum, "موفق");
+                            res.render("paymentaccept.ejs", { doctor: HC, time: strtime, resid: reservation.refid, chat: 0, doc: 0 });
+                            res.end();
+                          })
+                        }
+                        else {
+                          var catobj = null;
+                          HC.categories.forEach(function (doc) {
+                            if (doc.name == reservation.catname) {
+                              doc.reservations.push(reservation);
+                              doc.unavailabletimes.push(reservation.time);
+                            }
+                          })
+                          dbo.collection("HealthCenters").updateOne({ _id: reservation.HC }, { $set: { categories: HC.categories } }, function (err, sdf) {
+                            strtime = n(reserve.time.start.hour) + ":" + n(reserve.time.start.min) + "-" + n(reserve.time.end.hour) + ":" + n(reserve.time.end.min);
+                            changestatustransaction(req.body.ResNum, "موفق");
+                            if (HC.systype == "A") {
+                              HC.visitcost = HC.categories[0].visitcost;
+                            }
+                            res.render("paymentaccept.ejs", { doctor: HC, time: strtime, resid: reservation.refid, chat: 0, doc: 0 });
+                            res.end();
+                          })
+                        }
+                        user = await dbo.collection("Users").findOne({ _id: reservation.user })
+                        mytime = new persianDate([reservation.time.date.year, reservation.time.date.month, reservation.time.date.day])
+                        sendSMS("resHC", HC._id, "HealthCenters", mytime.format("L"), user.firstname + " " + user.lastname, null);
+                        sendSMS("resHCuser", user._id, "Users", mytime.format("L"), HC.name, null);
+                      })
                     })
                   })
                 })
-              })
-            } else {
-              strtime = n(reserve.time.start.hour) + ":" + n(reserve.time.start.min) + "-" + n(reserve.time.end.hour) + ":" + n(reserve.time.end.min);
-              dbo.collection("HealthCenters").findOne({ _id: reserve.HC }, function (err, HC) {
-                dbo.collection("TempReservesHC").deleteOne({ authority: query.Authority }, function (err, result) {
-                  if (HC.systype == "A") {
-                    HC.visitcost = HC.categories[0].visitcost;
-                  }
-                  changestatustransaction(query.Authority, "ناموفق");
-                  res.render("paymentfail.ejs", { doctor: HC, time: strtime, resid: 0, chat: 0, doc: 0 });
-                  res.end();
+              } else {
+                strtime = n(reserve.time.start.hour) + ":" + n(reserve.time.start.min) + "-" + n(reserve.time.end.hour) + ":" + n(reserve.time.end.min);
+                dbo.collection("HealthCenters").findOne({ _id: reserve.HC }, function (err, HC) {
+                  dbo.collection("TempReservesHC").deleteOne({ authority: req.body.ResNum }, function (err, result) {
+                    if (HC.systype == "A") {
+                      HC.visitcost = HC.categories[0].visitcost;
+                    }
+                    changestatustransaction(req.body.ResNum, "ناموفق");
+                    res.render("paymentfail.ejs", { doctor: HC, time: strtime, resid: 0, chat: 0, doc: 0 });
+                    res.end();
+                  })
                 })
-              })
-            }
-          }).catch(err => {
-            res.write("<html><body><p>there is a problem on server please try again later</p><a href='/' >go back to main page</a></body></html>");
-            console.error(err);
-            res.end();
-          });
+              }
+            })
+          }
         }
-      }
+      })
     })
-  })
+  }
+  else {
+    res.redirect("noaccess");
+  }
 })
 
 
@@ -6331,7 +6339,7 @@ router.post("/paymenthandler", function (req, res) {
                 "RefNum": req.body.RefNum
               }
             }, (error, response, body) => {
-              if (body.Result=="erSucceed") {
+              if (body.Result == "erSucceed") {
                 var reservation = reserve;
                 reservation.refid = body.RefNum;
                 dbo.collection("Reservations").insertOne(reservation, function (err, result234) {
@@ -6354,7 +6362,7 @@ router.post("/paymenthandler", function (req, res) {
               } else {
                 strtime = n(reserve.time.start.hour) + ":" + n(reserve.time.start.min) + "-" + n(reserve.time.end.hour) + ":" + n(reserve.time.end.min);
                 dbo.collection("Doctors").findOne({ _id: reserve.doctor }, function (err, doctor) {
-                  dbo.collection("TempReserves").deleteOne({ authority: req.body.ResNum}, function (err, result) {
+                  dbo.collection("TempReserves").deleteOne({ authority: req.body.ResNum }, function (err, result) {
                     changestatustransaction(req.body.ResNum, "ناموفق");
                     res.render("paymentfail.ejs", { doctor: doctor, time: strtime, resid: 0, chat: 0, doc: 1 });
                     res.end();
