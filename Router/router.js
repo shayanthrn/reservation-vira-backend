@@ -5584,26 +5584,31 @@ router.post("/ticketpayment", function (req, res) {
         }
         else {
           dbo.collection("Doctors").findOne({ name: req.body.doctor }, function (err, doctor) {
-            zarinpal.PaymentRequest({
-              Amount: req.body.cost, // In Tomans
-              CallbackURL: 'http://reservation.drtajviz.com/ticketpaymenthandler',
-              Description: 'Dr tajviz payment',
-              Email: 'shayanthrn@gmail.com',
-              Mobile: user.phonenumber
-            }).then(response => {
-              if (response.status === 100) {
+            authority = new Date().getTime().toString();
+            request({
+              url: "https://fcp.shaparak.ir/ref-payment/RestServices/mts/generateTokenWithNoSign/",
+              method: "POST",
+              json: true,
+              body: {
+                "WSContext": { "UserId": "21918395", "Password": "21918395" },
+                "TransType": "EN_GOODS",
+                "ReserveNum": authority,
+                "Amount": req.body.cost + "0",
+                "RedirectUrl": "https://reservation.drtajviz.com/ticketpaymenthandler",
+              }
+            }, (error, response, body) => {
+              if (body.Result == "erSucceed") {
                 var newchat = new Chat(req.body.doctor, user.phonenumber, doctor.chatcost);
-                addtransaction(user._id, req.body.cost, response.authority);
-                newchat.authority = response.authority;
+                addtransaction(user._id, req.body.cost, authority, body.Token);
+                newchat.authority = authority;
                 var now = new Date();
                 var newticket;
                 if (req.files == null) {
                   newticket = new Ticket(req.body.subject, req.body.text, null, now, "patient");
-
                   newchat.tickets.push(newticket);
                   dbo.collection("TempChats").insertOne(newchat, function (err, as) {
-                    res.redirect(response.url);
-                    db.close();
+                    res.render("continuepayment.ejs", { token: body.Token });
+                    res.end();
                   })
                 }
                 else {
@@ -5614,22 +5619,18 @@ router.post("/ticketpayment", function (req, res) {
                   mv(req.files.file.tempFilePath, file.path, { mkdirp: true }, function (err) {
                     newchat.tickets.push(newticket);
                     dbo.collection("TempChats").insertOne(newchat, function (err, as) {
-                      res.redirect(response.url);
-                      db.close();
+                      res.render("continuepayment.ejs", { token: body.Token });
+                      res.end();
                     })
                   })
                 }
               }
               else {
-                res.redirect("/failure");
-                db.close()
+                res.write("<html><body><p>there is a problem on bank server please try again later</p><a href='/' >go back to main page</a></body></html>");
+                console.error(err);
+                res.end();
               }
-            }).catch(err => {
-              res.write("<html><body><p>there is a problem on server please try again later</p><a href='/' >go back to main page</a></body></html>");
-              console.error(err);
-              db.close();
-              res.end();
-            });
+            })
           })
         }
       })
@@ -5652,93 +5653,98 @@ router.get("/paymentaccept2", function (req, res) {
   })
 })
 
-router.get("/ticketpaymenthandler", function (req, res) {
-  var query = url.parse(req.url, true).query;
-  MongoClient.connect(dburl, function (err, db) {
-    var dbo = db.db("mydb");
-    dbo.collection("TempChats").findOne({ authority: query.Authority }, function (err, chat) {
-      if (chat == null) {
-        db.close();
-        res.redirect("/paymentaccept2")
-      }
-      else {
-        console.log(chat)
-        if (query.Status == "NOK") {
-          dbo.collection("Doctors").findOne({ name: chat.doctor }, function (err, doctor) {
-            dbo.collection("TempChats").deleteOne({ authority: query.Authority }, function (err, result) {
-              if (chat.tickets[0].file != null) {
-                fs.unlink(chat.tickets[0].file.path, function (err) {
-                  if (err && err.code == 'ENOENT') {
-                    console.info("File doesn't exist, won't remove it.");
-                  } else if (err) {
-                    console.error("Error occurred while trying to remove file");
-                  } else {
-                    console.info(`removed`);
-                  }
-                });
-              }
-              doctor.visitcost = doctor.chatcost;
-              changestatustransaction(query.Authority, "ناموفق");
-              res.render("paymentfail.ejs", { doctor: doctor, time: "-", resid: 0, chat: 1, doc: 1 });
-              db.close();
-              res.end();
-            })
-          })
+router.post("/ticketpaymenthandler", function (req, res) {
+  if (req.headers.referer == "https://fcp.shaparak.ir/") {
+    MongoClient.connect(dburl, function (err, db) {
+      var dbo = db.db("mydb");
+      dbo.collection("TempChats").findOne({ authority: req.body.ResNum }, function (err, chat) {
+        if (chat == null) {
+          db.close();
+          res.redirect("/paymentaccept2")
         }
         else {
-          zarinpal.PaymentVerification({
-            Amount: chat.cost, // In Tomans
-            Authority: chat.authority,
-          }).then(response => {
-            if (response.status === 100 && response.RefID != 0) {
-              var mychat = chat;
-              mychat.refid = response.RefID;
-              dbo.collection("Chats").insertOne(mychat, function (err, result234) {
-                dbo.collection("TempChats").deleteOne({ authority: query.Authority }, function (err, aa) {
-                  dbo.collection("Users").updateOne({ phonenumber: mychat.userphone }, { $addToSet: { chats: mychat } }, function (err, ad) {
-                    dbo.collection("Doctors").findOne({ name: mychat.doctor }, function (err, doctor) {
-                      dbo.collection("Doctors").updateOne({ name: mychat.doctor }, { $addToSet: { chats: mychat } }, function (err, sas) {
-                        changestatustransaction(query.Authority, "موفق");
-                        res.render("paymentaccept.ejs", { doctor: doctor, time: "-", resid: mychat.refid, chat: 1, doc: 1 });
-                        //sendSMSforres(reservation);
-                        res.end();
+          if (req.body.State == "Canceled By User") {
+            dbo.collection("Doctors").findOne({ name: chat.doctor }, function (err, doctor) {
+              dbo.collection("TempChats").deleteOne({ authority: req.body.ResNum }, function (err, result) {
+                if (chat.tickets[0].file != null) {
+                  fs.unlink(chat.tickets[0].file.path, function (err) {
+                    if (err && err.code == 'ENOENT') {
+                      console.info("File doesn't exist, won't remove it.");
+                    } else if (err) {
+                      console.error("Error occurred while trying to remove file");
+                    } else {
+                      console.info(`removed`);
+                    }
+                  });
+                }
+                doctor.visitcost = doctor.chatcost;
+                changestatustransaction(req.body.ResNum, "ناموفق");
+                res.render("paymentfail.ejs", { doctor: doctor, time: "-", resid: 0, chat: 1, doc: 1 });
+                db.close();
+                res.end();
+              })
+            })
+          }
+          else {
+            request({
+              url: "https://fcp.shaparak.ir/ref-payment/RestServices/mts/verifyMerchantTrans/",
+              method: "POST",
+              json: true,
+              body: {
+                "WSContext": { "UserId": "21918395", "Password": "21918395" },
+                "Token": req.body.token,
+                "RefNum": req.body.RefNum
+              }
+            }, (error, response, body) => {
+              if (body.Result == "erSucceed") {
+                var mychat = chat;
+                mychat.refid = body.RefNum;
+                dbo.collection("Chats").insertOne(mychat, function (err, result234) {
+                  dbo.collection("TempChats").deleteOne({ authority: req.body.ResNum }, function (err, aa) {
+                    dbo.collection("Users").updateOne({ phonenumber: mychat.userphone }, { $addToSet: { chats: mychat } }, function (err, ad) {
+                      dbo.collection("Doctors").findOne({ name: mychat.doctor }, function (err, doctor) {
+                        dbo.collection("Doctors").updateOne({ name: mychat.doctor }, { $addToSet: { chats: mychat } }, function (err, sas) {
+                          changestatustransaction(req.body.ResNum, "موفق");
+                          res.render("paymentaccept.ejs", { doctor: doctor, time: "-", resid: mychat.refid, chat: 1, doc: 1 });
+                          //sendSMSforres(reservation);
+                          res.end();
+                        })
                       })
                     })
                   })
                 })
-              })
-            }
-            else {
-              dbo.collection("Doctors").findOne({ name: chat.doctor }, function (err, doctor) {
-                dbo.collection("TempChats").deleteOne({ authority: query.Authority }, function (err, result) {
-                  if (chat.tickets[0].file != null) {
-                    fs.unlink(chat.tickets[0].file.path, function (err) {
-                      if (err && err.code == 'ENOENT') {
-                        console.info("File doesn't exist, won't remove it.");
-                      } else if (err) {
-                        console.error("Error occurred while trying to remove file");
-                      } else {
-                        console.info(`removed`);
-                      }
-                    });
-                  }
-                  doctor.visitcost = doctor.chatcost;
-                  changestatustransaction(query.Authority, "ناموفق");
-                  res.render("paymentfail.ejs", { doctor: doctor, time: "-", resid: 0, chat: 1, doc: 1 });
-                  db.close();
-                  res.end();
+              }
+              else {
+                dbo.collection("Doctors").findOne({ name: chat.doctor }, function (err, doctor) {
+                  dbo.collection("TempChats").deleteOne({ authority: req.body.ResNum }, function (err, result) {
+                    if (chat.tickets[0].file != null) {
+                      fs.unlink(chat.tickets[0].file.path, function (err) {
+                        if (err && err.code == 'ENOENT') {
+                          console.info("File doesn't exist, won't remove it.");
+                        } else if (err) {
+                          console.error("Error occurred while trying to remove file");
+                        } else {
+                          console.info(`removed`);
+                        }
+                      });
+                    }
+                    doctor.visitcost = doctor.chatcost;
+                    changestatustransaction(req.body.ResNum, "ناموفق");
+                    res.render("paymentfail.ejs", { doctor: doctor, time: "-", resid: 0, chat: 1, doc: 1 });
+                    db.close();
+                    res.end();
+                  })
                 })
-              })
-            }
-          }).catch(err => {
-            res.write("<html><body><p>there is a problem on server please try again later</p><a href='/' >go back to main page</a></body></html>");
-            console.error(err);
-            res.end();
-          });
+              }
+            })
+          }
         }
-      }
+      })
     })
-  })
+  }
+  else {
+    res.redirect("noaccess");
+  }
 })
 
 
