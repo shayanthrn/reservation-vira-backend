@@ -2,7 +2,8 @@ var persianDate = require('persian-date');
 
 
 class Transaction{
-    constructor(authority,amount,status,username){
+    constructor(token,authority,amount,status,username){
+        this.token=token;
         this.authority=authority;
         this.amount=amount;
         this.status=status;

@@ -1857,11 +1857,11 @@ function n(n) {
   return n > 9 ? "" + n : "0" + n;
 }
 
-function addtransaction(userid, amount, authority) {
+function addtransaction(userid, amount, authority,token) {
   MongoClient.connect(dburl, function (err, db) {
     var dbo = db.db("mydb");
     dbo.collection("Users").findOne({ _id: userid }, function (err, user) {
-      var transaction = new Transaction(authority, amount, "پاسخی از بانک دریافت نشده است.", user.firstname + " " + user.lastname);
+      var transaction = new Transaction(token,authority, amount, "پاسخی از بانک دریافت نشده است.", user.firstname + " " + user.lastname);
       dbo.collection("Transactions").insertOne(transaction, function (err, asd) {
         console.log("added");
       })
@@ -6275,11 +6275,10 @@ router.post("/payment", function (req, res) {
                       "RedirectUrl": "https://reservation.drtajviz.com/paymenthandler",
                     }
                   }, (error, response, body) => {
-                    console.log(body);
                     if (body.Result == "erSucceed") {
-                      addtransaction(user._id, req.body.cost, authority);
+                      addtransaction(user._id, req.body.cost, authority,body.Token );
                       dbo.collection("TempReserves").insertOne(reservation, function (err, reserve) {
-                        res.render("continuepayment.ejs", { token: body.Token, categories: basiccategories, user: "" });
+                        res.render("continuepayment.ejs", { token: body.Token });
                         res.end();
                       })
                     }
@@ -6300,8 +6299,7 @@ router.post("/payment", function (req, res) {
 })
 
 
-router.get("/paymenthandler", function (req, res) {
-  console.log("this is paymenthandler");
+router.post("/paymenthandler", function (req, res) {
   console.log(req.body);
   // var query = url.parse(req.url, true).query;
   // MongoClient.connect(dburl, function (err, db) {
