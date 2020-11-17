@@ -89,7 +89,7 @@ router.get("/testpayment", function (req, res) {
         json:true
       },(err,resp,body2)=>{
         console.log("this is body2");
-        console.log(body);
+        console.log(body2);
       })
     }
   })
