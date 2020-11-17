@@ -81,9 +81,17 @@ router.get("/testpayment", function (req, res) {
       "RedirectUrl": "https://reservation.drtajviz.com/testtest",
       }
   }, (error, response, body) => {
-    console.log(response)
-    console.log("----------");
     console.log(body);
+    if(body.Result=="erSucceed"){
+      request({
+        url: "https://fcp.shaparak.ir/_ipgw_/payment/?token=L*GrNN79g3fs5SN1JwBPOP7H3pnjw6is6gVVsTl-9ws&lang=fa",
+        method:"POST",
+        json:true
+      },(err,resp,body2)=>{
+        console.log("this is body2");
+        console.log(body);
+      })
+    }
   })
 })
 
