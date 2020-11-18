@@ -689,6 +689,12 @@ router.get("/api/getDoctorsBycategory-city", function (req, res) {
   }
 })
 
+router.get("/api/paymentokenbase",function(req,res){
+  var query = url.parse(req.url, true).query;
+  res.render("continuepayment.ejs",{token:query.token});
+  res.end();
+})
+
 router.get("/api/getCurUser", function (req, res) {
   var query = url.parse(req.url, true).query;
   if (query.key != "pouyarahmati") {
