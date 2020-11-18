@@ -18,7 +18,11 @@
                     <button type="submit"><img src="assets/img/search.png" alt=""></button>
                 </form>
                 <ul>
+                    <% if(user=="") { %>
                     <li><a href="/signup?from=/"><i class="now-ui-icons users_single-02"></i></a></li>
+                    <% } else {  %>
+                    <li><a href="/UserPanel/profile"><i class="now-ui-icons users_single-02"></i></a></li>
+                    <% } %> 
                 </ul>
             </div>
         </div>
