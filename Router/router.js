@@ -230,11 +230,10 @@ router.post("/api/paymentHC", function (req, res) {
           }
           else {
             if (checkinterval(1)) {
-              dbo.collection("HealthCenters").findOne({ name: req.body.HCname }, function (err, HC) {
+              dbo.collection("HealthCenters").findOne({ name: req.body.HCname, type: req.body.type }, function (err, HC) {
                 if (HC == null) {
                   db.close();
-                  res.json({ data: "HC not found" });
-                  res.end();
+                  res.redirect("/noaccess");
                 }
                 else {
                   var catobj = null;
@@ -257,26 +256,33 @@ router.post("/api/paymentHC", function (req, res) {
                   temp = (start.hour * 60) + start.min + catobj.visitduration;
                   end = { hour: Math.floor(temp / 60), min: temp % 60 }
                   unavb = { start: start, end: end, date: date, dayofweek: new persianDate([Number(reservedata[2]), Number(reservedata[3]), Number(reservedata[4])]).format("dddd") };
-                  zarinpal.PaymentRequest({
-                    Amount: req.body.cost, // In Tomans
-                    CallbackURL: 'http://reservation.drtajviz.com/paymenthandlerHC',
-                    Description: 'Dr tajviz payment',
-                    Email: 'shayanthrn@gmail.com',
-                    Mobile: user.phonenumber
-                  }).then(response => {
-                    if (response.status === 100) {
-                      reservation = new ReservationHC(user._id, HC._id, req.body.cat, unavb, response.authority, req.body.cost);
-                      addtransaction(user._id, req.body.cost, response.authority);
+                  authority = new Date().getTime().toString();
+                  reservation = new ReservationHC(user._id, HC._id, req.body.cat, unavb, authority, req.body.cost);
+                  request({
+                    url: "https://fcp.shaparak.ir/ref-payment/RestServices/mts/generateTokenWithNoSign/",
+                    method: "POST",
+                    json: true,
+                    body: {
+                      "WSContext": { "UserId": "21918395", "Password": "21918395" },
+                      "TransType": "EN_GOODS",
+                      "ReserveNum": authority,
+                      "Amount": req.body.cost + "0",
+                      "RedirectUrl": "https://reservation.drtajviz.com/paymenthandlerHC",
+                    }
+                  }, (error, response, body) => {
+                    if (body.Result == "erSucceed") {
+                      addtransaction(user._id, req.body.cost, authority, body.Token);
                       dbo.collection("TempReservesHC").insertOne(reservation, function (err, reserve) {
-                        res.json({ data: response.url })
+                        res.json({ token: body.Token });
+                        res.end();
                       })
                     }
-                  }).catch(err => {
-                    res.write("<html><body><p>there is a problem on server please try again later</p><a href='/' >go back to main page</a></body></html>");
-                    console.error(err);
-                    db.close();
-                    res.end();
-                  });
+                    else {
+                      res.write("<html><body><p>there is a problem on bank server please try again later</p><a href='/' >go back to main page</a></body></html>");
+                      console.error(err);
+                      res.end();
+                    }
+                  })
                 }
               })
             }
@@ -748,7 +754,6 @@ router.get("/api/getTimeSlots", function (req, res) {
 
 router.post("/api/payment", function (req, res) {
   if (req.body.usertoken == undefined) {
-    console.log(req.body);
     res.json({ data: "user token not found" })
     res.end();
   }
@@ -758,7 +763,6 @@ router.post("/api/payment", function (req, res) {
       res.end();
     }
     else {
-
       MongoClient.connect(dburl, function (err, db) {
         var dbo = db.db("mydb");
         dbo.collection("Users").findOne({ token: req.body.usertoken }, function (err, user) {
@@ -782,26 +786,33 @@ router.post("/api/payment", function (req, res) {
                   temp = (start.hour * 60) + start.min + doctor.visitduration;
                   end = { hour: Math.floor(temp / 60), min: temp % 60 }
                   unavb = { start: start, end: end, date: date, dayofweek: new persianDate([Number(reservedata[2]), Number(reservedata[3]), Number(reservedata[4])]).format("dddd") };
-                  zarinpal.PaymentRequest({
-                    Amount: req.body.cost, // In Tomans
-                    CallbackURL: 'http://reservation.drtajviz.com/paymenthandler',
-                    Description: 'Dr tajviz payment',
-                    Email: 'shayanthrn@gmail.com',
-                    Mobile: user.phonenumber
-                  }).then(response => {
-                    if (response.status === 100) {
-                      reservation = new Reservation(user._id, doctor._id, unavb, response.authority, req.body.cost);
-                      addtransaction(user._id, req.body.cost, response.authority);
+                  authority = new Date().getTime().toString();
+                  reservation = new Reservation(user._id, doctor._id, unavb, authority, req.body.cost);
+                  request({
+                    url: "https://fcp.shaparak.ir/ref-payment/RestServices/mts/generateTokenWithNoSign/",
+                    method: "POST",
+                    json: true,
+                    body: {
+                      "WSContext": { "UserId": "21918395", "Password": "21918395" },
+                      "TransType": "EN_GOODS",
+                      "ReserveNum": authority,
+                      "Amount": req.body.cost + "0",
+                      "RedirectUrl": "https://reservation.drtajviz.com/paymenthandler",
+                    }
+                  }, (error, response, body) => {
+                    if (body.Result == "erSucceed") {
+                      addtransaction(user._id, req.body.cost, authority, body.Token);
                       dbo.collection("TempReserves").insertOne(reservation, function (err, reserve) {
-                        res.json({ url: response.url })
+                        res.json({ token: body.Token });
+                        res.end();
                       })
                     }
-                  }).catch(err => {
-                    res.write("<html><body><p>there is a problem on server please try again later</p><a href='/' >go back to main page</a></body></html>");
-                    console.error(err);
-                    db.close();
-                    res.end();
-                  });
+                    else {
+                      res.write("<html><body><p>there is a problem on bank server please try again later</p><a href='/' >go back to main page</a></body></html>");
+                      console.error(err);
+                      res.end();
+                    }
+                  })
                 }
               })
             }
@@ -826,25 +837,31 @@ router.post("/api/ticketpayment", function (req, res) {
         }
         else {
           dbo.collection("Doctors").findOne({ name: req.body.doctor }, function (err, doctor) {
-            zarinpal.PaymentRequest({
-              Amount: req.body.cost, // In Tomans
-              CallbackURL: 'http://reservation.drtajviz.com/ticketpaymenthandler',
-              Description: 'Dr tajviz payment',
-              Email: 'shayanthrn@gmail.com',
-              Mobile: user.phonenumber
-            }).then(response => {
-              if (response.status === 100) {
+            authority = new Date().getTime().toString();
+            request({
+              url: "https://fcp.shaparak.ir/ref-payment/RestServices/mts/generateTokenWithNoSign/",
+              method: "POST",
+              json: true,
+              body: {
+                "WSContext": { "UserId": "21918395", "Password": "21918395" },
+                "TransType": "EN_GOODS",
+                "ReserveNum": authority,
+                "Amount": req.body.cost + "0",
+                "RedirectUrl": "https://reservation.drtajviz.com/ticketpaymenthandler",
+              }
+            }, (error, response, body) => {
+              if (body.Result == "erSucceed") {
                 var newchat = new Chat(req.body.doctor, user.phonenumber, doctor.chatcost);
-                newchat.authority = response.authority;
-                addtransaction(user._id, req.body.cost, response.authority);
+                addtransaction(user._id, req.body.cost, authority, body.Token);
+                newchat.authority = authority;
                 var now = new Date();
                 var newticket;
                 if (req.files == null) {
                   newticket = new Ticket(req.body.subject, req.body.text, null, now, "patient");
                   newchat.tickets.push(newticket);
                   dbo.collection("TempChats").insertOne(newchat, function (err, as) {
-                    res.json({ url: response.url })
-                    db.close();
+                    res.render("continuepayment.ejs", { token: body.Token });
+                    res.end();
                   })
                 }
                 else {
@@ -855,23 +872,18 @@ router.post("/api/ticketpayment", function (req, res) {
                   mv(req.files.file.tempFilePath, file.path, { mkdirp: true }, function (err) {
                     newchat.tickets.push(newticket);
                     dbo.collection("TempChats").insertOne(newchat, function (err, as) {
-                      res.json({ url: response.url })
-                      db.close();
+                      res.json({ token: body.Token });
+                      res.end();
                     })
                   })
                 }
               }
               else {
-                res.json({ data: "fail" })
-                db.close()
+                res.write("<html><body><p>there is a problem on bank server please try again later</p><a href='/' >go back to main page</a></body></html>");
+                console.error(err);
+                res.end();
               }
-            }).catch(err => {
-              console.log(req.body.cost)
-              res.write("<html><body><p>there is a problem on server please try again later</p><a href='/' >go back to main page</a></body></html>");
-              console.error(err);
-              db.close();
-              res.end();
-            });
+            })
           })
         }
       })
@@ -903,26 +915,33 @@ router.post("/api/telepayment", function (req, res) {
               var date = new myDate(Number(reservedata[2]), Number(reservedata[1]), Number(reservedata[0]));
               var time = { start: reservedata[3], end: reservedata[4] };
               var timeinfo = { time: time, date: date }
-              zarinpal.PaymentRequest({
-                Amount: req.body.cost, // In Tomans
-                CallbackURL: 'http://reservation.drtajviz.com/telepaymenthandler',
-                Description: 'Dr tajviz payment',
-                Email: 'shayanthrn@gmail.com',
-                Mobile: user.phonenumber
-              }).then(response => {
-                if (response.status === 100) {
-                  reservation = new teleReservation(user._id, doctor._id, timeinfo, response.authority, req.body.cost);
-                  addtransaction(user._id, req.body.cost, response.authority);
+              authority = new Date().getTime().toString();
+              reservation = new teleReservation(user._id, doctor._id, timeinfo, authority, req.body.cost);
+              request({
+                url: "https://fcp.shaparak.ir/ref-payment/RestServices/mts/generateTokenWithNoSign/",
+                method: "POST",
+                json: true,
+                body: {
+                  "WSContext": { "UserId": "21918395", "Password": "21918395" },
+                  "TransType": "EN_GOODS",
+                  "ReserveNum": authority,
+                  "Amount": req.body.cost + "0",
+                  "RedirectUrl": "https://reservation.drtajviz.com/telepaymenthandler",
+                }
+              }, (error, response, body) => {
+                if (body.Result == "erSucceed") {
+                  addtransaction(user._id, req.body.cost, authority, body.Token);
                   dbo.collection("TempteleReserves").insertOne(reservation, function (err, reserve) {
-                    res.json({ url: response.url })
+                    res.json({ token: body.Token });
+                    res.end();
                   })
                 }
-              }).catch(err => {
-                res.write("<html><body><p>there is a problem on server please try again later</p><a href='/' >go back to main page</a></body></html>");
-                console.error(err);
-                db.close();
-                res.end();
-              });
+                else {
+                  res.write("<html><body><p>there is a problem on bank server please try again later</p><a href='/' >go back to main page</a></body></html>");
+                  console.error(err);
+                  res.end();
+                }
+              })
             })
           }
         })
