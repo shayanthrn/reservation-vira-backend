@@ -5679,7 +5679,8 @@ router.get("/paymentaccept2", function (req, res) {
 })
 
 router.post("/ticketpaymenthandler", function (req, res) {
-  if (req.headers.referer == "https://fcp.shaparak.ir/") {
+  // if (req.headers.referer == "https://fcp.shaparak.ir/") {
+    if(1){
     MongoClient.connect(dburl, function (err, db) {
       var dbo = db.db("mydb");
       dbo.collection("TempChats").findOne({ authority: req.body.ResNum }, function (err, chat) {
@@ -5833,7 +5834,8 @@ router.post("/telepayment", function (req, res) {
 })
 
 router.post("/telepaymenthandler", function (req, res) {
-  if (req.headers.referer == "https://fcp.shaparak.ir/") {
+  // if (req.headers.referer == "https://fcp.shaparak.ir/") {
+    if(1){
     MongoClient.connect(dburl, function (err, db) {
       var dbo = db.db("mydb");
       dbo.collection("TempteleReserves").findOne({ authority: req.body.ResNum }, function (err, reserve) {
@@ -5998,7 +6000,8 @@ router.post("/paymentHC", function (req, res) {
 
 
 router.post("/paymenthandlerHC", function (req, res) {
-  if (req.headers.referer == "https://fcp.shaparak.ir/") {
+  // if (req.headers.referer == "https://fcp.shaparak.ir/") {
+    if(1){
     MongoClient.connect(dburl, function (err, db) {
       var dbo = db.db("mydb");
       dbo.collection("TempReservesHC").findOne({ authority: req.body.ResNum }, function (err, reserve) {
@@ -6352,7 +6355,8 @@ router.post("/payment", function (req, res) {
 
 
 router.post("/paymenthandler", function (req, res) {
-  if (req.headers.referer == "https://fcp.shaparak.ir/") {
+  // if (req.headers.referer == "https://fcp.shaparak.ir/") {
+    if(1){
     MongoClient.connect(dburl, function (err, db) {
       var dbo = db.db("mydb");
       dbo.collection("TempReserves").findOne({ authority: req.body.ResNum }, function (err, reserve) {
