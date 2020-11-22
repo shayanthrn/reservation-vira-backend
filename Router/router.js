@@ -831,6 +831,7 @@ router.post("/api/payment", function (req, res) {
 
 router.post("/api/ticketpayment", function (req, res) {
   if (req.body.usertoken == undefined || req.body.key != "pouyarahmati") {
+    console.log("Flag1");
     res.json({ data: "user token not found" })
     res.end();
   }
@@ -839,6 +840,7 @@ router.post("/api/ticketpayment", function (req, res) {
       var dbo = db.db("mydb");
       dbo.collection("Users").findOne({ token: req.body.usertoken }, function (err, user) {
         if (user == null) {
+          console.log("Flag2");
           res.json({ data: "not found user" })
         }
         else {
@@ -866,6 +868,7 @@ router.post("/api/ticketpayment", function (req, res) {
                   newticket = new Ticket(req.body.subject, req.body.text, null, now, "patient");
                   newchat.tickets.push(newticket);
                   dbo.collection("TempChats").insertOne(newchat, function (err, as) {
+                    console.log("Flag3");
                     res.json({ token: body.Token });
                     res.end();
                   })
@@ -878,6 +881,7 @@ router.post("/api/ticketpayment", function (req, res) {
                   mv(req.files.file.tempFilePath, file.path, { mkdirp: true }, function (err) {
                     newchat.tickets.push(newticket);
                     dbo.collection("TempChats").insertOne(newchat, function (err, as) {
+                      console.log("Flag4");
                       res.json({ token: body.Token });
                       res.end();
                     })
@@ -885,6 +889,7 @@ router.post("/api/ticketpayment", function (req, res) {
                 }
               }
               else {
+                console.log("Flag5");
                 res.write("<html><body><p>there is a problem on bank server please try again later</p><a href='/' >go back to main page</a></body></html>");
                 console.error(err);
                 res.end();
