@@ -1012,7 +1012,7 @@ router.post("/api/paymentdocandroid", function (req, res) {
                           sendSMS("reserveACK", reservation.user, "Users", reservation.refid, doctor.name, new persianDate([reservation.time.date.year, reservation.time.date.month, reservation.time.date.day]).format("L"))
                           username = await dbo.collection("Users").findOne({ _id: reservation.user })
                           sendSMS("reserveACKdoc", reservation.doctor, "Doctors", reservation.refid, username.firstname + " " + username.lastname, new persianDate([reservation.time.date.year, reservation.time.date.month, reservation.time.date.day]).format("L"))
-                          res.json({status:"ok"})
+                          res.json({ status: "ok" })
                           res.end();
                         })
                       })
@@ -1029,11 +1029,175 @@ router.post("/api/paymentdocandroid", function (req, res) {
 })
 
 router.post("/api/paymentHCandroid", function (req, res) {
-
+  if (req.body.usertoken == undefined) {
+    console.log(req.body);
+    res.json({ data: "user token not found" })
+    res.end();
+  }
+  else {
+    if (req.body.choice == undefined) {
+      res.json({ data: "choice is not defined" })
+      res.end();
+    }
+    else {
+      MongoClient.connect(dburl, function (err, db) {
+        var dbo = db.db("mydb");
+        dbo.collection("Users").findOne({ token: req.body.usertoken }, function (err, user) {
+          if (user == null) {
+            res.json({ data: "user not found" });
+            db.close();
+            res.end();
+          }
+          else {
+            if (checkinterval(1)) {
+              dbo.collection("HealthCenters").findOne({ name: req.body.HCname, type: req.body.type }, function (err, HC) {
+                if (HC == null) {
+                  db.close();
+                  res.redirect("/noaccess");
+                }
+                else {
+                  var catobj = null;
+                  if (HC.categories == undefined) {
+                    catobj = HC;
+                  }
+                  else {
+                    HC.categories.forEach(function (doc) {
+                      if (doc.name == req.body.cat) {
+                        catobj = doc;
+                      }
+                    })
+                    if (catobj == null) {
+                      res.redirect("/noaccess")
+                    }
+                  }
+                  reservedata = req.body.choice.split(":");
+                  date = new myDate(Number(reservedata[4]), Number(reservedata[3]), Number(reservedata[2]));
+                  start = { hour: Number(reservedata[0]), min: Number(reservedata[1]) };
+                  temp = (start.hour * 60) + start.min + catobj.visitduration;
+                  end = { hour: Math.floor(temp / 60), min: temp % 60 }
+                  unavb = { start: start, end: end, date: date, dayofweek: new persianDate([Number(reservedata[2]), Number(reservedata[3]), Number(reservedata[4])]).format("dddd") };
+                  authority = new Date().getTime().toString();
+                  reservation = new ReservationHC(user._id, HC._id, req.body.cat, unavb, authority, req.body.cost);
+                  addtransaction(user._id, req.body.cost, authority, "bazarpayment");
+                  //--
+                  reservation.refid = req.body.RefNum;
+                  dbo.collection("Reservations").insertOne(reservation, function (err, result234) {
+                    dbo.collection("TempReservesHC").deleteOne({ authority: authority }, function (err, aa) {
+                      dbo.collection("Users").updateOne({ _id: reservation.user }, { $addToSet: { reserves: reservation } }, function (err, ad) {
+                        dbo.collection("HealthCenters").findOne({ _id: reservation.HC }, async function (err, HC) {
+                          if (HC.systype == "B") {
+                            dbo.collection("HealthCenters").updateOne({ _id: reservation.HC }, { $addToSet: { reservations: reservation, unavailabletimes: reservation.time } }, function (err, sas) {
+                              changestatustransaction(authority, "موفق");
+                              res.json({ status: "ok" })
+                              res.end();
+                            })
+                          }
+                          else {
+                            var catobj = null;
+                            HC.categories.forEach(function (doc) {
+                              if (doc.name == reservation.catname) {
+                                doc.reservations.push(reservation);
+                                doc.unavailabletimes.push(reservation.time);
+                              }
+                            })
+                            dbo.collection("HealthCenters").updateOne({ _id: reservation.HC }, { $set: { categories: HC.categories } }, function (err, sdf) {
+                              strtime = n(reserve.time.start.hour) + ":" + n(reserve.time.start.min) + "-" + n(reserve.time.end.hour) + ":" + n(reserve.time.end.min);
+                              changestatustransaction(authority, "موفق");
+                              if (HC.systype == "A") {
+                                HC.visitcost = HC.categories[0].visitcost;
+                              }
+                              res.json({ status: "ok" })
+                              res.end();
+                            })
+                          }
+                          user = await dbo.collection("Users").findOne({ _id: reservation.user })
+                          mytime = new persianDate([reservation.time.date.year, reservation.time.date.month, reservation.time.date.day])
+                          sendSMS("resHC", HC._id, "HealthCenters", mytime.format("L"), user.firstname + " " + user.lastname, null);
+                          sendSMS("resHCuser", user._id, "Users", mytime.format("L"), HC.name, null);
+                        })
+                      })
+                    })
+                  })
+                }
+              })
+            }
+          }
+        })
+      })
+    }
+  }
 })
 
 router.post("/api/paymentticketandroid", function (req, res) {
-
+  if (req.body.usertoken == undefined || req.body.key != "pouyarahmati") {
+    console.log("Flag1");
+    res.json({ data: "user token not found" })
+    res.end();
+  }
+  else {
+    MongoClient.connect(dburl, function (err, db) {
+      var dbo = db.db("mydb");
+      dbo.collection("Users").findOne({ token: req.body.usertoken }, function (err, user) {
+        if (user == null) {
+          console.log("Flag2");
+          res.json({ data: "not found user" })
+        }
+        else {
+          dbo.collection("Doctors").findOne({ name: req.body.doctor }, function (err, doctor) {
+            authority = new Date().getTime().toString();
+            var newchat = new Chat(req.body.doctor, user.phonenumber, doctor.chatcost);
+            addtransaction(user._id, req.body.cost, authority, "bazarpayment");
+            newchat.authority = authority;
+            var now = new Date();
+            var newticket;
+            if (req.files == null) {
+              newticket = new Ticket(req.body.subject, req.body.text, null, now, "patient");
+              newchat.tickets.push(newticket);
+              newchat.refid = req.body.RefNum;
+              dbo.collection("Chats").insertOne(newchat, function (err, result234) {
+                dbo.collection("TempChats").deleteOne({ authority: authority }, function (err, aa) {
+                  dbo.collection("Users").updateOne({ phonenumber: newchat.userphone }, { $addToSet: { chats: newchat } }, function (err, ad) {
+                    dbo.collection("Doctors").findOne({ name: newchat.doctor }, function (err, doctor) {
+                      dbo.collection("Doctors").updateOne({ name: newchat.doctor }, { $addToSet: { chats: newchat } }, function (err, sas) {
+                        changestatustransaction(authority, "موفق");
+                        res.json({ status: "ok" });
+                        //sendSMSforres(reservation);
+                        res.end();
+                      })
+                    })
+                  })
+                })
+              })
+            }
+            else {
+              var arr = req.files.file.name.split('.');
+              var fileformat = arr[arr.length - 1];
+              var file = { format: fileformat, path: "data/ticketfiles/" + arr[0] + now.getTime() + "." + fileformat };
+              newticket = new Ticket(req.body.subject, req.body.text, file, now, "patient");
+              mv(req.files.file.tempFilePath, file.path, { mkdirp: true }, function (err) {
+                newchat.tickets.push(newticket);
+                newchat.refid = req.body.RefNum;
+                dbo.collection("Chats").insertOne(newchat, function (err, result234) {
+                  dbo.collection("TempChats").deleteOne({ authority: authority }, function (err, aa) {
+                    dbo.collection("Users").updateOne({ phonenumber: newchat.userphone }, { $addToSet: { chats: newchat } }, function (err, ad) {
+                      dbo.collection("Doctors").findOne({ name: newchat.doctor }, function (err, doctor) {
+                        dbo.collection("Doctors").updateOne({ name: newchat.doctor }, { $addToSet: { chats: newchat } }, function (err, sas) {
+                          changestatustransaction(authority, "موفق");
+                          res.json({ status: "ok" });
+                          //sendSMSforres(reservation);
+                          res.end();
+                        })
+                      })
+                    })
+                  })
+                })
+              })
+            }
+          })
+        }
+      })
+    })
+  }
 })
 
 router.post("/changedocinfo", function (req, res) {
