@@ -963,6 +963,79 @@ router.post("/api/telepayment", function (req, res) {
 
 //--------------------------api---------------------------//
 
+
+
+router.post("/api/paymentdocandroid", function (req, res) {
+  if (req.body.usertoken == undefined) {
+    res.json({ data: "user token not found" })
+    res.end();
+  }
+  else {
+    if (req.body.choice == undefined) {
+      res.json({ data: "choice is not defined" })
+      res.end();
+    }
+    else {
+      MongoClient.connect(dburl, function (err, db) {
+        var dbo = db.db("mydb");
+        dbo.collection("Users").findOne({ token: req.body.usertoken }, function (err, user) {
+          if (user == null) {
+            res.json({ data: "user not found" });
+            db.close();
+            res.end();
+          }
+          else {
+            if (checkinterval(1)) {
+              dbo.collection("Doctors").findOne({ name: req.body.doctor }, function (err, doctor) {
+                if (doctor == null) {
+                  res.json({ data: "doctor not found" });
+                  db.close();
+                  res.end();
+                }
+                else {
+                  reservedata = req.body.choice.split(":");
+                  date = new myDate(Number(reservedata[4]), Number(reservedata[3]), Number(reservedata[2]));
+                  start = { hour: Number(reservedata[0]), min: Number(reservedata[1]) };
+                  temp = (start.hour * 60) + start.min + doctor.visitduration;
+                  end = { hour: Math.floor(temp / 60), min: temp % 60 }
+                  unavb = { start: start, end: end, date: date, dayofweek: new persianDate([Number(reservedata[2]), Number(reservedata[3]), Number(reservedata[4])]).format("dddd") };
+                  authority = new Date().getTime().toString();
+                  reservation = new Reservation(user._id, doctor._id, unavb, authority, req.body.cost);
+                  addtransaction(user._id, req.body.cost, authority, "bazarpayment");
+                  //----
+                  reservation.refid = req.body.RefNum;
+                  dbo.collection("Reservations").insertOne(reservation, function (err, result234) {
+                    dbo.collection("Doctors").updateOne({ _id: reservation.doctor }, { $addToSet: { reservations: reservation, unavailabletimes: reservation.time } }, function (err, ss) {
+                      dbo.collection("Users").updateOne({ _id: reservation.user }, { $addToSet: { reserves: reservation } }, function (err, ad) {
+                        dbo.collection("Doctors").findOne({ _id: reservation.doctor }, async function (err, doctor) {
+                          changestatustransaction(authority, "موفق");
+                          sendSMS("reserveACK", reservation.user, "Users", reservation.refid, doctor.name, new persianDate([reservation.time.date.year, reservation.time.date.month, reservation.time.date.day]).format("L"))
+                          username = await dbo.collection("Users").findOne({ _id: reservation.user })
+                          sendSMS("reserveACKdoc", reservation.doctor, "Doctors", reservation.refid, username.firstname + " " + username.lastname, new persianDate([reservation.time.date.year, reservation.time.date.month, reservation.time.date.day]).format("L"))
+                          res.json({status:"ok"})
+                          res.end();
+                        })
+                      })
+                    })
+                  })
+                }
+              })
+            }
+          }
+        })
+      })
+    }
+  }
+})
+
+router.post("/api/paymentHCandroid", function (req, res) {
+
+})
+
+router.post("/api/paymentticketandroid", function (req, res) {
+
+})
+
 router.post("/changedocinfo", function (req, res) {
   if (req.cookies.doctortoken == undefined) {
     res.redirect('/noaccess');
