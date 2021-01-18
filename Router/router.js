@@ -5818,7 +5818,7 @@ router.get("/reservation/:type/:HCname", function (req, res) {
 
 router.get("/ticket/:doctor", function (req, res) {
   if(req.cookies.usertoken== undefined){
-    res.redirect("/signup?from=/ticket" + req.params.doctor);
+    res.redirect("/signup?from=/ticket/" + req.params.doctor);
   }
   else{
     MongoClient.connect(dburl, function (err, db) {
