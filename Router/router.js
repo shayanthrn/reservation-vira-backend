@@ -5817,20 +5817,25 @@ router.get("/reservation/:type/:HCname", function (req, res) {
 
 
 router.get("/ticket/:doctor", function (req, res) {
-  MongoClient.connect(dburl, function (err, db) {
-    var dbo = db.db("mydb");
-    dbo.collection("Doctors").findOne({ name: req.params.doctor.split('-').join(' '), archived: false }, function (err, doctor) {
-      if (doctor == null) {
-        res.redirect("/")
-        res.end();
-      }
-      else {
-        res.render("ticket.ejs", { doctor: doctor });
-        res.end();
-        db.close();
-      }
+  if(req.cookies.usertoken== undefined){
+    res.redirect("/signup?from=/ticket" + req.params.doctor);
+  }
+  else{
+    MongoClient.connect(dburl, function (err, db) {
+      var dbo = db.db("mydb");
+      dbo.collection("Doctors").findOne({ name: req.params.doctor.split('-').join(' '), archived: false }, function (err, doctor) {
+        if (doctor == null) {
+          res.redirect("/")
+          res.end();
+        }
+        else {
+          res.render("ticket.ejs", { doctor: doctor });
+          res.end();
+          db.close();
+        }
+      })
     })
-  })
+  }
 })
 
 
