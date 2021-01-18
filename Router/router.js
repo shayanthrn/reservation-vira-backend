@@ -6014,10 +6014,70 @@ router.post("/ticketpaymenthandler", function (req, res) {
   }
 })
 
+router.get("/telepaymentafters",function(req,res){
+  if (req.cookies.usertoken == undefined) {
+    res.redirect("noaccess");
+  }
+  else {
+    req.body=req.session.resdata;
+    if (req.body.choice == undefined) {
+      res.redirect("back");
+    }
+    else {
+      MongoClient.connect(dburl, function (err, db) {
+        var dbo = db.db("mydb");
+        dbo.collection("Users").findOne({ token: req.cookies.usertoken }, function (err, user) {
+          if (user == null) {
+            res.redirect("/signup?from=" + query.from);
+            db.close();
+            res.end();
+          }
+          else {
+            dbo.collection("Doctors").findOne({ name: req.body.doctor }, function (err, doctor) {
+              var reservedata = req.body.choice.split(":");
+              var date = new myDate(Number(reservedata[2]), Number(reservedata[1]), Number(reservedata[0]));
+              var time = { start: reservedata[3], end: reservedata[4] };
+              var timeinfo = { time: time, date: date }
+              authority = new Date().getTime().toString();
+              reservation = new teleReservation(user._id, doctor._id, timeinfo, authority, req.body.cost);
+              request({
+                url: "https://fcp.shaparak.ir/ref-payment/RestServices/mts/generateTokenWithNoSign/",
+                method: "POST",
+                json: true,
+                body: {
+                  "WSContext": { "UserId": "21918395", "Password": "21918395" },
+                  "TransType": "EN_GOODS",
+                  "ReserveNum": authority,
+                  "Amount": req.body.cost + "0",
+                  "RedirectUrl": "https://reservation.drtajviz.com/telepaymenthandler",
+                }
+              }, (error, response, body) => {
+                if (body.Result == "erSucceed") {
+                  addtransaction(user._id, req.body.cost, authority, body.Token);
+                  dbo.collection("TempteleReserves").insertOne(reservation, function (err, reserve) {
+                    res.render("continuepayment.ejs", { token: body.Token });
+                    res.end();
+                  })
+                }
+                else {
+                  res.write("<html><body><p>there is a problem on bank server please try again later</p><a href='/' >go back to main page</a></body></html>");
+                  console.error(err);
+                  res.end();
+                }
+              })
+            })
+          }
+        })
+      })
+    }
+  }
+})
 
 router.post("/telepayment", function (req, res) {
   var query = url.parse(req.url, true).query;
   if (req.cookies.usertoken == undefined) {
+    req.session.resdata=req.body
+    req.session.payment="/telepaymentafters"
     res.redirect("/signup?from=" + query.from);
   }
   else {
@@ -6151,12 +6211,97 @@ router.post("/telepaymenthandler", function (req, res) {
   }
 })
 
+router.get("/paymentHCafters",function(req,res){
+  if (req.cookies.usertoken == undefined) {
+    res.redirect("noaccess");
+  }
+  else {
+    req.body=req.session.resdata
+    if (req.body.choice == undefined) {
+      res.redirect("back")
+      res.end();
+    }
+    else {
+      MongoClient.connect(dburl, function (err, db) {
+        var dbo = db.db("mydb");
+        dbo.collection("Users").findOne({ token: req.cookies.usertoken }, function (err, user) {
+          if (user == null) {
+            res.redirect("/signup" + "?from=" + query.from);
+            db.close();
+            res.end();
+          }
+          else {
+            if (checkinterval(1)) {
+              dbo.collection("HealthCenters").findOne({ name: req.body.HCname, type: req.body.type }, function (err, HC) {
+                if (HC == null) {
+                  db.close();
+                  res.redirect("/noaccess");
+                }
+                else {
+                  var catobj = null;
+                  if (HC.categories == undefined) {
+                    catobj = HC;
+                  }
+                  else {
+                    HC.categories.forEach(function (doc) {
+                      if (doc.name == req.body.cat) {
+                        catobj = doc;
+                      }
+                    })
+                    if (catobj == null) {
+                      res.redirect("/noaccess")
+                    }
+                  }
+                  reservedata = req.body.choice.split(":");
+                  date = new myDate(Number(reservedata[4]), Number(reservedata[3]), Number(reservedata[2]));
+                  start = { hour: Number(reservedata[0]), min: Number(reservedata[1]) };
+                  temp = (start.hour * 60) + start.min + catobj.visitduration;
+                  end = { hour: Math.floor(temp / 60), min: temp % 60 }
+                  unavb = { start: start, end: end, date: date, dayofweek: new persianDate([Number(reservedata[2]), Number(reservedata[3]), Number(reservedata[4])]).format("dddd") };
+                  authority = new Date().getTime().toString();
+                  reservation = new ReservationHC(user._id, HC._id, req.body.cat, unavb, authority, req.body.cost);
+                  request({
+                    url: "https://fcp.shaparak.ir/ref-payment/RestServices/mts/generateTokenWithNoSign/",
+                    method: "POST",
+                    json: true,
+                    body: {
+                      "WSContext": { "UserId": "21918395", "Password": "21918395" },
+                      "TransType": "EN_GOODS",
+                      "ReserveNum": authority,
+                      "Amount": req.body.cost + "0",
+                      "RedirectUrl": "https://reservation.drtajviz.com/paymenthandlerHC",
+                    }
+                  }, (error, response, body) => {
+                    if (body.Result == "erSucceed") {
+                      addtransaction(user._id, req.body.cost, authority, body.Token);
+                      dbo.collection("TempReservesHC").insertOne(reservation, function (err, reserve) {
+                        res.render("continuepayment.ejs", { token: body.Token });
+                        res.end();
+                      })
+                    }
+                    else {
+                      res.write("<html><body><p>there is a problem on bank server please try again later</p><a href='/' >go back to main page</a></body></html>");
+                      console.error(err);
+                      res.end();
+                    }
+                  })
+                }
+              })
+            }
+          }
+        })
+      })
+    }
+  }
+})
 
 router.post("/paymentHC", function (req, res) {
   var query = url.parse(req.url, true).query;
   req.session.prevurl = req.session.currurl;
   req.session.currurl = req.url;
   if (req.cookies.usertoken == undefined) {
+    req.session.resdata=req.body
+    req.session.payment="/paymentHCafters"
     res.redirect("/signup" + "?from=" + query.from);
   }
   else {
