@@ -7183,7 +7183,12 @@ router.post('/submitinfo', function (req, res) {
     res.cookie('usertoken', token1);
     dbo.collection("Users").updateOne({ phonenumber: req.body.phonenumber }, { $set: { sex: req.body.sex, firstname: req.body.firstname, lastname: req.body.lastname, birthdate: bdate, token: token1 } }, function (err, result) {
       db.close();
-      res.redirect('/');
+      if(req.session.resdata!=undefined && req.session.payment!=undefined){
+        res.redirect(req.session.payment);
+      }
+      else{
+        res.redirect(req.session.gobackafterlogin)
+      }
     })
   })
 })
