@@ -25,6 +25,31 @@
                 display: contents;
             }
         }
+        .stars__wrapper {
+            display: flex;
+        }
+
+        .star {
+        color: gray; /* gray color */
+        font-size: 24px; /* star size */
+        text-decoration: none; /* delete underline of link */
+        transition: .2s; /* smooth */
+        }
+
+        .star:hover,
+        .star:hover ~ .star {
+          color: #fb0; /* red color */
+        }
+
+        /* don't hover after choosing */
+        .wrapper__active .star:hover:not(.choosen),  
+        .wrapper__active .star:hover:not(.choosen) ~ .star:not(.choosen) {
+        color: gray;
+        }
+
+        .choosen {
+        color: #fb0; /* red color */
+        }
     </style>
 </head>
 
@@ -32,148 +57,227 @@
 
     <!-- header-responsive -->
     <%- include('header-responsive.ejs'); -%>
-    <!-- header-responsive -->
+        <!-- header-responsive -->
 
-    <div class="wrapper default">
+        <div class="wrapper default">
 
-        <!-- header -->
-        <%- include('header.ejs'); -%>
-        <!-- header -->
+            <!-- header -->
+            <%- include('header.ejs'); -%>
+                <!-- header -->
 
-        <!-- main -->
-        <main class="search-page default">
-            <div class="container">
-                <div class="row">
-                    <div class="col-12 col-sm-12 col-md-12 col-lg-12 order-2">
-                        <div class="listing default">
-                            <div class="tab-content default text-center">
-                                <div class="tab-pane active" id="related" role="tabpanel" aria-expanded="true">
-                                    <div class="container no-padding-right">
-                                        <ul class="row listing-items">
-                                            <li class="card rounded-20 my-3 medicaitve">
-                                                <div class="row p-3">
-                                                    <a class="row col-8 pr-0">
-                                                        <div class="col-5 profile text-center">
-                                                            <img src="<%= doctor.image %>"
-                                                                onerror="this.src='assets/img/altimage.png'"
-                                                                class=" rounded-circle ImageSize"
-                                                                style="min-height: 200px; max-height: 200px; min-width: 200px; max-width: 200px;">
+                <!-- main -->
+                <main class="search-page default">
+                    <div class="container">
+                        <div class="row">
+                            <div class="col-12 col-sm-12 col-md-12 col-lg-12 order-2">
+                                <div class="listing default">
+                                    <div class="tab-content default text-center">
+                                        <div class="tab-pane active" id="related" role="tabpanel" aria-expanded="true">
+                                            <div class="container no-padding-right">
+                                                <ul class="row listing-items">
+                                                    <li class="card rounded-20 my-3 medicaitve">
+                                                        <div class="row p-3">
+                                                            <a class="row col-8 pr-0">
+                                                                <div class="col-5 profile text-center">
+                                                                    
+                                                                    <img src="<%= doctor.image %>"
+                                                                        onerror="this.src='assets/img/altimage.png'"
+                                                                        class=" rounded-circle ImageSize"
+                                                                        style="min-height: 200px; max-height: 200px; min-width: 200px; max-width: 200px;">
+                        
+                                                                </div>
+                                                                <div class="col-9 text-right" style="font-size: 9px;">
+                                                                    <h1 class="text-18 font-weight-bold text-slate"
+                                                                        style="margin: 16px;">
+                                                                        <%= doctor.name %>
+                                                                    </h1>
+                                                                    <h2 class="text-16 py-2" style="margin: 16px;">
+                                                                        <% for(let i=0;i<doctor.categories.length;i++){
+                                                                            %>
+                                                                            <% if(i==doctor.categories.length-1){ %>
+                                                                                <%= doctor.categories[i] %>
+                                                                                    <% } else { %>
+                                                                                        <%= doctor.categories[i]+"," %>
+                                                                                            <% } %>
+                                                                                                <% } %>
+                                                                    </h2>
+                                                                    
+                                                                </div>
+                                                            </a>
+                                                            <div
+                                                                class="card col-4 border-0 bg-ice-blue rounded-10 p-3 h-100 text-14 align-items-start flex-column mydiv">
+                                                                <ul class="list-unstyled pr-0 text-right text-12"
+                                                                    style="height: 60%;">
+                                                                    <li class="py-1 text-gray-200 font-weight-medium">
+                                                                        <span class='stars__wrapper'>
+                                                                            امتیاز دهید:
+                                                                            <a href="/ratedoctor?point=5&id=<%=doctor._id%>&from=<%="/category/"+doctor.categories[0]+"/"+doctor.name.split(' ').join('-')%>" class='star'>★</a>
+                                                                            <a href="/ratedoctor?point=4&id=<%=doctor._id%>&from=<%="/category/"+doctor.categories[0]+"/"+doctor.name.split(' ').join('-')%>" class='star'>★</a>
+                                                                            <a href="/ratedoctor?point=3&id=<%=doctor._id%>&from=<%="/category/"+doctor.categories[0]+"/"+doctor.name.split(' ').join('-')%>" class='star'>★</a>
+                                                                            <a href="/ratedoctor?point=2&id=<%=doctor._id%>&from=<%="/category/"+doctor.categories[0]+"/"+doctor.name.split(' ').join('-')%>" class='star'>★</a>
+                                                                            <a href="/ratedoctor?point=1&id=<%=doctor._id%>&from=<%="/category/"+doctor.categories[0]+"/"+doctor.name.split(' ').join('-')%>" class='star'>★</a>
+                                                                        </span>
+                                                                    </li>
+                                                                    <li class="py-1 text-gray-200 font-weight-medium">
+                                                                        <span class='stars__wrapper'>
+                                                                            امتیاز :
+                                                                            <span class="points"><i class="fa fa-star" aria-hidden="true" style="color: #fb0;"></i><%if(doctor.countofvotes==0&&doctor.rate==0) { %>برای این دکتر امتیازی ثبت نشده است.<% }else{ %> <%= doctor.rate %> <% } %> </span>
+                                                                        </span>
+                                                                    </li>
+                                                                    <li class="py-1 text-gray-200 font-weight-medium">
+                                                                        <svg xmlns="http://www.w3.org/2000/svg"
+                                                                            width="24" height="24" viewBox="0 0 24 24"
+                                                                            fill="none" stroke="currentColor"
+                                                                            stroke-width="2" stroke-linecap="round"
+                                                                            stroke-linejoin="round"
+                                                                            class="feather feather-map-pin icon-20"
+                                                                            data-v-4606823b="">
+                                                                            <path
+                                                                                d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z">
+                                                                            </path>
+                                                                            <circle cx="12" cy="10" r="3"></circle>
+                                                                        </svg>
+                                                                        <span>آدرس:</span>
+                                                                        <span class="location text-gray-200 mr-3">
+                                                                            <%= doctor.address %>
+                                                                        </span>
+
+                                                                    </li>
+                                                                    <li class="py-1 text-gray-200 font-weight-medium">
+                                                                        <svg id="Capa_1"
+                                                                            enable-background="new 0 0 512 512"
+                                                                            height="24" viewBox="0 0 512 512" width="24"
+                                                                            xmlns="http://www.w3.org/2000/svg">
+                                                                            <g id="XMLID_2849_">
+                                                                                <g id="XMLID_400_">
+                                                                                    <path id="XMLID_708_"
+                                                                                        d="m451.976 98c-.001-2.601-.993-5.159-2.905-7.071l-88-88c-1.81-1.81-4.31-2.929-7.071-2.929h-284c-5.523 0-10 4.478-10 10v201c0 5.522 4.477 10 10 10s10-4.478 10-10v-191h264v78c0 5.522 4.477 10 10 10h78v384h-352v-191c0-5.522-4.477-10-10-10s-10 4.478-10 10v201c0 5.522 4.477 10 10 10h372c5.523 0 10-4.478 10-10v-404zm-87.976-10v-53.857l53.858 53.857z" />
+                                                                                    <path id="XMLID_711_"
+                                                                                        d="m157.924 268.922 75.888 75.888c6.117 6.117 14.152 9.176 22.188 9.176 8.035 0 16.071-3.059 22.188-9.176l75.888-75.888c14.042-14.043 21.776-32.714 21.776-52.573 0-19.858-7.734-38.529-21.776-52.572-26.737-26.736-68.937-28.814-98.076-6.233-29.138-22.581-71.338-20.503-98.075 6.233-14.043 14.043-21.777 32.714-21.777 52.573 0 19.858 7.734 38.529 21.776 52.572zm106.122 61.745c-4.437 4.438-11.656 4.436-16.092 0l-75.888-75.888c-1.306-1.306-2.535-2.668-3.69-4.078h42.758c3.297 0 6.382-1.625 8.247-4.345l11.881-17.326 14.109 53.892c1.025 3.916 4.309 6.827 8.319 7.376.454.062.908.092 1.358.092 3.521 0 6.828-1.862 8.636-4.963l20.25-34.726h59.685c-1.148 1.406-2.377 2.768-3.687 4.078zm-91.98-152.748c10.596-10.596 24.514-15.894 38.432-15.894 13.917 0 27.835 5.298 38.431 15.894 3.905 3.904 10.237 3.904 14.143 0 21.19-21.191 55.672-21.191 76.862 0 14.274 14.273 18.918 34.573 13.963 52.782h-75.707c-3.557 0-6.847 1.89-8.639 4.963l-10.958 18.791-13.526-51.663c-.991-3.787-4.101-6.647-7.957-7.319-3.86-.67-7.75.968-9.964 4.196l-21.28 31.032h-47.798c-1.257-4.621-1.921-9.434-1.921-14.352.001-14.517 5.654-28.165 15.919-38.43z" />
+                                                                                    <path id="XMLID_713_"
+                                                                                        d="m350.829 390h-189.658c-5.523 0-10 4.478-10 10s4.477 10 10 10h189.658c5.523 0 10-4.478 10-10s-4.477-10-10-10z" />
+                                                                                    <path id="XMLID_714_"
+                                                                                        d="m350.829 438h-189.658c-5.523 0-10 4.478-10 10s4.477 10 10 10h189.658c5.523 0 10-4.478 10-10s-4.477-10-10-10z" />
+                                                                                    <path id="XMLID_715_"
+                                                                                        d="m70 266c2.63 0 5.21-1.07 7.07-2.931 1.86-1.859 2.93-4.439 2.93-7.069s-1.07-5.21-2.93-7.07-4.44-2.93-7.07-2.93-5.21 1.069-7.07 2.93c-1.86 1.86-2.93 4.44-2.93 7.07s1.07 5.21 2.93 7.069c1.86 1.861 4.44 2.931 7.07 2.931z" />
+                                                                                </g>
+                                                                            </g>
+                                                                        </svg>
+                                                                        <span>سابقه:</span>
+                                                                        <span data-v-4606823b=""
+                                                                            class="experience text-gray-200 mr-3">
+                                                                            <%= doctor.background %>
+                                                                                سال
+                                                                        </span>
+                                                                    </li>
+                                                                    <li class="py-1 text-gray-200 font-weight-medium">
+                                                                        <% if(doctor.membershiptypes.includes("reserve")){
+                                                                            %>
+                                                                            <a href="reserve/<%= doctor.name.split(' ').join('-') %>"
+                                                                                class="btn btn-info">
+                                                                                نوبت گیری
+                                                                            </a>
+                                                                            <% } %>
+                                                                                <% if(doctor.membershiptypes.includes("teleconsultant")){
+                                                                                    %>
+                                                                                    <a href="telereserve/<%= doctor.name.split(' ').join('-') %>"
+                                                                                        class="btn btn-info"
+                                                                                        style="background-color: #25d366;">
+                                                                                        گفتگوی تلفنی
+                                                                                    </a>
+                                                                                    <% } %>
+                                                                                        <% if(doctor.membershiptypes.includes("chatconsultant")){
+                                                                                            %>
+                                                                                            <a href="ticket/<%= doctor.name.split(' ').join('-') %>"
+                                                                                                class="btn btn-info"
+                                                                                                style="background-color: #128c7e;">
+                                                                                                گفتگوی متنی
+                                                                                            </a>
+                                                                                            <% } %>
+                                                                    </li>
+                                                                </ul>
+                                                            </div>
                                                         </div>
-                                                        <div class="col-9 text-right" style="font-size: 9px;">
-                                                            <h1 class="text-18 font-weight-bold text-slate"
-                                                                style="margin: 16px;">
-                                                                <%= doctor.name %>
-                                                            </h1>
-                                                            <h2 class="text-16 py-2" style="margin: 16px;">
-                                                                <% for(let i=0;i<doctor.categories.length;i++){  %>
-                                                                <% if(i==doctor.categories.length-1){ %>
-                                                                <%= doctor.categories[i] %>
-                                                                <% } else { %>
-                                                                <%= doctor.categories[i]+"," %>
-                                                                <% } %>
-                                                                <% } %>
-                                                            </h2>
+                                                    </li>
+                                                </ul>
+                                                <p>
+                                                <h5 style="direction: rtl;">
+                                                    توضیحات:
+                                                </h5>
+                                                <%= doctor.description %>
+                                                    </p>
+                                                    <div class="comments-area default">
+                                                        <div class="box-tabs-tab"
+                                                            style="text-align: -webkit-right;margin-right: 50px;">
+                                                            <h5>
+                                                                <i class="now-ui-icons ui-2_chat-round"></i> نظرات
+                                                                کاربران:
+                                                            </h5>
+                                                            <a style="max-width: 200px;" href="/submitcomment?for=<%=doctor._id%>&from=/category/<%=doctor.categories[0] +"/"+doctor.name.split(' ').join('-') %>" class="btn btn-info">
+                                                                ثبت نظر
+                                                            </a>
                                                         </div>
-                                                    </a>
-                                                    <div
-                                                        class="card col-4 border-0 bg-ice-blue rounded-10 p-3 h-100 text-14 align-items-start flex-column mydiv">
-                                                        <ul class="list-unstyled pr-0 text-right text-12"
-                                                            style="height: 60%;">
-                                                            <li class="py-1 text-gray-200 font-weight-medium">
-                                                                <svg xmlns="http://www.w3.org/2000/svg" width="24"
-                                                                    height="24" viewBox="0 0 24 24" fill="none"
-                                                                    stroke="currentColor" stroke-width="2"
-                                                                    stroke-linecap="round" stroke-linejoin="round"
-                                                                    class="feather feather-map-pin icon-20"
-                                                                    data-v-4606823b="">
-                                                                    <path
-                                                                        d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z">
-                                                                    </path>
-                                                                    <circle cx="12" cy="10" r="3"></circle>
-                                                                </svg>
-                                                                <span>آدرس:</span>
-                                                                <span
-                                                                    class="location text-gray-200 mr-3"><%= doctor.address %></span>
-
+                                                        <% if(comments.length==0){ %>
+                                                            نظری موجود  نیست.
+                                                        <% } else {  %>
+                                                        <ol class="comment-list">
+                                                            <% for(let i=0;i<comments.length;i++) { %>
+                                                            <li>
+                                                                <div class="comment-body">
+                                                                    <div class="row">
+                                                                        <div class="col-md-3 col-sm-12">
+                                                                            <div class="comment-author">
+                                                                                توسط <%= comments[i].sender[0].firstname +" "+comments[i].sender[0].lastname %> در تاریخ <%= comments[i].time %>
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="col-md-9 col-sm-12 comment-content">
+                                                                            <div class="row">
+                                                                                <h5 style="margin-right: 50px;">
+                                                                                    <%= comments[i].title %>
+                                                                                </h5>
+                                                                            </div>
+                                                                            <p style="margin-right: 50px;margin:initial;word-break: break-all;">
+                                                                               <%= comments[i].content %>
+                                                                            </p>
+                                                                            <% if(comments[i].response != undefined ) { %>
+                                                                                <div class="row">
+                                                                                  <h5 style="margin-right: 50px;">
+                                                                                      پاسخ:
+                                                                                  </h5>
+                                                                                </div>
+                                                                                <p style="margin-right: 50px;margin:initial;word-break: break-all;">
+                                                                                  <%= comments[i].response %>
+                                                                                </p>
+                                                                                <% } %>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
                                                             </li>
-                                                            <li class="py-1 text-gray-200 font-weight-medium">
-                                                                <svg id="Capa_1" enable-background="new 0 0 512 512"
-                                                                    height="24" viewBox="0 0 512 512" width="24"
-                                                                    xmlns="http://www.w3.org/2000/svg">
-                                                                    <g id="XMLID_2849_">
-                                                                        <g id="XMLID_400_">
-                                                                            <path id="XMLID_708_"
-                                                                                d="m451.976 98c-.001-2.601-.993-5.159-2.905-7.071l-88-88c-1.81-1.81-4.31-2.929-7.071-2.929h-284c-5.523 0-10 4.478-10 10v201c0 5.522 4.477 10 10 10s10-4.478 10-10v-191h264v78c0 5.522 4.477 10 10 10h78v384h-352v-191c0-5.522-4.477-10-10-10s-10 4.478-10 10v201c0 5.522 4.477 10 10 10h372c5.523 0 10-4.478 10-10v-404zm-87.976-10v-53.857l53.858 53.857z" />
-                                                                            <path id="XMLID_711_"
-                                                                                d="m157.924 268.922 75.888 75.888c6.117 6.117 14.152 9.176 22.188 9.176 8.035 0 16.071-3.059 22.188-9.176l75.888-75.888c14.042-14.043 21.776-32.714 21.776-52.573 0-19.858-7.734-38.529-21.776-52.572-26.737-26.736-68.937-28.814-98.076-6.233-29.138-22.581-71.338-20.503-98.075 6.233-14.043 14.043-21.777 32.714-21.777 52.573 0 19.858 7.734 38.529 21.776 52.572zm106.122 61.745c-4.437 4.438-11.656 4.436-16.092 0l-75.888-75.888c-1.306-1.306-2.535-2.668-3.69-4.078h42.758c3.297 0 6.382-1.625 8.247-4.345l11.881-17.326 14.109 53.892c1.025 3.916 4.309 6.827 8.319 7.376.454.062.908.092 1.358.092 3.521 0 6.828-1.862 8.636-4.963l20.25-34.726h59.685c-1.148 1.406-2.377 2.768-3.687 4.078zm-91.98-152.748c10.596-10.596 24.514-15.894 38.432-15.894 13.917 0 27.835 5.298 38.431 15.894 3.905 3.904 10.237 3.904 14.143 0 21.19-21.191 55.672-21.191 76.862 0 14.274 14.273 18.918 34.573 13.963 52.782h-75.707c-3.557 0-6.847 1.89-8.639 4.963l-10.958 18.791-13.526-51.663c-.991-3.787-4.101-6.647-7.957-7.319-3.86-.67-7.75.968-9.964 4.196l-21.28 31.032h-47.798c-1.257-4.621-1.921-9.434-1.921-14.352.001-14.517 5.654-28.165 15.919-38.43z" />
-                                                                            <path id="XMLID_713_"
-                                                                                d="m350.829 390h-189.658c-5.523 0-10 4.478-10 10s4.477 10 10 10h189.658c5.523 0 10-4.478 10-10s-4.477-10-10-10z" />
-                                                                            <path id="XMLID_714_"
-                                                                                d="m350.829 438h-189.658c-5.523 0-10 4.478-10 10s4.477 10 10 10h189.658c5.523 0 10-4.478 10-10s-4.477-10-10-10z" />
-                                                                            <path id="XMLID_715_"
-                                                                                d="m70 266c2.63 0 5.21-1.07 7.07-2.931 1.86-1.859 2.93-4.439 2.93-7.069s-1.07-5.21-2.93-7.07-4.44-2.93-7.07-2.93-5.21 1.069-7.07 2.93c-1.86 1.86-2.93 4.44-2.93 7.07s1.07 5.21 2.93 7.069c1.86 1.861 4.44 2.931 7.07 2.931z" />
-                                                                        </g>
-                                                                    </g>
-                                                                </svg>
-                                                                <span>سابقه:</span>
-                                                                <span data-v-4606823b=""
-                                                                    class="experience text-gray-200 mr-3"><%= doctor.background %>
-                                                                    سال</span>
-                                                            </li>
-                                                            <li class="py-1 text-gray-200 font-weight-medium">
-                                                                <% if(doctor.membershiptypes.includes("reserve")){ %>
-                                                                <a href="reserve/<%= doctor.name.split(' ').join('-') %>"
-                                                                    class="btn btn-info">
-                                                                    نوبت گیری
-                                                                </a>
-                                                                <% } %>
-                                                                <% if(doctor.membershiptypes.includes("teleconsultant")){ %>
-                                                                <a href="telereserve/<%= doctor.name.split(' ').join('-') %>"
-                                                                    class="btn btn-info"
-                                                                    style="background-color: #25d366;">
-                                                                    گفتگوی تلفنی
-                                                                </a>
-                                                                <% } %>
-                                                                <% if(doctor.membershiptypes.includes("chatconsultant")){ %>
-                                                                <a href="ticket/<%= doctor.name.split(' ').join('-') %>"
-                                                                    class="btn btn-info"
-                                                                    style="background-color: #128c7e;">
-                                                                    گفتگوی متنی
-                                                                </a>
-                                                                <% } %>
-                                                            </li>
-                                                        </ul>
+                                                            <% } %>
+                                                        </ol>
+                                                        <% } %>
                                                     </div>
-                                                </div>
-                                            </li>
-                                        </ul>
-                                        <p>
-                                        <h5 style="direction: rtl;">
-                                            توضیحات:
-                                        </h5>
-                                        <%= doctor.description %>
-                                        </p>
-                                    </div>
-                                </div>
-                                <div class="tab-pane" id="most-view" role="tabpanel" aria-expanded="false">
-                                    <div class="container no-padding-right">
-                                        <ul class="row listing-items">
-                                        </ul>
+                                            </div>
+                                        </div>
+                                        <div class="tab-pane" id="most-view" role="tabpanel" aria-expanded="false">
+                                            <div class="container no-padding-right">
+                                                <ul class="row listing-items">
+                                                </ul>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                </div>
-            </div>
-        </main>
-        <!-- main -->
+                </main>
+                <!-- main -->
 
-        <!-- footer -->
-        <%- include('footer.ejs'); -%>
-        <!-- footer -->
+                <!-- footer -->
+                <%- include('footer.ejs'); -%>
+                    <!-- footer -->
 
-    </div>
+        </div>
 </body>
 <!--   Core JS Files   -->
 <script src="assets/js/core/jquery.3.2.1.min.js" type="text/javascript"></script>

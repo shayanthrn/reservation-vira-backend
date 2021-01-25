@@ -33,84 +33,8 @@
 
   <div class="container-fluid">
     <div class="row">
-      
-      <nav class="col-lg-3 col-xl-2 d-lg-block sidebar collapse" id="navbarTogglerDemo">
-        <div class="sidebar-sticky">
-          <ul class="nav flex-column">
-            
-            <li class="nav-item">
-              <a class="nav-link" href="/adminpanel/dashboard" >
-                <i class="fa fa-tachometer"></i>
-                داشبورد
-              </a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link " href="/adminpanel/chats" >
-                <i class="fa fa-commenting"></i>
-                گفتگو های متنی
-              </a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="/AdminPanel/telereserves" >
-                <i class="fa fa-phone"></i>
-                رزرو های تلفنی
-              </a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="/adminpanel/doctors" >
-                <i class="fa fa-user-md"></i>
-                دکتر ها
-              </a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="/adminpanel/healthcenters" >
-                <i class="fa fa-heartbeat"></i>
-                مراکز درمانی
-              </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="/adminpanel/visittimes">
-                  <i class="fa fa-calendar"></i>
-                  تعیین زمانبندی
-                </a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link " href="/adminpanel/costmanage">
-                <i class="fa fa-calendar"></i>
-                تعیین هزینه ها
-              </a>
-          </li>
-            <li class="nav-item">
-              <a class="nav-link" href="/adminpanel/categories" >
-                <i class="fa fa-book"></i>
-                تخصص ها
-              </a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="/adminpanel/patients" >
-                <i class="fa fa-users"></i>
-                بیماران
-              </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link active" href="/adminpanel/transactions" >
-                  <i class="fa fa-money"></i>
-                  تراکنش های مالی
-                </a>
-              </li>
-            <li class="nav-item">
-              <a class="nav-link" href="/exit" >
-                <i class="fa fa-sign-out"></i>
-                خروج
-              </a>
-            </li>
-          </ul>
-
-          </div>
-      </nav>
-
-
-      
+      <%- include('navbar.ejs',{flag:11}); -%>
+    
       <main role="main" class=" ml-sm-auto col-lg-9 col-xl-10 px-4" id="reserve-list">
         <div class="container-fluid">
           <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">

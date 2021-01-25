@@ -16,6 +16,8 @@ class Doctor{
         this.visitduration=60;
         this.visitcost=3000;
         this.description=description;
+        this.rate=0;
+        this.countofvotes=0;
         this.membershiptypes=membershiptypes;
         if(membershiptypes.includes("teleconsultant")){
             this.teletimes=[]

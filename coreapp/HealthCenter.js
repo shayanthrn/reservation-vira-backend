@@ -13,6 +13,8 @@ class HealthCenter{
         this.directphonenumber=directphonenumber;
         this.background=background;
         this.address=address;
+        this.rate=0;
+        this.countofvotes=0;
         if(systype=="A"){
             this.categories=[];
         }

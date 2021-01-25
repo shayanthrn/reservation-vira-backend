@@ -19,6 +19,7 @@
   <link rel="stylesheet" href="https://unpkg.com/persian-datepicker@latest/dist/css/persian-datepicker.min.css">
   <link href="assets/css/main.css" rel="stylesheet" />
   
+  
 </head>
 
 <body>
@@ -34,69 +35,53 @@
   <div class="container-fluid">
     <div class="row">
       
-      <%- include('navbar.ejs',{flag:2}); -%>
+      <%- include('navbar.ejs',{flag:6}); -%>
       
       <main role="main" class=" ml-sm-auto col-lg-9 col-xl-10 px-4" id="reserve-list">
         <div class="container-fluid">
           <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-            <h1 class="h2">گفتگو های متنی</h1>
-          </div>
-          <form autocomplete="off" action="/AdminPanel/chats" method="POST">
-          <div class='row'>
-            <div class="col-xl-2 col-lg-6">
-              <div class="form-group">
-                <label for="name">
-                  نام دکتر
-                </label>
-                <select class="form-control" id="name" name="name" required>
-                    <option disabled selected>---انتخاب ---</option>
-                    <% for (let i = 0 ; i < doctors.length ; i++ ) {  %>
-                        <option value="<%= doctors[i].name %>"><%= doctors[i].name %></option>
-                    <% } %>
-                  </select>
-              </div>
-              <button type="submit" class="btn btn-success submit-button float-right" id="reserveTimesRequestButton">
-                <i class="fa fa-check"></i>
-                 نمایش
-              </button>
-            </div>
-          </div>
-          </form>
-
-          <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-            <h1 class="h2">لیست گفتگو ها</h1>
+            <h1 class="h2">لیست  نظرات</h1>
           </div>
           
 
           <div class="row">
             <div class="col">
               <div class="table-responsive">
-                <% if(chats.length!=0) { %>
-                <table class="table table-bordered">
-                  <thead>
-                    <tr>
-                      <th scope="col">#</th>
-                      <th scope="col">عملیات</th>
-                      <th scope="col">وضعیت</th>
-                      <th scope="col">شماره همراه بیمار</th>
-                    </tr>
-                  </thead>
-                  <tbody id="patients-list">
-                    <% for( let i=0 ; i < chats.length ; i++ ) { %>
-                    <tr>
-                      <th scope="row"><%= i+1 %></th>
-                      <td><a href="<%= "/AdminPanel/chats/"+ chats[i]._id %>" class="btn btn-info" >مشاهده جزئیات</a></td>
-                      <td><% if(chats.finished==true) {  %>
-                            <p>پایان یافته</p>
-                            <% } else { %>
-                            <p>فعال </p>
-                            <% }  %>
-                      </td>
-                      <td><%= chats[i].userphone %></td>
-                    </tr>
-                    <% } %>
-                  </tbody>
-                </table>
+                <% if(comments.length!=0) { %>
+                    <ol class="comment-list">
+                        <% for(let i=0;i<comments.length;i++) { %>
+                            <li>
+                                <div class="comment-body">
+                                    <div class="row">
+                                        <div class="col-md-3 col-sm-12">
+                                            <div class="comment-author">
+                                                توسط <%= comments[i].sender[0].firstname +" "+comments[i].sender[0].lastname %> در تاریخ <%= comments[i].time %>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-9 col-sm-12 comment-content">
+                                            <div class="row">
+                                                <h5 style="margin-right: 50px;">
+                                                    <%= comments[i].title %>
+                                                </h5>
+                                            </div>
+                                            <p style="margin-right: 50px;margin:initial;word-break: break-all;">
+                                               <%= comments[i].content %>
+                                            </p>
+                                            <% if(comments[i].status=="pending") { %>
+                                            <a class="btn btn-info" href="acceptcomment?id=<%= comments[i]._id %>">
+                                                تایید نظر
+                                            </a>
+                                            <% } %>
+                                            <a class="btn btn-danger" href="removecomment?id=<%= comments[i]._id %>" >
+                                                حذف
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </li>
+                            <% } %>
+                    </ol>
+                    
                 <% } else { %>
                   موردی جهت نمایش وجود ندارد
                 <% } %>
@@ -108,8 +93,6 @@
       
     </div>
   </div>
-  
-
 
   
   <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>

@@ -20,6 +20,7 @@ var Transaction = require('../coreapp/Transaction.js');
 var dburl = "mongodb://localhost:27017/";          //url of database            auth o doros kon 
 var lodash = require('lodash');
 var HealthCenter = require('../coreapp/HealthCenter.js');
+var Comment = require("../coreapp/Comment.js")
 var time = require('../coreapp/resTime.js');
 var persianDate = require('persian-date');
 var myDate = require('../coreapp/myDate.js');
@@ -4197,6 +4198,175 @@ router.get("/AdminPanel/HealthCenters/:hcname", function (req, res) {
 })
 
 
+router.get("/AdminPanel/comments",function(req,res){
+  if (req.cookies.admintoken == undefined) {
+    res.redirect('/noaccess');
+  }
+  else {
+    MongoClient.connect(dburl, function (err, db) {
+      var dbo = db.db("mydb");
+      dbo.collection("Admins").findOne({ token: req.cookies.admintoken }, async function (err, result) {
+        if (result == null) {
+          db.close();
+          res.redirect('/noaccess');
+        }
+        else {
+          var doctors = await dbo.collection("Doctors").find().toArray()
+          res.render("AdminPanel/comments.ejs", {doctors:doctors, comments:[] })
+          res.end();
+          db.close();
+        }
+      })
+    })
+  }
+})
+
+router.post("/AdminPanel/comments",function(req,res){
+  if (req.cookies.admintoken == undefined) {
+    res.redirect('/noaccess');
+  }
+  else {
+    MongoClient.connect(dburl, function (err, db) {
+      var dbo = db.db("mydb");
+      dbo.collection("Admins").findOne({ token: req.cookies.admintoken },function (err, result) {
+        if (result == null) {
+          db.close();
+          res.redirect('/noaccess');
+        }
+        else {
+          dbo.collection("Doctors").findOne({name:req.body.name},async function(err,doctor){
+            if(doctor!=null){
+              comments=await dbo.collection("Comments").aggregate([{ $match:{for:doctor._id}},{ $lookup: { from: "Users", localField: "senderid", foreignField: "_id", as: "sender" } },{$project:{"sender.firstname":1,"sender.lastname":1,"title":1,"content":1,"time":1,"status":1,"response":1}}]).toArray();
+              var doctors = await dbo.collection("Doctors").find().toArray()
+              res.render("AdminPanel/comments.ejs", {doctors:doctors, comments:comments })
+              res.end();
+              db.close();
+            }
+            else{
+              res.redirect("/adminpanel/comments")
+            }
+          })
+        }
+      })
+    })
+  }
+})
+
+router.get("/adminpanel/pendingcomments",function(req,res){
+  if (req.cookies.admintoken == undefined) {
+    res.redirect('/noaccess');
+  }
+  else {
+    MongoClient.connect(dburl, function (err, db) {
+      var dbo = db.db("mydb");
+      dbo.collection("Admins").findOne({ token: req.cookies.admintoken },async function (err, result) {
+        if (result == null) {
+          db.close();
+          res.redirect('/noaccess');
+        }
+        else {
+          comments=await dbo.collection("Comments").aggregate([{ $match:{status:"pending"}},{ $lookup: { from: "Users", localField: "senderid", foreignField: "_id", as: "sender" } },{$project:{"sender.firstname":1,"sender.lastname":1,"title":1,"content":1,"time":1,"status":1}}]).toArray();
+          res.render("AdminPanel/pendingcomments.ejs", {comments:comments })
+          res.end();
+          db.close();
+        }
+      })
+    })
+  }
+})
+
+router.get("/acceptcomment",function(req,res){
+  var query = url.parse(req.url, true).query;
+  if (req.cookies.admintoken == undefined) {
+    res.redirect('/noaccess');
+  }
+  else {
+    MongoClient.connect(dburl, function (err, db) {
+      var dbo = db.db("mydb");
+      dbo.collection("Admins").findOne({ token: req.cookies.admintoken }, async function (err, result) {
+        if (result == null) {
+          db.close();
+          res.redirect('/noaccess');
+        }
+        else {
+          id=new ObjectID(query.id);
+          dbo.collection("Comments").updateOne({_id:id},{$set:{status:"ok"}});
+          res.redirect("/adminpanel/pendingcomments")
+        }
+      })
+    })
+  }
+})
+
+router.get("/answercomment",function(req,res){
+  var query = url.parse(req.url, true).query;
+  if (req.cookies.admintoken == undefined) {
+    res.redirect('/noaccess');
+  }
+  else {
+    MongoClient.connect(dburl, function (err, db) {
+      var dbo = db.db("mydb");
+      dbo.collection("Admins").findOne({ token: req.cookies.admintoken }, async function (err, result) {
+        if (result == null) {
+          db.close();
+          res.redirect('/noaccess');
+        }
+        else {
+          res.render("AdminPanel/answercomment.ejs",{id:query.id});
+          res.end();
+        }
+      })
+    })
+  }
+})
+
+router.post("/answercomment",function(req,res){
+  var query = url.parse(req.url, true).query;
+  if (req.cookies.admintoken == undefined) {
+    res.redirect('/noaccess');
+  }
+  else {
+    MongoClient.connect(dburl, function (err, db) {
+      var dbo = db.db("mydb");
+      dbo.collection("Admins").findOne({ token: req.cookies.admintoken }, async function (err, result) {
+        if (result == null) {
+          db.close();
+          res.redirect('/noaccess');
+        }
+        else {
+          id=new ObjectID(query.id)
+          dbo.collection("Comments").updateOne({_id:id},{$set:{response:req.body.content}});
+          res.redirect("/adminpanel/comments")
+        }
+      })
+    })
+  }
+})
+
+router.get("/removecomment",function(req,res){
+  var query = url.parse(req.url, true).query;
+  if (req.cookies.admintoken == undefined) {
+    res.redirect('/noaccess');
+  }
+  else {
+    MongoClient.connect(dburl, function (err, db) {
+      var dbo = db.db("mydb");
+      dbo.collection("Admins").findOne({ token: req.cookies.admintoken }, async function (err, result) {
+        if (result == null) {
+          db.close();
+          res.redirect('/noaccess');
+        }
+        else {
+          id=new ObjectID(query.id);
+          dbo.collection("Comments").deleteOne({_id:id},function(err,result){
+            res.redirect("/adminpanel/comments")
+          });
+        }
+      })
+    })
+  }
+})
+
 router.get("/AdminPanel/Chats", function (req, res) {
   if (req.cookies.admintoken == undefined) {
     res.redirect('/noaccess');
@@ -5817,10 +5987,10 @@ router.get("/reservation/:type/:HCname", function (req, res) {
 
 
 router.get("/ticket/:doctor", function (req, res) {
-  if(req.cookies.usertoken== undefined){
+  if (req.cookies.usertoken == undefined) {
     res.redirect("/signup?from=/ticket/" + req.params.doctor);
   }
-  else{
+  else {
     MongoClient.connect(dburl, function (err, db) {
       var dbo = db.db("mydb");
       dbo.collection("Doctors").findOne({ name: req.params.doctor.split('-').join(' '), archived: false }, function (err, doctor) {
@@ -6019,12 +6189,12 @@ router.post("/ticketpaymenthandler", function (req, res) {
   }
 })
 
-router.get("/telepaymentafters",function(req,res){
+router.get("/telepaymentafters", function (req, res) {
   if (req.cookies.usertoken == undefined) {
     res.redirect("noaccess");
   }
   else {
-    req.body=req.session.resdata;
+    req.body = req.session.resdata;
     if (req.body.choice == undefined) {
       res.redirect("back");
     }
@@ -6081,8 +6251,8 @@ router.get("/telepaymentafters",function(req,res){
 router.post("/telepayment", function (req, res) {
   var query = url.parse(req.url, true).query;
   if (req.cookies.usertoken == undefined) {
-    req.session.resdata=req.body
-    req.session.payment="/telepaymentafters"
+    req.session.resdata = req.body
+    req.session.payment = "/telepaymentafters"
     res.redirect("/signup?from=" + query.from);
   }
   else {
@@ -6138,6 +6308,58 @@ router.post("/telepayment", function (req, res) {
     }
   }
 })
+
+
+router.get("/submitcomment", function (req, res) {
+  var query = url.parse(req.url, true).query;
+  if (req.cookies.usertoken == undefined) {
+    res.redirect("/signup" + "?from=" + query.from);
+    db.close();
+    res.end();
+  }
+  else {
+    MongoClient.connect(dburl, function (err, db) {
+      var dbo = db.db("mydb");
+      dbo.collection("Users").findOne({ token: req.cookies.usertoken }, function (err, user) {
+        if (user == null) {
+          res.redirect("/signup" + "?from=" + query.from);
+          db.close();
+          res.end();
+        }
+        else {
+          categories().then(basiccategories => {
+            res.render("comment.ejs", { categories: basiccategories, user: "" ,object:query.for,from:query.from});
+            res.end();
+          })
+        }
+      })
+    })
+  }
+})
+
+router.post("/addcomment",function(req,res){
+  if (req.cookies.usertoken == undefined) {
+    res.redirect("noaccess");
+  }
+  else {
+    MongoClient.connect(dburl, function (err, db) {
+      var dbo = db.db("mydb");
+      dbo.collection("Users").findOne({ token: req.cookies.usertoken }, function (err, user) {
+        if (user == null) {
+          res.redirect("noaccess");
+        }
+        else {
+          id=new ObjectID(req.body.id)
+          comment= new Comment(req.body.title,req.body.content,user._id,id);
+          dbo.collection("Comments").insertOne(comment,function(err,result){
+            res.redirect(req.body.from);
+          })
+        }
+      })
+    })
+  }
+})
+
 
 router.post("/telepaymenthandler", function (req, res) {
   // if (req.headers.referer == "https://fcp.shaparak.ir/") {
@@ -6216,12 +6438,12 @@ router.post("/telepaymenthandler", function (req, res) {
   }
 })
 
-router.get("/paymentHCafters",function(req,res){
+router.get("/paymentHCafters", function (req, res) {
   if (req.cookies.usertoken == undefined) {
     res.redirect("noaccess");
   }
   else {
-    req.body=req.session.resdata
+    req.body = req.session.resdata
     if (req.body.choice == undefined) {
       res.redirect("back")
       res.end();
@@ -6305,8 +6527,8 @@ router.post("/paymentHC", function (req, res) {
   req.session.prevurl = req.session.currurl;
   req.session.currurl = req.url;
   if (req.cookies.usertoken == undefined) {
-    req.session.resdata=req.body
-    req.session.payment="/paymentHCafters"
+    req.session.resdata = req.body
+    req.session.payment = "/paymentHCafters"
     res.redirect("/signup" + "?from=" + query.from);
   }
   else {
@@ -6546,17 +6768,18 @@ router.get("/category/:Category/:Doctor", function (req, res) {
         db.close();
       }
       else {
-        dbo.collection("Users").findOne({ token: req.cookies.usertoken }, function (err, user) {
+        dbo.collection("Users").findOne({ token: req.cookies.usertoken },async function (err, user) {
+          comments=await dbo.collection("Comments").aggregate([{ $match:{for:result._id,status:"ok" }},{ $lookup: { from: "Users", localField: "senderid", foreignField: "_id", as: "sender" } },{$project:{"sender.firstname":1,"sender.lastname":1,"title":1,"content":1,"time":1,"response":1}}]).toArray();
           if (user == null) {
             categories().then(basiccategories => {
-              res.render("doctorpage.ejs", { doctor: result, categories: basiccategories, user: "" });
+              res.render("doctorpage.ejs", { doctor: result, categories: basiccategories, user: "" ,comments:comments});
               db.close();
               res.end();
             })
           }
           else {
             categories().then(basiccategories => {
-              res.render("doctorpage.ejs", { doctor: result, categories: basiccategories, user: user });
+              res.render("doctorpage.ejs", { doctor: result, categories: basiccategories, user: user,comments:comments });
               db.close();
               res.end();
             })
@@ -6565,6 +6788,46 @@ router.get("/category/:Category/:Doctor", function (req, res) {
       }
     })
   })
+})
+
+router.get("/ratedoctor",function(req,res){
+  var query=url.parse(req.url,true).query;
+  if(req.cookies.usertoken==undefined){
+    res.redirect("/signup?from="+query.from)
+  }
+  else{
+    MongoClient.connect(dburl,function(err,db){
+      var dbo=db.db("mydb");
+      dbo.collection("Users").findOne({token:req.cookies.usertoken},function(err,user){
+        if(user==null){
+          res.redirect("/signup?from="+query.from)
+        }
+        else{
+          id=new ObjectID(query.id);
+          if(user.votedids.includes(query.id)){
+            res.redirect(query.from);
+          }
+          else{
+            dbo.collection("Doctors").findOne({_id:id},function(err,doctor){
+              sum=doctor.rate*doctor.countofvotes;
+              sum+=Number(query.point);
+              newc=doctor.countofvotes+1;
+              newr=sum/newc;
+              dbo.collection("Doctors").updateOne({_id:id},{$set:{rate:newr.toPrecision(2),countofvotes:newc}});
+              dbo.collection("Users").updateOne({token:req.cookies.usertoken},{$addToSet:{votedids:query.id}});
+              res.redirect("/rated?from="+query.from);
+            })
+          }
+        }
+      })
+    })
+  }
+})
+
+router.get("/rated",function(req,res){
+  var query=url.parse(req.url,true).query;
+  res.render("rated.ejs",{from:query.from});
+  res.end();
 })
 
 router.get("/reserve/:Doctor", function (req, res) {
@@ -6669,13 +6932,13 @@ router.get("/telereserve/:Doctor", function (req, res) {
   })
 })
 
-router.get("/paymentafters",function(req,res){
+router.get("/paymentafters", function (req, res) {
   if (req.cookies.usertoken == undefined) {
     res.redirect("/noaccess");
     res.end();
   }
   else {
-    req.body=req.session.resdata
+    req.body = req.session.resdata
     if (req.body.choice == undefined) {
       res.redirect("back")
       res.end();
@@ -6745,8 +7008,8 @@ router.post("/payment", function (req, res) {
   req.session.prevurl = req.session.currurl;
   req.session.currurl = req.url;
   if (req.cookies.usertoken == undefined) {
-    req.session.resdata=req.body
-    req.session.payment="/paymentafters"
+    req.session.resdata = req.body
+    req.session.payment = "/paymentafters"
     res.redirect("/signup" + "?from=" + query.from);
     res.end();
   }
@@ -7128,23 +7391,27 @@ router.post("/verifynumber", function (req, res) {
               else {
                 if (result4 != "") {
                   res.cookie('usertoken', result4.token);
+                  var hour = 3600000;
+                  req.session.cookie.maxAge = 30 * 24 * hour;
                   db.close();
-                  if(req.session.resdata!=undefined && req.session.payment!=undefined){
+                  if (req.session.resdata != undefined && req.session.payment != undefined) {
                     res.redirect(req.session.payment);
                   }
-                  else{
+                  else {
                     res.redirect(req.session.gobackafterlogin)
                   }
                 }
                 else {
                   let token1 = tokgen.generate();
                   res.cookie('usertoken', token1);
+                  var hour = 3600000;
+                  req.session.cookie.maxAge = 30 * 24 * hour;
                   dbo.collection("Users").updateOne({ phonenumber: req.body.phonenumber }, { $set: { token: token1 } }, function (err, result5) {
                     db.close();
-                    if(req.session.resdata!=undefined && req.session.payment!=undefined){
+                    if (req.session.resdata != undefined && req.session.payment != undefined) {
                       res.redirect(req.session.payment);
                     }
-                    else{
+                    else {
                       res.redirect(req.session.gobackafterlogin)
                     }
                   })
@@ -7181,12 +7448,14 @@ router.post('/submitinfo', function (req, res) {
     }
     let token1 = tokgen.generate();
     res.cookie('usertoken', token1);
+    var hour = 3600000;
+    req.session.cookie.maxAge = 30 * 24 * hour;
     dbo.collection("Users").updateOne({ phonenumber: req.body.phonenumber }, { $set: { sex: req.body.sex, firstname: req.body.firstname, lastname: req.body.lastname, birthdate: bdate, token: token1 } }, function (err, result) {
       db.close();
-      if(req.session.resdata!=undefined && req.session.payment!=undefined){
+      if (req.session.resdata != undefined && req.session.payment != undefined) {
         res.redirect(req.session.payment);
       }
-      else{
+      else {
         res.redirect(req.session.gobackafterlogin)
       }
     })
@@ -7228,6 +7497,8 @@ router.post('/loginDoc', function (req, res) {
           }
           dbo.collection("Doctors").updateOne({ username: req.body.username }, { $set: { token: mytoken } }, function (err, result2) {
             res.cookie('doctortoken', mytoken);
+            var hour = 3600000;
+            req.session.cookie.maxAge = 30 * 24 * hour;
             db.close();
             res.redirect('/Doctorpanel/dashboard');
           })
@@ -7271,6 +7542,8 @@ router.post('/loginHC', function (req, res) {
           }
           dbo.collection("HealthCenters").updateOne({ username: req.body.username }, { $set: { token: mytoken } }, function (err, result2) {
             res.cookie('HCtoken', mytoken);
+            var hour = 3600000;
+            req.session.cookie.maxAge = 30 * 24 * hour;
             db.close();
             res.redirect('/HCpanel/dashboard');
           })
@@ -7314,6 +7587,8 @@ router.post('/loginAdmin', function (req, res) {
           }
           dbo.collection("Admins").updateOne({ username: req.body.username }, { $set: { token: mytoken } }, function (err, result2) {
             res.cookie('admintoken', mytoken);
+            var hour = 3600000;
+            req.session.cookie.maxAge = 30 * 24 * hour;
             db.close();
             res.redirect('/AdminPanel/dashboard');
           })
