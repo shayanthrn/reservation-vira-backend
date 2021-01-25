@@ -6328,7 +6328,7 @@ router.get("/submitcomment", function (req, res) {
         }
         else {
           categories().then(basiccategories => {
-            res.render("comment.ejs", { categories: basiccategories, user: "" ,object:query.for,from:query.from});
+            res.render("Comment.ejs", { categories: basiccategories, user: "" ,object:query.for,from:query.from});
             res.end();
           })
         }
