@@ -55,10 +55,24 @@
                 <select class="form-control" id="name" name="name" required>
                     <option disabled selected>---انتخاب ---</option>
                     <% for (let i = 0 ; i < doctors.length ; i++ ) {  %>
-                        <option value="<%= doctors[i].name %>"><%= doctors[i].name %></option>
+                        <option name="objects" value="<%= doctors[i].name %>"><%= doctors[i].name %></option>
                     <% } %>
                   </select>
+                  <input oninput="fastsearch()" id="searchinput" style="margin-top: 20px;" type="text" placeholder="جستجوی سریع">
               </div>
+              <script>
+                function fastsearch(){
+                    value=document.getElementById("searchinput").value;
+                    document.getElementsByName("objects").forEach(function(doc){
+                        if(doc.value.includes(value)){
+                            document.getElementById("name").value=doc.value
+                        }
+                        else{
+                          
+                        }
+                    })
+                }
+            </script>
               <button type="submit" class="btn btn-success submit-button float-right" id="reserveTimesRequestButton">
                 <i class="fa fa-check"></i>
                  نمایش
@@ -66,7 +80,41 @@
             </div>
           </div>
           </form>
-
+          <form autocomplete="off" action="/AdminPanel/comments" method="POST">
+            <div class='row'>
+              <div class="col-xl-2 col-lg-6">
+                <div class="form-group">
+                  <label for="name">
+                    نام مرکز
+                  </label>
+                  <select class="form-control" id="name2" name="name2" required>
+                      <option disabled selected>---انتخاب ---</option>
+                      <% for (let i = 0 ; i < HCs.length ; i++ ) {  %>
+                          <option name="objects" value="<%= HCs[i].name %>"><%= HCs[i].name %></option>
+                      <% } %>
+                    </select>
+                    <input oninput="fastsearch2()" id="searchinput2" style="margin-top: 20px;" type="text" placeholder="جستجوی سریع">
+                </div>
+                <script>
+                  function fastsearch2(){
+                      value=document.getElementById("searchinput2").value;
+                      document.getElementsByName("objects").forEach(function(doc){
+                          if(doc.value.includes(value)){
+                              document.getElementById("name2").value=doc.value
+                          }
+                          else{
+                            
+                          }
+                      })
+                  }
+              </script>
+                <button type="submit" class="btn btn-success submit-button float-right" id="reserveTimesRequestButton">
+                  <i class="fa fa-check"></i>
+                   نمایش
+                </button>
+              </div>
+            </div>
+            </form>
           <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
             <h1 class="h2">لیست  نظرات</h1>
           </div>

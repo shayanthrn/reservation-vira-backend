@@ -91,6 +91,9 @@
                           <i class="fa fa-eye"></i>
                           مشاهده
                         </a>
+                        <a href="/setrate?type=HealthCenters&id=<%=HCs[i]._id %>" class="btn btn-info" href="#">
+                          تنظیم امتیاز
+                        </a>
                         <% if(HCs[i].archived==false) { %>
                           <a href="<%= "/archive/hc/"+HCs[i]._id %>" class="btn btn-danger" href="#">
                             آرشیو کردن  

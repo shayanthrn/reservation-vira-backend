@@ -96,6 +96,9 @@
                           <i class="fa fa-eye"></i>
                           مشاهده
                         </a>
+                        <a href="/setrate?type=Doctors&id=<%=doctors[i]._id %>" class="btn btn-info" href="#">
+                          تنظیم امتیاز
+                        </a>
                         <% if(doctors[i].archived==false) { %>
                         <a href="<%= "/archive/doc/"+doctors[i]._id %>" class="btn btn-danger" href="#">
                           آرشیو کردن  

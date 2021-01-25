@@ -26,15 +26,15 @@ app.set('views','./htmls');
 app.engine('html', require('ejs').renderFile);
 app.use('/',router);
 
-var privateKey  = fs.readFileSync('/etc/letsencrypt/live/reservation.drtajviz.com/privkey.pem', 'utf8');
-var certificate = fs.readFileSync('/etc/letsencrypt/live/reservation.drtajviz.com/fullchain.pem', 'utf8');
+// var privateKey  = fs.readFileSync('/etc/letsencrypt/live/reservation.drtajviz.com/privkey.pem', 'utf8');
+// var certificate = fs.readFileSync('/etc/letsencrypt/live/reservation.drtajviz.com/fullchain.pem', 'utf8');
 
-var credentials = {key: privateKey, cert: certificate};
-var httpServer = http.createServer(apphttp);
-var httpsServer = https.createServer(credentials, app);
+// var credentials = {key: privateKey, cert: certificate};
+var httpServer = http.createServer(app);
+// var httpsServer = https.createServer(credentials, app);
 
 
 httpServer.listen(80);
 console.log("http started")
-httpsServer.listen(443);
+// httpsServer.listen(443);
 console.log("https started")

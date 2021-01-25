@@ -108,6 +108,7 @@
                                                                 class="card col-4 border-0 bg-ice-blue rounded-10 p-3 h-100 text-14 align-items-start flex-column mydiv">
                                                                 <ul class="list-unstyled pr-0 text-right text-12"
                                                                     style="height: 60%;">
+                                                                    <% if(rateflag!=1){ %>
                                                                     <li class="py-1 text-gray-200 font-weight-medium">
                                                                         <span class='stars__wrapper'>
                                                                             امتیاز دهید:
@@ -118,6 +119,7 @@
                                                                             <a href="/ratedoctor?point=1&id=<%=doctor._id%>&from=<%="/category/"+doctor.categories[0]+"/"+doctor.name.split(' ').join('-')%>" class='star'>★</a>
                                                                         </span>
                                                                     </li>
+                                                                    <% } %>
                                                                     <li class="py-1 text-gray-200 font-weight-medium">
                                                                         <span class='stars__wrapper'>
                                                                             امتیاز :

@@ -61,16 +61,31 @@
                   <option disabled selected>---انتخاب ---</option>
                   
                 </select>
+                <input oninput="fastsearch()" id="searchinput" style="margin-top: 20px;" type="text" placeholder="جستجوی سریع">
+                <script>
+                  function fastsearch(){
+                      value=document.getElementById("searchinput").value;
+                      console.log(value);
+                      document.getElementsByName("objects").forEach(function(doc){
+                          if(doc.value.includes(value)){
+                              document.getElementById("type-list").value=doc.value
+                          }
+                          else{
+                            
+                          }
+                      })
+                  }
+              </script>
                 <div id="doclist" style="display: none;">
                   <% for(let i = 0 ; i < doctors.length;i++) {  %>
-                    <option>
+                    <option name="objects" value="<%= doctors[i].name %>">
                       <%= doctors[i].name %>
                     </option>
                   <% } %>
                   </div>
                 <div id="hclist" style="display: none;">">
                   <% for(let i = 0 ; i < HCs.length;i++) {  %>
-                    <option>
+                    <option name="objects" value="<%= HCs[i].name %>">
                       <%= HCs[i].name %>
                     </option>
                   <% } %>

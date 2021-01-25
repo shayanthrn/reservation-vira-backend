@@ -172,7 +172,9 @@
                                                                 onerror="this.src='assets/img/altimage.png'"
                                                                 alt="not found">
                                                         </div>
-                                                        <span style="color: black;" class="points"><i class="fa fa-star" aria-hidden="true" style="color: #fb0;"></i><%if(Objects[i].countofvotes==0&&Objects[i].rate==0) { %><% }else{ %> <%= Objects[i].rate %> <% } %> </span>
+                                                        <%if(Objects[i].countofvotes==0&&Objects[i].rate==0) { }else{ %>
+                                                        <span style="color: black;" class="points"><i class="fa fa-star" aria-hidden="true" style="color: #fb0;"></i> <%= Objects[i].rate %></span>
+                                                        <% } %>
                                                         <p class="card-text text-slate font-weight-bold text-14 mt-4"
                                                             style="color: #1e3e72;">
                                                             <%= Objects[i].name %>

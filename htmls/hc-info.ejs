@@ -25,6 +25,31 @@
                 display: contents;
             }
         }
+        .stars__wrapper {
+            display: flex;
+        }
+
+        .star {
+        color: gray; /* gray color */
+        font-size: 24px; /* star size */
+        text-decoration: none; /* delete underline of link */
+        transition: .2s; /* smooth */
+        }
+
+        .star:hover,
+        .star:hover ~ .star {
+          color: #fb0; /* red color */
+        }
+
+        /* don't hover after choosing */
+        .wrapper__active .star:hover:not(.choosen),  
+        .wrapper__active .star:hover:not(.choosen) ~ .star:not(.choosen) {
+        color: gray;
+        }
+
+        .choosen {
+        color: #fb0; /* red color */
+        }
     </style>
 </head>
 
@@ -70,6 +95,24 @@
                                                         class="card col-4 border-0 bg-ice-blue rounded-10 p-3 h-100 text-14 align-items-start flex-column mydiv">
                                                         <ul class="list-unstyled pr-0 text-right text-12"
                                                             style="height: 60%;">
+                                                            <% if(rateflag!=1){ %>
+                                                            <li class="py-1 text-gray-200 font-weight-medium">
+                                                                <span class='stars__wrapper'>
+                                                                    امتیاز دهید:
+                                                                    <a href="/rateHC?point=5&id=<%=HC._id%>&from=<%="/HealthCenters/"+HC.type+"/"+HC.name.split(' ').join('-')%>" class='star'>★</a>
+                                                                    <a href="/rateHC?point=4&id=<%=HC._id%>&from=<%="/HealthCenters/"+HC.type+"/"+HC.name.split(' ').join('-')%>" class='star'>★</a>
+                                                                    <a href="/rateHC?point=3&id=<%=HC._id%>&from=<%="/HealthCenters/"+HC.type+"/"+HC.name.split(' ').join('-')%>" class='star'>★</a>
+                                                                    <a href="/rateHC?point=2&id=<%=HC._id%>&from=<%="/HealthCenters/"+HC.type+"/"+HC.name.split(' ').join('-')%>" class='star'>★</a>
+                                                                    <a href="/rateHC?point=1&id=<%=HC._id%>&from=<%="/HealthCenters/"+HC.type+"/"+HC.name.split(' ').join('-')%>" class='star'>★</a>
+                                                                </span>
+                                                            </li>
+                                                            <% } %>
+                                                            <li class="py-1 text-gray-200 font-weight-medium">
+                                                                <span class='stars__wrapper'>
+                                                                    امتیاز :
+                                                                    <span class="points"><i class="fa fa-star" aria-hidden="true" style="color: #fb0;"></i><%if(HC.countofvotes==0&&HC.rate==0) { %>برای این مرکز امتیازی ثبت نشده است.<% }else{ %> <%= HC.rate %> <% } %> </span>
+                                                                </span>
+                                                            </li>
                                                             <li class="py-1 text-gray-200 font-weight-medium">
                                                                 <svg xmlns="http://www.w3.org/2000/svg" width="24"
                                                                     height="24" viewBox="0 0 24 24" fill="none"
@@ -96,8 +139,60 @@
                                                 </div>
                                             </li>
                                         </ul>
+                                        <div class="comments-area default">
+                                            <div class="box-tabs-tab"
+                                                style="text-align: -webkit-right;margin-right: 50px;">
+                                                <h5>
+                                                    <i class="now-ui-icons ui-2_chat-round"></i> نظرات
+                                                    کاربران:
+                                                </h5>
+                                                <a style="max-width: 200px;" href="/submitcomment?for=<%=HC._id%>&from=<%="/HealthCenters/"+HC.type+"/"+HC.name.split(' ').join('-')%>" class="btn btn-info">
+                                                    ثبت نظر
+                                                </a>
+                                            </div>
+                                            <% if(comments.length==0){ %>
+                                                نظری موجود  نیست.
+                                            <% } else {  %>
+                                            <ol class="comment-list">
+                                                <% for(let i=0;i<comments.length;i++) { %>
+                                                <li>
+                                                    <div class="comment-body">
+                                                        <div class="row">
+                                                            <div class="col-md-3 col-sm-12">
+                                                                <div class="comment-author">
+                                                                    توسط <%= comments[i].sender[0].firstname +" "+comments[i].sender[0].lastname %> در تاریخ <%= comments[i].time %>
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-md-9 col-sm-12 comment-content">
+                                                                <div class="row">
+                                                                    <h5 style="margin-right: 50px;">
+                                                                        <%= comments[i].title %>
+                                                                    </h5>
+                                                                </div>
+                                                                <p style="margin-right: 50px;margin:initial;word-break: break-all;">
+                                                                   <%= comments[i].content %>
+                                                                </p>
+                                                                <% if(comments[i].response != undefined ) { %>
+                                                                    <div class="row">
+                                                                      <h5 style="margin-right: 50px;">
+                                                                          پاسخ:
+                                                                      </h5>
+                                                                    </div>
+                                                                    <p style="margin-right: 50px;margin:initial;word-break: break-all;">
+                                                                      <%= comments[i].response %>
+                                                                    </p>
+                                                                    <% } %>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </li>
+                                                <% } %>
+                                            </ol>
+                                            <% } %>
+                                        </div>
                                     </div>
                                 </div>
+                                
                                 <div class="tab-pane" id="most-view" role="tabpanel" aria-expanded="false">
                                     <div class="container no-padding-right">
                                         <ul class="row listing-items">

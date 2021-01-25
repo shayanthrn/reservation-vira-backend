@@ -4125,6 +4125,52 @@ router.get("/AdminPanel/doctors", function (req, res) {
 })
 
 
+router.get("/setrate",function(req,res){
+  var query = url.parse(req.url, true).query;
+  if (req.cookies.admintoken == undefined) {
+    res.redirect('/noaccess');
+  }
+  else {
+    MongoClient.connect(dburl, function (err, db) {
+      var dbo = db.db("mydb");
+      dbo.collection("Admins").findOne({ token: req.cookies.admintoken }, async function (err, result) {
+        if (result == null) {
+          db.close();
+          res.redirect('/noaccess');
+        }
+        else {
+          res.render("AdminPanel/setrate.ejs",{type:query.type,id:query.id});
+          res.end();
+        }
+      })
+    })
+  }
+})
+
+router.post("/setrate",function(req,res){
+  var query = url.parse(req.url, true).query;
+  if (req.cookies.admintoken == undefined) {
+    res.redirect('/noaccess');
+  }
+  else {
+    MongoClient.connect(dburl, function (err, db) {
+      var dbo = db.db("mydb");
+      dbo.collection("Admins").findOne({ token: req.cookies.admintoken }, async function (err, result) {
+        if (result == null) {
+          db.close();
+          res.redirect('/noaccess');
+        }
+        else {
+          id=new ObjectID(query.id);
+          obj=await dbo.collection(query.type).findOne({_id:id});
+          dbo.collection(query.type).updateOne({_id:id},{$set:{rate:Number(req.body.rate),countofvotes:obj.countofvotes+1}});
+          res.redirect("adminpanel/"+query.type)
+        }
+      })
+    })
+  }
+})
+
 router.get("/AdminPanel/doctors/:doctor", function (req, res) {
   if (req.cookies.admintoken == undefined) {
     res.redirect('/noaccess');
@@ -4211,8 +4257,9 @@ router.get("/AdminPanel/comments",function(req,res){
           res.redirect('/noaccess');
         }
         else {
-          var doctors = await dbo.collection("Doctors").find().toArray()
-          res.render("AdminPanel/comments.ejs", {doctors:doctors, comments:[] })
+          var doctors = await dbo.collection("Doctors").find({archived:false}).toArray()
+          var HCs= await dbo.collection("HealthCenters").find({archived:false}).toArray()
+          res.render("AdminPanel/comments.ejs", {doctors:doctors,HCs:HCs, comments:[] })
           res.end();
           db.close();
         }
@@ -4234,18 +4281,39 @@ router.post("/AdminPanel/comments",function(req,res){
           res.redirect('/noaccess');
         }
         else {
-          dbo.collection("Doctors").findOne({name:req.body.name},async function(err,doctor){
-            if(doctor!=null){
-              comments=await dbo.collection("Comments").aggregate([{ $match:{for:doctor._id}},{ $lookup: { from: "Users", localField: "senderid", foreignField: "_id", as: "sender" } },{$project:{"sender.firstname":1,"sender.lastname":1,"title":1,"content":1,"time":1,"status":1,"response":1}}]).toArray();
-              var doctors = await dbo.collection("Doctors").find().toArray()
-              res.render("AdminPanel/comments.ejs", {doctors:doctors, comments:comments })
-              res.end();
-              db.close();
-            }
-            else{
-              res.redirect("/adminpanel/comments")
-            }
-          })
+          if(req.body.name!=undefined){
+            dbo.collection("Doctors").findOne({name:req.body.name},async function(err,doctor){
+              if(doctor!=null){
+                comments=await dbo.collection("Comments").aggregate([{ $match:{for:doctor._id}},{ $lookup: { from: "Users", localField: "senderid", foreignField: "_id", as: "sender" } },{$project:{"sender.firstname":1,"sender.lastname":1,"title":1,"content":1,"time":1,"status":1,"response":1}}]).toArray();
+                var doctors = await dbo.collection("Doctors").find({archived:false}).toArray()
+                var HCs= await dbo.collection("HealthCenters").find({archived:false}).toArray()
+                res.render("AdminPanel/comments.ejs", {doctors:doctors,HCs:HCs ,comments:comments })
+                res.end();
+                db.close();
+              }
+              else{
+                res.redirect("/adminpanel/comments")
+              }
+            })
+          }
+          else if(req.body.name2!=undefined){
+            dbo.collection("HealthCenters").findOne({name:req.body.name2},async function(err,doctor){
+              if(doctor!=null){
+                comments=await dbo.collection("Comments").aggregate([{ $match:{for:doctor._id}},{ $lookup: { from: "Users", localField: "senderid", foreignField: "_id", as: "sender" } },{$project:{"sender.firstname":1,"sender.lastname":1,"title":1,"content":1,"time":1,"status":1,"response":1}}]).toArray();
+                var doctors = await dbo.collection("Doctors").find({archived:false}).toArray()
+                var HCs= await dbo.collection("HealthCenters").find({archived:false}).toArray()
+                res.render("AdminPanel/comments.ejs", {doctors:doctors,HCs:HCs, comments:comments })
+                res.end();
+                db.close();
+              }
+              else{
+                res.redirect("/adminpanel/comments")
+              }
+            })
+          }
+          else{
+            res.redirect("noaccess")
+          }
         }
       })
     })
@@ -5755,6 +5823,7 @@ router.get("/healthcenters/:type", function (req, res) {
     var dbo = db.db("mydb");
     dbo.collection("HealthCenters").find({ type: type, archived: false }, async function (err, result) {
       HCs = await result.toArray();
+      sortbyrate(HCs)
       if (req.cookies.usertoken == undefined) {
         categories().then(basiccategories => {
           res.render("healthcenters-type.ejs", { Objects: HCs, user: "", categories: basiccategories, type: type });
@@ -5792,11 +5861,12 @@ router.get("/healthcenters/:type/:HC", function (req, res) {
   var type = req.params.type.split("-").join(' ');
   MongoClient.connect(dburl, function (err, db) {
     var dbo = db.db("mydb");
-    dbo.collection("HealthCenters").findOne({ name: HCname }, function (err, HC) {
+    dbo.collection("HealthCenters").findOne({ name: HCname },async function (err, HC) {
+      comments=await dbo.collection("Comments").aggregate([{ $match:{for:HC._id,status:"ok" }},{ $lookup: { from: "Users", localField: "senderid", foreignField: "_id", as: "sender" } },{$project:{"sender.firstname":1,"sender.lastname":1,"title":1,"content":1,"time":1,"response":1}}]).toArray();
       if (HC.systype == "C") {
         if (req.cookies.usertoken == undefined) {
           categories().then(basiccategories => {
-            res.render("hc-info.ejs", { user: "", categories: basiccategories, HC: HC });
+            res.render("hc-info.ejs", { user: "", categories: basiccategories, HC: HC,comments:comments });
             res.end();
             db.close();
           })
@@ -5805,14 +5875,20 @@ router.get("/healthcenters/:type/:HC", function (req, res) {
           dbo.collection("Users").findOne({ token: req.cookies.usertoken }, function (err, user) {
             if (user == null) {
               categories().then(basiccategories => {
-                res.render("hc-info.ejs", { user: user, categories: basiccategories, HC: HC });
+                res.render("hc-info.ejs", { user: user, categories: basiccategories, HC: HC ,comments:comments });
                 res.end();
                 db.close();
               })
             }
             else {
+              if(user.votedids.includes(HC._id.toString())){
+                flag=1;
+              }
+              else{
+                flag=0
+              }
               categories().then(basiccategories => {
-                res.render("hc-info.ejs", { user: user, categories: basiccategories, HC: HC });
+                res.render("hc-info.ejs", { user: user, categories: basiccategories, HC: HC ,comments:comments,rateflag:flag });
                 res.end();
                 db.close();
               })
@@ -5823,7 +5899,7 @@ router.get("/healthcenters/:type/:HC", function (req, res) {
       else if (HC.systype == "B") {
         if (req.cookies.usertoken == undefined) {
           categories().then(basiccategories => {
-            res.render("hc-res-info.ejs", { user: "", categories: basiccategories, HC: HC, category: "آزمایش" });
+            res.render("hc-res-info.ejs", { user: "", categories: basiccategories, HC: HC, category: "آزمایش",comments:comments  });
             res.end();
             db.close();
           })
@@ -5832,14 +5908,20 @@ router.get("/healthcenters/:type/:HC", function (req, res) {
           dbo.collection("Users").findOne({ token: req.cookies.usertoken }, function (err, user) {
             if (user == null) {
               categories().then(basiccategories => {
-                res.render("hc-res-info.ejs", { user: user, categories: basiccategories, HC: HC, category: "آزمایش" });
+                res.render("hc-res-info.ejs", { user: user, categories: basiccategories, HC: HC, category: "آزمایش" ,comments:comments });
                 res.end();
                 db.close();
               })
             }
             else {
+              if(user.votedids.includes(HC._id.toString())){
+                flag=1;
+              }
+              else{
+                flag=0
+              }
               categories().then(basiccategories => {
-                res.render("hc-res-info.ejs", { user: user, categories: basiccategories, HC: HC, category: "آزمایش" });
+                res.render("hc-res-info.ejs", { user: user, categories: basiccategories, HC: HC, category: "آزمایش",comments:comments ,rateflag:flag});
                 res.end();
                 db.close();
               })
@@ -5887,10 +5969,11 @@ router.get("/reservation/info/:type/:HCname/:category", function (req, res) {
   var category = req.params.category.split('-').join(' ');
   MongoClient.connect(dburl, function (err, db) {
     var dbo = db.db("mydb");
-    dbo.collection("HealthCenters").findOne({ type: type, name: HCname }, function (err, HC) {
+    dbo.collection("HealthCenters").findOne({ type: type, name: HCname },async function (err, HC) {
+      comments=await dbo.collection("Comments").aggregate([{ $match:{for:HC._id,status:"ok" }},{ $lookup: { from: "Users", localField: "senderid", foreignField: "_id", as: "sender" } },{$project:{"sender.firstname":1,"sender.lastname":1,"title":1,"content":1,"time":1,"response":1}}]).toArray();
       if (req.cookies.usertoken == undefined) {
         categories().then(basiccategories => {
-          res.render("hc-res-info.ejs", { HC: HC, category: category, categories: basiccategories, user: "" });
+          res.render("hc-res-info.ejs", { HC: HC, category: category, categories: basiccategories, user: "" ,comments:comments });
           res.end();
           db.close();
         })
@@ -5899,14 +5982,20 @@ router.get("/reservation/info/:type/:HCname/:category", function (req, res) {
         dbo.collection("Users").findOne({ token: req.cookies.usertoken }, function (err, user) {
           if (user == null) {
             categories().then(basiccategories => {
-              res.render("hc-res-info.ejs", { HC: HC, category: category, categories: basiccategories, user: "" });
+              res.render("hc-res-info.ejs", { HC: HC, category: category, categories: basiccategories, user: "" ,comments:comments });
               res.end();
               db.close();
             })
           }
           else {
+            if(user.votedids.includes(HC._id.toString())){
+              flag=1;
+            }
+            else{
+              flag=0
+            }
             categories().then(basiccategories => {
-              res.render("hc-res-info.ejs", { HC: HC, category: category, categories: basiccategories, user: user });
+              res.render("hc-res-info.ejs", { HC: HC, category: category, categories: basiccategories, user: user ,comments:comments,rateflag:flag });
               res.end();
               db.close();
             })
@@ -6713,6 +6802,18 @@ router.post("/paymenthandlerHC", function (req, res) {
   }
 })
 
+function sortbyrate(objects){
+  for(let i=0;i<objects.length;i++){
+    for(let j=0;j<i;j++){
+      if(objects[i].rate>=objects[j].rate){
+        var b = objects[i];
+        objects[i] = objects[j];
+        objects[j] = b;
+      }
+    }
+  }
+}
+
 
 router.get("/category/:Category", function (req, res) {
   req.session.prevurl = req.session.currurl;
@@ -6731,6 +6832,7 @@ router.get("/category/:Category", function (req, res) {
     dbo.collection("Doctors").find({ categories: req.params.Category.split('-').join(' '), city: qcity, archived: false }).forEach(function (doc, err) {
       Doctors.push(doc);
     }, function () {
+      sortbyrate(Doctors);
       if (req.cookies.usertoken == undefined) {
         categories().then(basiccategories => {
           res.render("index.ejs", { Objects: Doctors, type: "doc", category: req.params.Category, user: "", categories: basiccategories });
@@ -6778,8 +6880,14 @@ router.get("/category/:Category/:Doctor", function (req, res) {
             })
           }
           else {
+            if(user.votedids.includes(result._id.toString())){
+              flag=1;
+            }
+            else{
+              flag=0
+            }
             categories().then(basiccategories => {
-              res.render("doctorpage.ejs", { doctor: result, categories: basiccategories, user: user,comments:comments });
+              res.render("doctorpage.ejs", { doctor: result, categories: basiccategories, user: user,comments:comments,rateflag:flag });
               db.close();
               res.end();
             })
@@ -6824,10 +6932,53 @@ router.get("/ratedoctor",function(req,res){
   }
 })
 
+router.get("/ratehc",function(req,res){
+  var query=url.parse(req.url,true).query;
+  if(req.cookies.usertoken==undefined){
+    res.redirect("/signup?from="+query.from)
+  }
+  else{
+    MongoClient.connect(dburl,function(err,db){
+      var dbo=db.db("mydb");
+      dbo.collection("Users").findOne({token:req.cookies.usertoken},function(err,user){
+        if(user==null){
+          res.redirect("/signup?from="+query.from)
+        }
+        else{
+          id=new ObjectID(query.id);
+          if(user.votedids.includes(query.id)){
+            res.redirect(query.from);
+          }
+          else{
+            dbo.collection("HealthCenters").findOne({_id:id},function(err,doctor){
+              sum=doctor.rate*doctor.countofvotes;
+              sum+=Number(query.point);
+              newc=doctor.countofvotes+1;
+              newr=sum/newc;
+              dbo.collection("HealthCenters").updateOne({_id:id},{$set:{rate:newr.toPrecision(2),countofvotes:newc}});
+              dbo.collection("Users").updateOne({token:req.cookies.usertoken},{$addToSet:{votedids:query.id}});
+              res.redirect("/rated?from="+query.from);
+            })
+          }
+        }
+      })
+    })
+  }
+})
+
 router.get("/rated",function(req,res){
   var query=url.parse(req.url,true).query;
-  res.render("rated.ejs",{from:query.from});
-  res.end();
+  MongoClient.connect(dburl,function(err,db){
+    var dbo=db.db("mydb");
+    dbo.collection("Users").findOne({token:req.cookies.usertoken},function(err,user){
+      categories().then(basiccategories => {
+        res.render("rated.ejs",{from:query.from,user:user,categories:basiccategories});
+        res.end();
+      })
+      
+    })
+  })
+  
 })
 
 router.get("/reserve/:Doctor", function (req, res) {
