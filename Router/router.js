@@ -5866,7 +5866,7 @@ router.get("/healthcenters/:type/:HC", function (req, res) {
       if (HC.systype == "C") {
         if (req.cookies.usertoken == undefined) {
           categories().then(basiccategories => {
-            res.render("hc-info.ejs", { user: "", categories: basiccategories, HC: HC,comments:comments });
+            res.render("hc-info.ejs", { user: "", categories: basiccategories, HC: HC,comments:comments,rateflag:0 });
             res.end();
             db.close();
           })
@@ -5875,7 +5875,7 @@ router.get("/healthcenters/:type/:HC", function (req, res) {
           dbo.collection("Users").findOne({ token: req.cookies.usertoken }, function (err, user) {
             if (user == null) {
               categories().then(basiccategories => {
-                res.render("hc-info.ejs", { user: user, categories: basiccategories, HC: HC ,comments:comments });
+                res.render("hc-info.ejs", { user: user, categories: basiccategories, HC: HC ,comments:comments,rateflag:0 });
                 res.end();
                 db.close();
               })
@@ -5899,7 +5899,7 @@ router.get("/healthcenters/:type/:HC", function (req, res) {
       else if (HC.systype == "B") {
         if (req.cookies.usertoken == undefined) {
           categories().then(basiccategories => {
-            res.render("hc-res-info.ejs", { user: "", categories: basiccategories, HC: HC, category: "آزمایش",comments:comments  });
+            res.render("hc-res-info.ejs", { user: "", categories: basiccategories, HC: HC, category: "آزمایش",comments:comments,rateflag:0  });
             res.end();
             db.close();
           })
@@ -5908,7 +5908,7 @@ router.get("/healthcenters/:type/:HC", function (req, res) {
           dbo.collection("Users").findOne({ token: req.cookies.usertoken }, function (err, user) {
             if (user == null) {
               categories().then(basiccategories => {
-                res.render("hc-res-info.ejs", { user: user, categories: basiccategories, HC: HC, category: "آزمایش" ,comments:comments });
+                res.render("hc-res-info.ejs", { user: user, categories: basiccategories, HC: HC, category: "آزمایش" ,comments:comments,rateflag:0 });
                 res.end();
                 db.close();
               })
@@ -5973,7 +5973,7 @@ router.get("/reservation/info/:type/:HCname/:category", function (req, res) {
       comments=await dbo.collection("Comments").aggregate([{ $match:{for:HC._id,status:"ok" }},{ $lookup: { from: "Users", localField: "senderid", foreignField: "_id", as: "sender" } },{$project:{"sender.firstname":1,"sender.lastname":1,"title":1,"content":1,"time":1,"response":1}}]).toArray();
       if (req.cookies.usertoken == undefined) {
         categories().then(basiccategories => {
-          res.render("hc-res-info.ejs", { HC: HC, category: category, categories: basiccategories, user: "" ,comments:comments });
+          res.render("hc-res-info.ejs", { HC: HC, category: category, categories: basiccategories, user: "" ,comments:comments,rateflag:0 });
           res.end();
           db.close();
         })
@@ -5982,7 +5982,7 @@ router.get("/reservation/info/:type/:HCname/:category", function (req, res) {
         dbo.collection("Users").findOne({ token: req.cookies.usertoken }, function (err, user) {
           if (user == null) {
             categories().then(basiccategories => {
-              res.render("hc-res-info.ejs", { HC: HC, category: category, categories: basiccategories, user: "" ,comments:comments });
+              res.render("hc-res-info.ejs", { HC: HC, category: category, categories: basiccategories, user: "" ,comments:comments ,rateflag:0});
               res.end();
               db.close();
             })
@@ -6003,6 +6003,29 @@ router.get("/reservation/info/:type/:HCname/:category", function (req, res) {
         })
       }
     })
+  })
+})
+
+
+router.get("/suggestdoctor",function(req,res){
+  var query = url.parse(req.url, true).query;
+  category=query.cat;
+  MongoClient.connect(dburl,async function(err,db){
+    var dbo=db.db("mydb");
+    doctors=await dbo.collection("Doctors").find({categories:category,archived:false}).toArray();
+    sortbyrate(doctors);
+    if(doctors.length==0){
+      res.json({data:"nothing"});
+    }
+    else{
+      value=doctors.length/3;
+      if(value<1){
+        value=1;
+      }
+      array=doctors.slice(0,value);
+      var randomElement = array[Math.floor(Math.random() * array.length)];
+      res.json({data:randomElement})
+    }
   })
 })
 
@@ -6874,7 +6897,7 @@ router.get("/category/:Category/:Doctor", function (req, res) {
           comments=await dbo.collection("Comments").aggregate([{ $match:{for:result._id,status:"ok" }},{ $lookup: { from: "Users", localField: "senderid", foreignField: "_id", as: "sender" } },{$project:{"sender.firstname":1,"sender.lastname":1,"title":1,"content":1,"time":1,"response":1}}]).toArray();
           if (user == null) {
             categories().then(basiccategories => {
-              res.render("doctorpage.ejs", { doctor: result, categories: basiccategories, user: "" ,comments:comments});
+              res.render("doctorpage.ejs", { doctor: result, categories: basiccategories, user: "" ,comments:comments,rateflag:0});
               db.close();
               res.end();
             })
