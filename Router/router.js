@@ -6010,6 +6010,7 @@ router.get("/reservation/info/:type/:HCname/:category", function (req, res) {
 router.get("/suggestdoctor",function(req,res){
   var query = url.parse(req.url, true).query;
   category=query.cat;
+  category=category.split('-').join(' ')
   MongoClient.connect(dburl,async function(err,db){
     var dbo=db.db("mydb");
     doctors=await dbo.collection("Doctors").find({categories:category,archived:false}).toArray();
