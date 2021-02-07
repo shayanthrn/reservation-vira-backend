@@ -5679,6 +5679,37 @@ router.get("/", function (req, res) {
     var dbo = db.db("mydb");
     if (req.cookies.usertoken == undefined) {
       categories().then(basiccategories => {
+        res.render('main.ejs', {user: "", categories: basiccategories });
+        res.end();
+        db.close();
+      })
+    }
+    else {
+      dbo.collection("Users").findOne({ token: req.cookies.usertoken }, function (err, result) {
+        if (err) throw err;
+        if (result == null) {
+          res.clearCookie('usertoken');
+          res.redirect('/');
+        }
+        categories().then(basiccategories => {
+          res.render('main.ejs', {user: result, categories: basiccategories });
+          res.end();
+          db.close();
+        })
+      })
+    }
+  })
+})
+
+router.get("/category",function(req,res){
+  req.session.prevurl = req.session.currurl;
+  req.session.currurl = req.url;
+  Categories = [];
+  MongoClient.connect(dburl, function (err, db) {
+    if (err) throw err;
+    var dbo = db.db("mydb");
+    if (req.cookies.usertoken == undefined) {
+      categories().then(basiccategories => {
         res.render('index.ejs', { Objects: basiccategories, type: "category", category: "", user: "", categories: basiccategories });
         res.end();
         db.close();
