@@ -1162,7 +1162,9 @@ router.post("/api/paymentticketandroid", function (req, res) {
                       dbo.collection("Doctors").updateOne({ name: newchat.doctor }, { $addToSet: { chats: newchat } }, function (err, sas) {
                         changestatustransaction(authority, "موفق");
                         res.json({ status: "ok" });
-                        //sendSMSforres(reservation);
+                        muser=dbo.collection("Users").findOne({ phonenumber: newchat.userphone })
+                        sendSMS("chatdoc",doctor._id,"Doctors",new persianDate([reservation.time.date.year, reservation.time.date.month, reservation.time.date.day]).format("L"),muser.firstname+" "+muser.lastname);
+                        sendSMS("chatuser",muser._id,"Users",new persianDate([reservation.time.date.year, reservation.time.date.month, reservation.time.date.day]).format("L"),doctor.name)
                         res.end();
                       })
                     })
@@ -1185,7 +1187,9 @@ router.post("/api/paymentticketandroid", function (req, res) {
                         dbo.collection("Doctors").updateOne({ name: newchat.doctor }, { $addToSet: { chats: newchat } }, function (err, sas) {
                           changestatustransaction(authority, "موفق");
                           res.json({ status: "ok" });
-                          //sendSMSforres(reservation);
+                          muser=dbo.collection("Users").findOne({ phonenumber: newchat.userphone })
+                        sendSMS("chatdoc",doctor._id,"Doctors",new persianDate([reservation.time.date.year, reservation.time.date.month, reservation.time.date.day]).format("L"),muser.firstname+" "+muser.lastname);
+                        sendSMS("chatuser",muser._id,"Users",new persianDate([reservation.time.date.year, reservation.time.date.month, reservation.time.date.day]).format("L"),doctor.name)
                           res.end();
                         })
                       })
@@ -6289,10 +6293,13 @@ router.post("/ticketpaymenthandler", function (req, res) {
                   dbo.collection("TempChats").deleteOne({ authority: req.body.ResNum }, function (err, aa) {
                     dbo.collection("Users").updateOne({ phonenumber: mychat.userphone }, { $addToSet: { chats: mychat } }, function (err, ad) {
                       dbo.collection("Doctors").findOne({ name: mychat.doctor }, function (err, doctor) {
-                        dbo.collection("Doctors").updateOne({ name: mychat.doctor }, { $addToSet: { chats: mychat } }, function (err, sas) {
+                        dbo.collection("Doctors").updateOne({ name: mychat.doctor }, { $addToSet: { chats: mychat } },async function (err, sas) {
                           changestatustransaction(req.body.ResNum, "موفق");
+                          
                           res.render("paymentaccept.ejs", { doctor: doctor, time: "-", resid: mychat.refid, chat: 1, doc: 1 });
-                          //sendSMSforres(reservation);
+                          muser=dbo.collection("Users").findOne({ phonenumber: mychat.userphone })
+                          sendSMS("chatdoc",doctor._id,"Doctors",new persianDate([reservation.time.date.year, reservation.time.date.month, reservation.time.date.day]).format("L"),muser.firstname+" "+muser.lastname);
+                          sendSMS("chatuser",muser._id,"Users",new persianDate([reservation.time.date.year, reservation.time.date.month, reservation.time.date.day]).format("L"),doctor.name)
                           res.end();
                         })
                       })
