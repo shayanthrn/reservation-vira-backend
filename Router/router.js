@@ -7268,6 +7268,10 @@ router.post("/payment", function (req, res) {
                       "RedirectUrl": "https://reservation.drtajviz.com/paymenthandler",
                     }
                   }, (error, response, body) => {
+                    console.log("------------------");
+                    console.log(response);
+                    console.log("***********");
+                    console.log(body);
                     if (body.Result == "erSucceed") {
                       addtransaction(user._id, req.body.cost, authority, body.Token);
                       dbo.collection("TempReserves").insertOne(reservation, function (err, reserve) {
@@ -7277,7 +7281,7 @@ router.post("/payment", function (req, res) {
                     }
                     else {
                       res.write("<html><body><p>there is a problem on bank server please try again later</p><a href='/' >go back to main page</a></body></html>");
-                      console.error(err);
+                      console.error(error);
                       res.end();
                     }
                   })
