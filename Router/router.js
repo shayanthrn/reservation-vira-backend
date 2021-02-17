@@ -75,7 +75,7 @@ router.get("/testpayment", function (req, res) {
     method: "POST",
     json: true,
     body: {
-      "WSContext": { "UserId": "211061915", "Password": "211061915" },
+      "WSContext": { "UserId": "22072268", "Password": "22072268" },
       "TransType": "EN_GOODS",
       "ReserveNum": "FanAvaTest123",
       "Amount": "1007",
@@ -264,7 +264,7 @@ router.post("/api/paymentHC", function (req, res) {
                     method: "POST",
                     json: true,
                     body: {
-                      "WSContext": { "UserId": "211061915", "Password": "211061915" },
+                      "WSContext": { "UserId": "22072268", "Password": "22072268" },
                       "TransType": "EN_GOODS",
                       "ReserveNum": authority,
                       "Amount": req.body.cost + "0",
@@ -800,7 +800,7 @@ router.post("/api/payment", function (req, res) {
                     method: "POST",
                     json: true,
                     body: {
-                      "WSContext": { "UserId": "211061915", "Password": "211061915" },
+                      "WSContext": { "UserId": "22072268", "Password": "22072268" },
                       "TransType": "EN_GOODS",
                       "ReserveNum": authority,
                       "Amount": req.body.cost + "0",
@@ -852,7 +852,7 @@ router.post("/api/ticketpayment", function (req, res) {
               method: "POST",
               json: true,
               body: {
-                "WSContext": { "UserId": "211061915", "Password": "211061915" },
+                "WSContext": { "UserId": "22072268", "Password": "22072268" },
                 "TransType": "EN_GOODS",
                 "ReserveNum": authority,
                 "Amount": req.body.cost + "0",
@@ -934,7 +934,7 @@ router.post("/api/telepayment", function (req, res) {
                 method: "POST",
                 json: true,
                 body: {
-                  "WSContext": { "UserId": "211061915", "Password": "211061915" },
+                  "WSContext": { "UserId": "22072268", "Password": "22072268" },
                   "TransType": "EN_GOODS",
                   "ReserveNum": authority,
                   "Amount": req.body.cost + "0",
@@ -6179,7 +6179,7 @@ router.post("/ticketpayment", function (req, res) {
               method: "POST",
               json: true,
               body: {
-                "WSContext": { "UserId": "211061915", "Password": "211061915" },
+                "WSContext": { "UserId": "22072268", "Password": "22072268" },
                 "TransType": "EN_GOODS",
                 "ReserveNum": authority,
                 "Amount": req.body.cost + "0",
@@ -6281,7 +6281,7 @@ router.post("/ticketpaymenthandler", function (req, res) {
               method: "POST",
               json: true,
               body: {
-                "WSContext": { "UserId": "211061915", "Password": "211061915" },
+                "WSContext": { "UserId": "22072268", "Password": "22072268" },
                 "Token": req.body.token,
                 "RefNum": req.body.RefNum
               }
@@ -6371,7 +6371,7 @@ router.get("/telepaymentafters", function (req, res) {
                 method: "POST",
                 json: true,
                 body: {
-                  "WSContext": { "UserId": "211061915", "Password": "211061915" },
+                  "WSContext": { "UserId": "22072268", "Password": "22072268" },
                   "TransType": "EN_GOODS",
                   "ReserveNum": authority,
                   "Amount": req.body.cost + "0",
@@ -6432,7 +6432,7 @@ router.post("/telepayment", function (req, res) {
                 method: "POST",
                 json: true,
                 body: {
-                  "WSContext": { "UserId": "211061915", "Password": "211061915" },
+                  "WSContext": { "UserId": "22072268", "Password": "22072268" },
                   "TransType": "EN_GOODS",
                   "ReserveNum": authority,
                   "Amount": req.body.cost + "0",
@@ -6541,7 +6541,7 @@ router.post("/telepaymenthandler", function (req, res) {
               method: "POST",
               json: true,
               body: {
-                "WSContext": { "UserId": "211061915", "Password": "211061915" },
+                "WSContext": { "UserId": "22072268", "Password": "22072268" },
                 "Token": req.body.token,
                 "RefNum": req.body.RefNum
               }
@@ -6643,7 +6643,7 @@ router.get("/paymentHCafters", function (req, res) {
                     method: "POST",
                     json: true,
                     body: {
-                      "WSContext": { "UserId": "211061915", "Password": "211061915" },
+                      "WSContext": { "UserId": "22072268", "Password": "22072268" },
                       "TransType": "EN_GOODS",
                       "ReserveNum": authority,
                       "Amount": req.body.cost + "0",
@@ -6731,7 +6731,7 @@ router.post("/paymentHC", function (req, res) {
                     method: "POST",
                     json: true,
                     body: {
-                      "WSContext": { "UserId": "211061915", "Password": "211061915" },
+                      "WSContext": { "UserId": "22072268", "Password": "22072268" },
                       "TransType": "EN_GOODS",
                       "ReserveNum": authority,
                       "Amount": req.body.cost + "0",
@@ -6794,7 +6794,7 @@ router.post("/paymenthandlerHC", function (req, res) {
               method: "POST",
               json: true,
               body: {
-                "WSContext": { "UserId": "211061915", "Password": "211061915" },
+                "WSContext": { "UserId": "22072268", "Password": "22072268" },
                 "Token": req.body.token,
                 "RefNum": req.body.RefNum
               }
@@ -7186,7 +7186,7 @@ router.get("/paymentafters", function (req, res) {
                     method: "POST",
                     json: true,
                     body: {
-                      "WSContext": { "UserId": "211061915", "Password": "211061915" },
+                      "WSContext": { "UserId": "22072268", "Password": "22072268" },
                       "TransType": "EN_GOODS",
                       "ReserveNum": authority,
                       "Amount": req.body.cost + "0",
@@ -7261,7 +7261,7 @@ router.post("/payment", function (req, res) {
                     method: "POST",
                     json: true,
                     body: {
-                      "WSContext": { "UserId": "211061915", "Password": "211061915" },
+                      "WSContext": { "UserId": "22072268", "Password": "22072268" },
                       "TransType": "EN_GOODS",
                       "ReserveNum": authority,
                       "Amount": req.body.cost + "0",
@@ -7325,7 +7325,7 @@ router.post("/paymenthandler", function (req, res) {
               method: "POST",
               json: true,
               body: {
-                "WSContext": { "UserId": "211061915", "Password": "211061915" },
+                "WSContext": { "UserId": "22072268", "Password": "22072268" },
                 "Token": req.body.token,
                 "RefNum": req.body.RefNum
               }
