@@ -125,12 +125,8 @@
                   </button>
                   <script>
                     function myfunc(){
-                    var inputformat=document.getElementById("file").value.toLowerCase().split('.');
                     checkdatalist();
-                    if(inputformat[inputformat.length-1]!="zip"){
-                      alert("فرمت فایل ورودی صحیح نیست")
-                      return false;
-                    }
+                    return true
                     }
                     function checkdatalist(){
                     const currentValue = document.getElementById('phonenumber').value;
