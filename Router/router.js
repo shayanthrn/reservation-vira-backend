@@ -2874,7 +2874,9 @@ router.post("/addexp", function (req, res) {
               }
               else {
                 var now = new Date();
-                path = "data/Experiments/" + now.getTime() + ".zip";
+                var arr = req.files.file.name.split('.');
+                var fileformat = arr[arr.length - 1];
+                path = "data/Experiments/" + now.getTime() + "." + fileformat;
                 dbo.collection("Experiments").insertOne({ userid: user._id, hcid: HC._id, dateuploaded: now, description: req.body.description, path: path }, function (err, result) {
                   mv(req.files.file.tempFilePath, path, { mkdirp: true }, function (err) {
                     sendSMS("addexp", user._id, "Users", new persianDate().format("L"), HC.name, null)
