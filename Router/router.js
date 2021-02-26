@@ -2355,7 +2355,7 @@ function sendSMS(template, id, type, token, token2, token3) {
           apikave.VerifyLookup({
             token: token,
             token10: token2,
-            token3: token3,
+            token20: token3,
             template: template,
             receptor: obj.phonenumber
           },
@@ -2371,9 +2371,9 @@ function sendSMS(template, id, type, token, token2, token3) {
           apikave.VerifyLookup({
             token: token,
             token10: token2,
-            token3: token3,
+            token20: token3,
             template: template,
-            receptor: obj.phonenumber
+            receptor: obj.workphone
           },
             function (response, status) {
               console.log(response);
@@ -2416,8 +2416,8 @@ function sendSMS(template, id, type, token, token2, token3) {
         case "teleresdoc":
           apikave.VerifyLookup({
             token: token,
-            token2: token2,
-            token10: token3,
+            token10: token2,
+            token20: token3,
             template: template,
             receptor: obj.phonenumber
           },
@@ -6561,7 +6561,7 @@ router.post("/telepaymenthandler", function (req, res) {
                           res.render("paymentaccept.ejs", { doctor: doctor, time: strtime, resid: reservation.refid, chat: 2, doc: 1 });
                           user = await dbo.collection("Users").findOne({ _id: reservation.user })
                           mytime = reservation.timeinfo.date.year + "/" + reservation.timeinfo.date.month + "/" + reservation.timeinfo.date.day
-                          sendSMS("teleresdoc", doctor._id, "Doctors", mytime, strtime, user.firstname + " " + user.lastname);
+                          sendSMS("teleresdoc", doctor._id, "Doctors",user.phonenumber, mytime +" " + strtime, user.firstname + " " + user.lastname);
                           sendSMS("teleresuser", user._id, "Users", mytime, strtime, doctor.name);
                           res.end();
                         })
@@ -7343,9 +7343,9 @@ router.post("/paymenthandler", function (req, res) {
                         dbo.collection("Doctors").findOne({ _id: reservation.doctor }, async function (err, doctor) {
                           changestatustransaction(req.body.ResNum, "موفق");
                           res.render("paymentaccept.ejs", { doctor: doctor, time: strtime, resid: reservation.refid, chat: 0, doc: 1 });
-                          sendSMS("reserveACK", reservation.user, "Users", reservation.refid, doctor.name, new persianDate([reservation.time.date.year, reservation.time.date.month, reservation.time.date.day]).format("L"))
+                          sendSMS("reserveACK", reservation.user, "Users", reservation.refid, doctor.name, new persianDate([reservation.time.date.year, reservation.time.date.month, reservation.time.date.day]).format("L")+" "+strtime)
                           username = await dbo.collection("Users").findOne({ _id: reservation.user })
-                          sendSMS("reserveACKdoc", reservation.doctor, "Doctors", reservation.refid, username.firstname + " " + username.lastname, new persianDate([reservation.time.date.year, reservation.time.date.month, reservation.time.date.day]).format("L"))
+                          sendSMS("reserveACKdoc", reservation.doctor, "Doctors", reservation.refid, username.firstname + " " + username.lastname, new persianDate([reservation.time.date.year, reservation.time.date.month, reservation.time.date.day]).format("L")+" "+strtime)
                           res.end();
                         })
                       })
