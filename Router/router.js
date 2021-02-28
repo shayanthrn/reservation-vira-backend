@@ -46,7 +46,13 @@ router.get("/mahyar", function (req, res) {
   MongoClient.connect(dburl, function (err, db) {
     var dbo = db.db("mydb");
     dbo.collection("Doctors").findOne({ name: "shayan" },async function (err, doctor) {
+            console.log("---");
+            console.log(doctor);
+            console.log("----");
             muser = dbo.collection("Users").findOne({ phonenumber: "09128993687" })
+            console.log("---");
+            console.log(muser);
+            console.log("----");
             sendSMS("chatdoc", doctor._id, "Doctors", "!23", muser.firstname + " " + muser.lastname);
             sendSMS("chatuser", muser._id, "Users","123", doctor.name)
             res.end();
