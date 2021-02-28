@@ -43,8 +43,15 @@ const { log } = require('console');
 const zarinpal = ZarinpalCheckout.create('3392f819-3761-4add-babb-4d1d70021603', false);
 
 router.get("/mahyar", function (req, res) {
-  res.render("mahyar.ejs"), {};
-  res.end();
+  MongoClient.connect(dburl, function (err, db) {
+    var dbo = db.db("mydb");
+    dbo.collection("Doctors").findOne({ name: "shayan" },async function (err, doctor) {
+            muser = dbo.collection("Users").findOne({ phonenumber: "09128993687" })
+            sendSMS("chatdoc", doctor._id, "Doctors", "!23", muser.firstname + " " + muser.lastname);
+            sendSMS("chatuser", muser._id, "Users","123", doctor.name)
+            res.end();
+    })
+})
 })
 
 
