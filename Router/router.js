@@ -6312,8 +6312,8 @@ router.post("/ticketpaymenthandler", function (req, res) {
                           changestatustransaction(req.body.ResNum, "موفق");
                           res.render("paymentaccept.ejs", { doctor: doctor, time: "-", resid: mychat.refid, chat: 1, doc: 1 });
                           muser=await dbo.collection("Users").findOne({ phonenumber: mychat.userphone })
-                          sendSMS("chatdoc",doctor._id,"Doctors",new persianDate([reservation.time.date.year, reservation.time.date.month, reservation.time.date.day]).format("L"),muser.firstname+" "+muser.lastname);
-                          sendSMS("chatuser",muser._id,"Users",new persianDate([reservation.time.date.year, reservation.time.date.month, reservation.time.date.day]).format("L"),doctor.name)
+                          sendSMS("chatdoc",doctor._id,"Doctors",new persianDate().format("L"),muser.firstname+" "+muser.lastname);
+                          sendSMS("chatuser",muser._id,"Users",new persianDate().format("L"),doctor.name)
                           res.end();
                         })
                       })
